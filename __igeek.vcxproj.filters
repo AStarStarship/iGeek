@@ -5,406 +5,109 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="./\_seams">
+    <Filter Include="./\_Seams">
       <UniqueIdentifier>{88d27d96-2f20-40fc-976a-1e83c0f7357e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="kabuki.toolkit">
-      <UniqueIdentifier>{811823e8-437f-46d2-9721-1b6399bc7c0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="script2">
-      <UniqueIdentifier>{be201b02-2596-4ccb-b032-a6cf72be0d83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="./\imaging">
-      <UniqueIdentifier>{ae5b118e-594c-454f-acaa-922e671d8cd8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="environment.h">
-      <Filter>./</Filter>
-    </ClInclude>
-    <ClInclude Include="_seams\release.h">
-      <Filter>./\_seams</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>./</Filter>
-    </ClInclude>
-    <ClInclude Include="_seams\_config.h">
-      <Filter>./\_seams</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\stack.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\strand.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\stringf.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\stringf.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\table.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\test.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\test.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\typevalue.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\typevalue.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\uniprinter.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\varint.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\wall.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\wall.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\_config.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\address.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\args.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\array.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\array.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\autoject.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\avalue.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\bin.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\binary.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\book.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\bout.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\bsq.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\buffer.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\cin.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\clock.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\clock.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\cout.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\crabs.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\dic.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\door.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\error.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\event.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\file.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\file.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\floor.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\folder.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\interrupts.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\iterator.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\language.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\library.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\list.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\loom.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\map.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\matrix.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\mirror.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\op.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\operand.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\puff.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\puff.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\rng.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\room.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\set.hpp">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\script2\slot.h">
-      <Filter>script2</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_DDS.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_DDS_c.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_ext.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_ext_c.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_pkm.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_pkm_c.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_pvr.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stbi_pvr_c.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\etc1_utils.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\image_DXT.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\image_helper.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\jo_jpeg.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\pkm_helper.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\pvr_helper.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\SOIL2.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stb_image.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-    <ClInclude Include="imaging\stb_image_write.h">
-      <Filter>./\imaging</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="_seams\_release.inl">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\_Release.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_seams\_seams.inl">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\_Seams.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_seams\_undef.inl">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\_Undef.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_seams\00.core.inl">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\00.Core.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_seams\readme.md">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\01.ImageBMP.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_seams\_debug.inl">
-      <Filter>./\_seams</Filter>
+    <None Include="_Seams\02.OpenGLHelloWorld.inl">
+      <Filter>./\_Seams</Filter>
     </None>
-    <None Include="core.vs">
+    <None Include="_Seams\ReadMe.md">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Debug.inl">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="Env.inl">
       <Filter>./</Filter>
     </None>
-    <None Include="core.frag">
+    <None Include="EnvGoal.inl">
       <Filter>./</Filter>
     </None>
-    <None Include="environment.inl">
+    <None Include="Gym.inl">
       <Filter>./</Filter>
     </None>
-    <None Include="..\script2\stringf.inl">
-      <Filter>script2</Filter>
+    <None Include="ReadMe.md">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\tasks.json">
-      <Filter>script2</Filter>
+    <None Include="EnvReward.inl">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\test.inl">
-      <Filter>script2</Filter>
+    <None Include="School.inl">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\typevalue.inl">
-      <Filter>script2</Filter>
+    <None Include="SchoolCourse.inl">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\_config_default.inl">
-      <Filter>script2</Filter>
+    <None Include="Multiverse.inl">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\_config_footer.inl">
-      <Filter>script2</Filter>
+    <None Include="SchoolDegree.inl">
+      <Filter>./</Filter>
     </None>
-    <None Include="..\script2\_config_header.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\_debug.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\_impl.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\_release.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\_undef.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\array.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\bin.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\bout.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\bsq.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\cin.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\clock.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\cout.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\crabs.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\error.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\event.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\file.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\floor.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\folder.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\interrupts.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\morsecode.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\op.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\operand.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\puff.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\readme.md">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\rng.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\room.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="..\script2\slot.inl">
-      <Filter>script2</Filter>
-    </None>
-    <None Include="imaging\_impl.inl">
-      <Filter>./\imaging</Filter>
-    </None>
-    <None Include="imaging\etc1_utils.inl">
-      <Filter>./\imaging</Filter>
-    </None>
-    <None Include="imaging\image_DXT.inl">
-      <Filter>./\imaging</Filter>
-    </None>
-    <None Include="imaging\image_helper.inl">
-      <Filter>./\imaging</Filter>
-    </None>
-    <None Include="imaging\SOIL2.inl">
-      <Filter>./\imaging</Filter>
+    <None Include="SchoolDepartment.inl">
+      <Filter>./</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="_seams\CMakeLists.txt">
-      <Filter>./\_seams</Filter>
-    </Text>
-    <Text Include="..\script2\CMakeLists.txt">
-      <Filter>script2</Filter>
-    </Text>
+    <ClInclude Include="_Seams\Release.h">
+      <Filter>./\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="_Seams\_Config.h">
+      <Filter>./\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="Env.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvGoal.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Gym.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvReward.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="SchoolCourse.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="School.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Multiverse.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="SchoolDegree.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="SchoolDepartment.h">
+      <Filter>./</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="_seams\_main.cpp">
-      <Filter>./\_seams</Filter>
+    <ClCompile Include="_Seams\_Main.cpp">
+      <Filter>./\_Seams</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_Seams\CMakeLists.txt">
+      <Filter>./\_Seams</Filter>
+    </Text>
   </ItemGroup>
 </Project>

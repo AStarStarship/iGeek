@@ -1,6 +1,6 @@
 # Docs
 
-This folder contains miscellaneous documentation. Please consult the root repo [readme.md](../readme.md) file for instructions to get started.
+This folder contains miscellaneous documentation. Please consult the root repo [readme.md](../) file for instructions to get started.
 
 ## Documents
 
@@ -11,3 +11,9 @@ This folder contains miscellaneous documentation. Please consult the root repo [
 * [issue_template.md](./issue_template.md)
 * [pull_request_template.md](./pull_request_template.md)
 * [roadmap.md](./roadmap.md)
+
+## License
+
+Copyright 2020-21 © [Kabuki Starship](https://kabukistarship.com).
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at <https://mozilla.org/MPL/2.0/>.

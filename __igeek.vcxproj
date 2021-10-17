@@ -18,12 +18,51 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Env.inl" />
+    <None Include="EnvGoal.inl" />
+    <None Include="EnvReward.inl" />
+    <None Include="Gym.inl" />
+    <None Include="Multiverse.inl" />
+    <None Include="ReadMe.md" />
+    <None Include="School.inl" />
+    <None Include="SchoolCourse.inl" />
+    <None Include="SchoolDegree.inl" />
+    <None Include="SchoolDepartment.inl" />
+    <None Include="_Seams\00.Core.inl" />
+    <None Include="_Seams\01.ImageBMP.inl" />
+    <None Include="_Seams\02.OpenGLHelloWorld.inl" />
+    <None Include="_Seams\ReadMe.md" />
+    <None Include="_Seams\_Debug.inl" />
+    <None Include="_Seams\_Release.inl" />
+    <None Include="_Seams\_Seams.inl" />
+    <None Include="_Seams\_Undef.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Env.h" />
+    <ClInclude Include="EnvGoal.h" />
+    <ClInclude Include="EnvReward.h" />
+    <ClInclude Include="Gym.h" />
+    <ClInclude Include="Multiverse.h" />
+    <ClInclude Include="School.h" />
+    <ClInclude Include="SchoolCourse.h" />
+    <ClInclude Include="SchoolDegree.h" />
+    <ClInclude Include="SchoolDepartment.h" />
+    <ClInclude Include="_Seams\Release.h" />
+    <ClInclude Include="_Seams\_Config.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_Seams\_Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_Seams\CMakeLists.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{6094E54E-8DD4-40E0-89B0-D9E17A77B50C}</ProjectGuid>
     <RootNamespace>igeek</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>igeek</ProjectName>
+    <ProjectName>iGeek</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -88,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)./;$(ProjectDir)./../../;$(SolutionDir)./../SDL2-2.0.10/include;$(SolutionDir)./../glew-2.1/include;$(SolutionDir)../glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)./;($ProjectDir)./_Seams;$(ProjectDir)./../</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,141 +180,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\script2\address.h" />
-    <ClInclude Include="..\script2\args.h" />
-    <ClInclude Include="..\script2\array.h" />
-    <ClInclude Include="..\script2\array.hpp" />
-    <ClInclude Include="..\script2\autoject.h" />
-    <ClInclude Include="..\script2\avalue.hpp" />
-    <ClInclude Include="..\script2\bin.hpp" />
-    <ClInclude Include="..\script2\binary.hpp" />
-    <ClInclude Include="..\script2\book.hpp" />
-    <ClInclude Include="..\script2\bout.h" />
-    <ClInclude Include="..\script2\bsq.h" />
-    <ClInclude Include="..\script2\buffer.h" />
-    <ClInclude Include="..\script2\cin.h" />
-    <ClInclude Include="..\script2\clock.h" />
-    <ClInclude Include="..\script2\clock.hpp" />
-    <ClInclude Include="..\script2\cout.h" />
-    <ClInclude Include="..\script2\crabs.h" />
-    <ClInclude Include="..\script2\dic.hpp" />
-    <ClInclude Include="..\script2\door.hpp" />
-    <ClInclude Include="..\script2\error.h" />
-    <ClInclude Include="..\script2\event.h" />
-    <ClInclude Include="..\script2\file.h" />
-    <ClInclude Include="..\script2\file.hpp" />
-    <ClInclude Include="..\script2\floor.h" />
-    <ClInclude Include="..\script2\folder.h" />
-    <ClInclude Include="..\script2\interrupts.h" />
-    <ClInclude Include="..\script2\iterator.h" />
-    <ClInclude Include="..\script2\language.h" />
-    <ClInclude Include="..\script2\library.hpp" />
-    <ClInclude Include="..\script2\list.hpp" />
-    <ClInclude Include="..\script2\loom.hpp" />
-    <ClInclude Include="..\script2\map.hpp" />
-    <ClInclude Include="..\script2\matrix.hpp" />
-    <ClInclude Include="..\script2\mirror.h" />
-    <ClInclude Include="..\script2\op.h" />
-    <ClInclude Include="..\script2\operand.h" />
-    <ClInclude Include="..\script2\puff.h" />
-    <ClInclude Include="..\script2\puff.hpp" />
-    <ClInclude Include="..\script2\rng.h" />
-    <ClInclude Include="..\script2\room.h" />
-    <ClInclude Include="..\script2\set.hpp" />
-    <ClInclude Include="..\script2\slot.h" />
-    <ClInclude Include="..\script2\stack.hpp" />
-    <ClInclude Include="..\script2\strand.hpp" />
-    <ClInclude Include="..\script2\stringf.h" />
-    <ClInclude Include="..\script2\stringf.hpp" />
-    <ClInclude Include="..\script2\table.hpp" />
-    <ClInclude Include="..\script2\test.h" />
-    <ClInclude Include="..\script2\test.hpp" />
-    <ClInclude Include="..\script2\typevalue.h" />
-    <ClInclude Include="..\script2\typevalue.hpp" />
-    <ClInclude Include="..\script2\uniprinter.hpp" />
-    <ClInclude Include="..\script2\varint.h" />
-    <ClInclude Include="..\script2\wall.h" />
-    <ClInclude Include="..\script2\wall.hpp" />
-    <ClInclude Include="..\script2\_config.h" />
-    <ClInclude Include="environment.h" />
-    <ClInclude Include="imaging\etc1_utils.h" />
-    <ClInclude Include="imaging\image_DXT.h" />
-    <ClInclude Include="imaging\image_helper.h" />
-    <ClInclude Include="imaging\jo_jpeg.h" />
-    <ClInclude Include="imaging\pkm_helper.h" />
-    <ClInclude Include="imaging\pvr_helper.h" />
-    <ClInclude Include="imaging\SOIL2.h" />
-    <ClInclude Include="imaging\stbi_DDS.h" />
-    <ClInclude Include="imaging\stbi_DDS_c.h" />
-    <ClInclude Include="imaging\stbi_ext.h" />
-    <ClInclude Include="imaging\stbi_ext_c.h" />
-    <ClInclude Include="imaging\stbi_pkm.h" />
-    <ClInclude Include="imaging\stbi_pkm_c.h" />
-    <ClInclude Include="imaging\stbi_pvr.h" />
-    <ClInclude Include="imaging\stbi_pvr_c.h" />
-    <ClInclude Include="imaging\stb_image.h" />
-    <ClInclude Include="imaging\stb_image_write.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="_seams\release.h" />
-    <ClInclude Include="_seams\_config.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\script2\array.inl" />
-    <None Include="..\script2\bin.inl" />
-    <None Include="..\script2\bout.inl" />
-    <None Include="..\script2\bsq.inl" />
-    <None Include="..\script2\cin.inl" />
-    <None Include="..\script2\clock.inl" />
-    <None Include="..\script2\cout.inl" />
-    <None Include="..\script2\crabs.inl" />
-    <None Include="..\script2\error.inl" />
-    <None Include="..\script2\event.inl" />
-    <None Include="..\script2\file.inl" />
-    <None Include="..\script2\floor.inl" />
-    <None Include="..\script2\folder.inl" />
-    <None Include="..\script2\interrupts.inl" />
-    <None Include="..\script2\morsecode.inl" />
-    <None Include="..\script2\op.inl" />
-    <None Include="..\script2\operand.inl" />
-    <None Include="..\script2\puff.inl" />
-    <None Include="..\script2\readme.md" />
-    <None Include="..\script2\rng.inl" />
-    <None Include="..\script2\room.inl" />
-    <None Include="..\script2\slot.inl" />
-    <None Include="..\script2\stringf.inl" />
-    <None Include="..\script2\tasks.json" />
-    <None Include="..\script2\test.inl" />
-    <None Include="..\script2\typevalue.inl" />
-    <None Include="..\script2\_config_default.inl" />
-    <None Include="..\script2\_config_footer.inl" />
-    <None Include="..\script2\_config_header.inl" />
-    <None Include="..\script2\_debug.inl" />
-    <None Include="..\script2\_impl.inl" />
-    <None Include="..\script2\_release.inl" />
-    <None Include="..\script2\_undef.inl" />
-    <None Include="core.frag" />
-    <None Include="core.vs" />
-    <None Include="environment.inl" />
-    <None Include="imaging\etc1_utils.inl" />
-    <None Include="imaging\image_DXT.inl" />
-    <None Include="imaging\image_helper.inl" />
-    <None Include="imaging\SOIL2.inl" />
-    <None Include="imaging\_impl.inl" />
-    <None Include="_seams\00.core.inl" />
-    <None Include="_seams\readme.md" />
-    <None Include="_seams\_debug.inl" />
-    <None Include="_seams\_release.inl" />
-    <None Include="_seams\_seams.inl" />
-    <None Include="_seams\_undef.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\script2\CMakeLists.txt" />
-    <Text Include="_seams\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="_seams\_main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

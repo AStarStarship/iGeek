@@ -1,6 +1,24 @@
-#include "../../kabuki.toolkit/_seams/_seams.inl"
+#include "../../KT/_Seams/_Seams.inl"
 
-#define IGEEK KABUKI_TOOLKIT_RELEASE
+#define iGeek KABUKITOOLKIT_RELEASE
 
-#define IGEEK_CORE IGEEK
-#define IGEEK_RELEASE IGEEK + 1
+#define SCRIPT2_CORE 1
+#define SCRIPT2_RNG 2
+#define SCRIPT2_ITOS 3
+#define SCRIPT2_FTOS 4
+#define SCRIPT2_SPRINTER 5
+#define SCRIPT2_CLOCK 6
+#define SCRIPT2_STACK 7
+#define SCRIPT2_MATRIX 8
+#define SCRIPT2_STRING 9
+#define SCRIPT2_LOOM 10
+#define SCRIPT2_LIST 11
+#define SCRIPT2_BOOK 12
+#define SCRIPT2_MAP 13
+#define SCRIPT2_TABLE 14
+#define SCRIPT2_DIC 15
+#define SCRIPT2_CRABS 16
+#define SCRIPT2_DOOR 17
+#define SCRIPT2_FILECABINET 18
+#define SCRIPT2_RELEASE 19
+#define SEAM_N SCRIPT2_RELEASE
