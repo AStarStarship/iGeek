@@ -17,14 +17,14 @@ SchoolDepartment::SchoolDepartment() {
 ISC SchoolDepartment::ClassCount() { return class_count_; }
 
 void SchoolDepartment::CreateRepo() {
-  //InitializeRepo
+  // InitializeRepo
   for (int i = 0; i < class_count_; ++i) {
+
   }
 }
 
 const Op* SchoolDepartment::Star(CHC index, Crabs* crabs) {
-  static const Op cThis = {
-    "Door",
+  static const Op cThis = { "Door",
     OpFirst('A'),
     OpFirst('A' + 0),
     "A course in a program.",
@@ -44,4 +44,6 @@ const Op* SchoolDepartment::Star(CHC index, Crabs* crabs) {
   }
   return nullptr;
 }
+
+}  // namespace _
 #endif
