@@ -1,34 +1,44 @@
-/* Interactive Gym Environment and Educaitonal Kit @version 0.x
-@link    https://github.com/KabukiStarship/iGeek.git
-@file    /EnvGoal.h
-@author  Cale McCollough <https://cookingwithcale.org>
-@license Copyright (C) 2021 Kabuki Starship (TM) <kabukistarship.com>;
-This Source Code Form is subject to the terms of the Mozilla Public License,
-v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain
-one at <https://mozilla.org/MPL/2.0/>. */
+// Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ENVGOAL_DECL
-#define IGEEK_ENVGOAL_DECL
-#include "../Script2/Operand.h"
+#ifndef IGEEK_ENVREWARD_DECL
+#define IGEEK_ENVREWARD_DECL
+#include "../ASCIICrabs/Operand.h"
 namespace _ {
 
+/* Wraps the scalar reward for one env step as a Script2 data node.
+Migrated 2026-10-07:
+  - Fixed the copy-pasted include guard (was IGEEK_ENVGOAL_DECL).
+  - `Star(CHN, ...)` -> `Star(CHC, ...)`.
+  - Dropped the `TRoom<CHD, CHD>` member (instantiating it fails — verified
+    2026-10-07, see ASCIICrabs/AGENT_PLAN.md). The scalar reward is the FPC
+    member; the optional datum container is a `Crabs*` pointer.
+*/
 class EnvReward : public Operand {
+ public:
 
-  public:
+  EnvReward() : reward_(0.0f), crabs_(NILP) {}
+  ~EnvReward() {}
 
-  EnvReward();
+  /* Script2 operation. */
+  const Op* Star(CHC index, Crabs* crabs) override;
 
-  // Scrtip2 opertaions.
-  virtual const Op* Star(CHN index, Crabs* crabs);
+  /* Set / get the scalar reward for this step. */
+  void SetReward(FPC r) { reward_ = r; }
+  FPC Reward() const { return reward_; }
 
-  private:
+  /* Optional datum container to stream the reward into (may be NILP). */
+  void SetCrabs(Crabs* c) { crabs_ = c; }
+  Crabs* GetCrabs() const { return crabs_; }
 
-  _::Room reward_;
+ private:
+
+  FPC reward_;
+  Crabs* crabs_;
 };
 
 template <typename Printer>
 Printer& PrintTo(Printer& p, const EnvReward& env_reward) {
-  return p << "\nEnvGoal";
+  return p << "\nEnvReward";
 }
 
 }  // namespace _
