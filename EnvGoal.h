@@ -1,27 +1,48 @@
-/* Interactive Gym Environment and Educaitonal Kit @version 0.x
-@link    https://github.com/KabukiStarship/iGeek.git
-@file    /EnvGoal.h
-@author  Cale McCollough <https://cookingwithcale.org>
-@license Copyright (C) 2021 Kabuki Starship (TM) <kabukistarship.com>;
-This Source Code Form is subject to the terms of the Mozilla Public License,
-v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain
-one at <https://mozilla.org/MPL/2.0/>. */
+// Copyright AStarship <https://astarship.net>.
 #pragma once
 #ifndef IGEEK_ENVGOAL_DECL
 #define IGEEK_ENVGOAL_DECL
-#include "../Script2/Operand.h"
+#include "../ASCIICrabs/Operand.h"
 namespace _ {
 
+/* A Script2 data node holding the three goals relevant to one env step:
+   the raw observation, the achieved goal, and the desired goal.
+Migrated 2026-10-07:
+  - `Star(CHN, ...)` -> `Star(CHC, ...)`: the Operand virtual is
+    `const Op* Star(CHC index, Crabs* crabs)` in the latest ASCIICrabs
+    (CHC = char32_t; School.h already used this form).
+  - `_::Room`/`TRoom` members -> `Crabs*` pointers. A `TRoom<CHD,CHD>`
+    member instantiates the buggy `TRoom::Main`/`Star` (verified 2026-10-07,
+    see ASCIICrabs/AGENT_PLAN.md) and fails to compile. The data-node role
+    (store percepts/actions as Crabs datums) is served by a `Crabs*`
+    container pointer instead — no template instantiation.
+*/
 class EnvGoal : public Operand {
+ public:
 
-  EnvGoal();
+  EnvGoal() : observation_(NILP), desired_goal_(NILP), achieved_goal_(NILP) {}
+  ~EnvGoal() {}
 
-  // Scrtip2 opertaions.
-  virtual const Op* Star(CHN index, Crabs* crabs);
+  /* Script2 operation. */
+  const Op* Star(CHC index, Crabs* crabs) override;
 
-  private:
+  /* Accessors (Puffer-informed: the policy reads observation, the reward
+  compares achieved vs desired). */
+  Crabs* Observation() { return observation_; }
+  Crabs* DesiredGoal() { return desired_goal_; }
+  Crabs* AchievedGoal() { return achieved_goal_; }
+  const Crabs* ObservationC() const { return observation_; }
 
-  _::Room observation, desired_goal, achieved_goal;
+  /* Bind a datum container to a slot (no std; the world owns the Crabs). */
+  void SetObservation(Crabs* c) { observation_ = c; }
+  void SetDesiredGoal(Crabs* c) { desired_goal_ = c; }
+  void SetAchievedGoal(Crabs* c) { achieved_goal_ = c; }
+
+ private:
+
+  Crabs* observation_;
+  Crabs* desired_goal_;
+  Crabs* achieved_goal_;
 };
 
 template <typename Printer>
