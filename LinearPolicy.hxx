@@ -69,12 +69,21 @@ class TLinearPolicy : public TPolicy {
     TTensor lse = TTensorAlloc(B, 1);
     TTensorRowLogSumExp(logits, lse);
     for (ISC b = 0; b < B; ++b) {
-      ISC best = 0;
-      FPC bestv = logits.AtC(b, 0);
-      for (ISC a = 1; a < logits.cols_; ++a)
-        if (logits.AtC(b, a) > bestv) { bestv = logits.AtC(b, a); best = a; }
-      actions[b] = best;
-      logp[b] = logits.AtC(b, best) - lse.At(b, 0);
+      // Sampled-stochastic (PufferLib's sample_logits pattern): a seeded LCG
+      // draws u in [0,1) and the action is the first index whose CDF exceeds
+      // u. Pure argmax here is a degenerate policy (zero exploration -> PPO
+      //'s gradient carries no signal and the value head can't bootstrap);
+      // the old argmax was a debugging leftover, not the design.
+      seed_ = seed_ * 6364136223846793005ULL + 1442695040888963407ULL;
+      FPC u = (FPC)(((seed_ >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
+      FPC cumsum = 0.0f;
+      ISC sampled = logits.cols_ - 1;
+      for (ISC a = 0; a < logits.cols_; ++a) {
+        cumsum += (FPC)exp(logits.AtC(b, a) - lse.At(b, 0));
+        if (u < cumsum) { sampled = a; break; }
+      }
+      actions[b] = sampled;
+      logp[b] = logits.AtC(b, sampled) - lse.At(b, 0);
     }
     TTensorFree(lse);
   }
