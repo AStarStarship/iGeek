@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\iGeek\Env.h" />
+    <ClInclude Include="..\iGeek\EnvGoal.hpp" />
+    <ClInclude Include="..\iGeek\Shader.h" />
+    <ClInclude Include="..\iGeek\_Seams\Release.h" />
+    <ClInclude Include="..\iGeek\_Seams\_Config.h" />
+    <ClInclude Include="..\KabukiToolkit\AppClient.h" />
+    <ClInclude Include="..\KabukiToolkit\AppServer.h" />
+    <ClInclude Include="..\KabukiToolkit\Audio\SoundWave.h" />
+    <ClInclude Include="..\KabukiToolkit\Audio\SoundWave.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Code\CodeModule.h" />
+    <ClInclude Include="..\KabukiToolkit\Code\CommentStripper.h" />
+    <ClInclude Include="..\KabukiToolkit\Code\Include.h" />
+    <ClInclude Include="..\KabukiToolkit\Code\stb_c_lexer.h" />
+    <ClInclude Include="..\KabukiToolkit\Code\stb_leakcheck.h" />
+    <ClInclude Include="..\KabukiToolkit\Document.h" />
+    <ClInclude Include="..\KabukiToolkit\Forms\Validator.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\etc1_utils.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\image_DXT.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\image_helper.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\jo_jpeg.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\pkm_helper.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\pvr_helper.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\SOIL2.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_DDS.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_DDS_c.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_ext.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_ext_c.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pkm.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pkm_c.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pvr.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pvr_c.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stb_image.h" />
+    <ClInclude Include="..\KabukiToolkit\Image\stb_image_write.h" />
+    <ClInclude Include="..\KabukiToolkit\IMUL\Doxygen.h" />
+    <ClInclude Include="..\KabukiToolkit\IMUL\Parser.h" />
+    <ClInclude Include="..\KabukiToolkit\IMUL\UML.h" />
+    <ClInclude Include="..\KabukiToolkit\Package.h" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Git.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Global.h" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Issue.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Mission.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Project.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Schedule.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Task.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\Workspace.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Pro\_Config.h" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ADSR.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Button.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonDMX.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonDummy.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonEvent.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMacro.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMidi.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMode.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonPage.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonRadio.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonScroller.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonSwap.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonWidget.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ChannelGroup.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Component.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlDMX.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Controller.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControllerISymmetric.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMaster.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMatrix.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMidi.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlXY.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Event.h" />
+    <ClInclude Include="..\KabukiToolkit\Touch\GlobalConfig.h" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Library.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Mixer.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\MixerChannel.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\MixerPage.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Param.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\ParamSet.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Set.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Tag.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\TagLibrary.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\Widget.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetManager.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetMidi.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetPage.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Touch\_Config.h" />
+    <ClInclude Include="..\KabukiToolkit\Who\Acount.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Address.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\AddressEmail.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Authenticator.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\AuthenticatorDefault.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Entity.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\EntityGroup.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\EntityList.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Global.h" />
+    <ClInclude Include="..\KabukiToolkit\Who\Handle.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Name.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Organization.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Password.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Person.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Privilege.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Profile.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Registrar.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Relationship.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Role.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Roster.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\Symbol.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\UIDAssigner.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\User.hpp" />
+    <ClInclude Include="..\KabukiToolkit\Who\UserList.hpp" />
+    <ClInclude Include="..\KabukiToolkit\_Seams\Code\01.StripComments.h" />
+    <ClInclude Include="..\KabukiToolkit\_Seams\Code\01.StripComments.SourceExampleWithoutComments.h" />
+    <ClInclude Include="..\KabukiToolkit\_Seams\_Config.h" />
+    <ClInclude Include="..\Crabs\Address.h" />
+    <ClInclude Include="..\Crabs\Args.h" />
+    <ClInclude Include="..\Crabs\Array.h" />
+    <ClInclude Include="..\Crabs\Array.hpp" />
+    <ClInclude Include="..\Crabs\Autoject.h" />
+    <ClInclude Include="..\Crabs\BIn.h" />
+    <ClInclude Include="..\Crabs\BIn.hpp" />
+    <ClInclude Include="..\Crabs\Binary.hpp" />
+    <ClInclude Include="..\Crabs\Book.hpp" />
+    <ClInclude Include="..\Crabs\BOut.h" />
+    <ClInclude Include="..\Crabs\BOut.hpp" />
+    <ClInclude Include="..\Crabs\BSeq.h" />
+    <ClInclude Include="..\Crabs\BSeq.hpp" />
+    <ClInclude Include="..\Crabs\Buffer.h" />
+    <ClInclude Include="..\Crabs\CIn.h" />
+    <ClInclude Include="..\Crabs\Clock.h" />
+    <ClInclude Include="..\Crabs\Clock.hpp" />
+    <ClInclude Include="..\Crabs\COut.h" />
+    <ClInclude Include="..\Crabs\Crabs.h" />
+    <ClInclude Include="..\Crabs\Dic.hpp" />
+    <ClInclude Include="..\Crabs\Door.hpp" />
+    <ClInclude Include="..\Crabs\Error.h" />
+    <ClInclude Include="..\Crabs\Event.h" />
+    <ClInclude Include="..\Crabs\File.h" />
+    <ClInclude Include="..\Crabs\File.hpp" />
+    <ClInclude Include="..\Crabs\Floor.h" />
+    <ClInclude Include="..\Crabs\Folder.h" />
+    <ClInclude Include="..\Crabs\Hash.hpp" />
+    <ClInclude Include="..\Crabs\Interrupts.h" />
+    <ClInclude Include="..\Crabs\Iterator.h" />
+    <ClInclude Include="..\Crabs\Language.h" />
+    <ClInclude Include="..\Crabs\Library.hpp" />
+    <ClInclude Include="..\Crabs\List.hpp" />
+    <ClInclude Include="..\Crabs\Loom.hpp" />
+    <ClInclude Include="..\Crabs\Map.hpp" />
+    <ClInclude Include="..\Crabs\Matrix.hpp" />
+    <ClInclude Include="..\Crabs\Mirror.h" />
+    <ClInclude Include="..\Crabs\Op.h" />
+    <ClInclude Include="..\Crabs\Op.hpp" />
+    <ClInclude Include="..\Crabs\Operand.h" />
+    <ClInclude Include="..\Crabs\Puff.h" />
+    <ClInclude Include="..\Crabs\Puff.hpp" />
+    <ClInclude Include="..\Crabs\RNG.h" />
+    <ClInclude Include="..\Crabs\Room.h" />
+    <ClInclude Include="..\Crabs\Set.hpp" />
+    <ClInclude Include="..\Crabs\Slot.h" />
+    <ClInclude Include="..\Crabs\Slot.hpp" />
+    <ClInclude Include="..\Crabs\Stack.hpp" />
+    <ClInclude Include="..\Crabs\String.hpp" />
+    <ClInclude Include="..\Crabs\Stringf.h" />
+    <ClInclude Include="..\Crabs\Stringf.hpp" />
+    <ClInclude Include="..\Crabs\Table.hpp" />
+    <ClInclude Include="..\Crabs\Test.h" />
+    <ClInclude Include="..\Crabs\Test.hpp" />
+    <ClInclude Include="..\Crabs\TypeValue.h" />
+    <ClInclude Include="..\Crabs\TypeValue.hpp" />
+    <ClInclude Include="..\Crabs\Uniprinter.hpp" />
+    <ClInclude Include="..\Crabs\Varint.h" />
+    <ClInclude Include="..\Crabs\Wall.h" />
+    <ClInclude Include="..\Crabs\Wall.hpp" />
+    <ClInclude Include="..\Crabs\_Config.h" />
+    <ClInclude Include="..\Crabs\_Seams\TestWords.h" />
+    <ClInclude Include="..\Crabs\_Seams\_Config.h" />
+    <ClInclude Include="Blackjack.h" />
+    <ClInclude Include="BlackjackCardCombo.h" />
+    <ClInclude Include="BlackjackDealer.h" />
+    <ClInclude Include="BlackjackHand.h" />
+    <ClInclude Include="BlackjackPlayer.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="CardCombo.h" />
+    <ClInclude Include="CardStack.h" />
+    <ClInclude Include="Dealer.h" />
+    <ClInclude Include="Deck.h" />
+    <ClInclude Include="DeckDefault.h" />
+    <ClInclude Include="Hand.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="_Config.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\iGeek\core.frag" />
+    <None Include="..\iGeek\core.vs" />
+    <None Include="..\iGeek\Env.hxx" />
+    <None Include="..\iGeek\README.md" />
+    <None Include="..\iGeek\_Seams\00.Core.hxx" />
+    <None Include="..\iGeek\_Seams\01.ImageBMP.hxx" />
+    <None Include="..\iGeek\_Seams\02.OpenGLHelloWorld.hxx" />
+    <None Include="..\iGeek\_Seams\README.md" />
+    <None Include="..\iGeek\_Seams\_Debug.hxx" />
+    <None Include="..\iGeek\_Seams\_Release.hxx" />
+    <None Include="..\iGeek\_Seams\_Seams.hxx" />
+    <None Include="..\iGeek\_Seams\_Undef.hxx" />
+    <None Include="..\KabukiToolkit\AppClient.hxx" />
+    <None Include="..\KabukiToolkit\AppServer.hxx" />
+    <None Include="..\KabukiToolkit\Audio\README.md" />
+    <None Include="..\KabukiToolkit\Code\CodeModule.hxx" />
+    <None Include="..\KabukiToolkit\Code\CommentStripper.hxx" />
+    <None Include="..\KabukiToolkit\Code\Include.hxx" />
+    <None Include="..\KabukiToolkit\Code\README.md" />
+    <None Include="..\KabukiToolkit\Code\stb_c_lexer.hxx" />
+    <None Include="..\KabukiToolkit\Code\stb_leakcheck.hxx" />
+    <None Include="..\KabukiToolkit\Code\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\Data\README.md" />
+    <None Include="..\KabukiToolkit\Document.hxx" />
+    <None Include="..\KabukiToolkit\Forms\README.md" />
+    <None Include="..\KabukiToolkit\GUI\README.md" />
+    <None Include="..\KabukiToolkit\GUI\_Package.hxx" />
+    <None Include="..\KabukiToolkit\Image\etc1_utils.hxx" />
+    <None Include="..\KabukiToolkit\Image\image_DXT.hxx" />
+    <None Include="..\KabukiToolkit\Image\image_helper.hxx" />
+    <None Include="..\KabukiToolkit\Image\README.md" />
+    <None Include="..\KabukiToolkit\Image\SOIL2.hxx" />
+    <None Include="..\KabukiToolkit\Image\_Package.hxx" />
+    <None Include="..\KabukiToolkit\IMUL\README.md" />
+    <None Include="..\KabukiToolkit\IMUL\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\Package.hxx" />
+    <None Include="..\KabukiToolkit\Pro\README.md" />
+    <None Include="..\KabukiToolkit\Pro\_Config.hxx" />
+    <None Include="..\KabukiToolkit\Pro\_Debug.hxx" />
+    <None Include="..\KabukiToolkit\Pro\_Library.hxx" />
+    <None Include="..\KabukiToolkit\Pro\_Release.hxx" />
+    <None Include="..\KabukiToolkit\Pro\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\Pro\_Undef.hxx" />
+    <None Include="..\KabukiToolkit\README.md" />
+    <None Include="..\KabukiToolkit\Touch\README.md" />
+    <None Include="..\KabukiToolkit\Touch\_Config.hxx" />
+    <None Include="..\KabukiToolkit\Touch\_Debug.hxx" />
+    <None Include="..\KabukiToolkit\Touch\_Library.hxx" />
+    <None Include="..\KabukiToolkit\Touch\_Release.hxx" />
+    <None Include="..\KabukiToolkit\Touch\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\Touch\_Undef.hxx" />
+    <None Include="..\KabukiToolkit\Who\README.md" />
+    <None Include="..\KabukiToolkit\Who\_Config.hxx" />
+    <None Include="..\KabukiToolkit\Who\_Debug.hxx" />
+    <None Include="..\KabukiToolkit\Who\_Library.hxx" />
+    <None Include="..\KabukiToolkit\Who\_Release.hxx" />
+    <None Include="..\KabukiToolkit\Who\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\Who\_Undef.hxx" />
+    <None Include="..\KabukiToolkit\_Package.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Audio\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Audio\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Code\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Data\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Data\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Forms\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Forms\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\GUI\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\GUI\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Image\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Image\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Imul\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Imul\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Pro\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Pro\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Release.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Touch\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Touch\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\Who\00.Core.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\Who\README.md" />
+    <None Include="..\KabukiToolkit\_Seams\_Debug.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\_Release.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\_Seams.hxx" />
+    <None Include="..\KabukiToolkit\_Seams\_Undef.hxx" />
+    <None Include="..\Crabs\Array.hxx" />
+    <None Include="..\Crabs\BIn.hxx" />
+    <None Include="..\Crabs\BOut.hxx" />
+    <None Include="..\Crabs\BSeq.hxx" />
+    <None Include="..\Crabs\CIn.hxx" />
+    <None Include="..\Crabs\Clock.hxx" />
+    <None Include="..\Crabs\COut.hxx" />
+    <None Include="..\Crabs\Crabs.hxx" />
+    <None Include="..\Crabs\Error.hxx" />
+    <None Include="..\Crabs\File.hxx" />
+    <None Include="..\Crabs\Floor.hxx" />
+    <None Include="..\Crabs\Folder.hxx" />
+    <None Include="..\Crabs\Interrupts.hxx" />
+    <None Include="..\Crabs\MorseCode.hxx" />
+    <None Include="..\Crabs\Op.hxx" />
+    <None Include="..\Crabs\Operand.hxx" />
+    <None Include="..\Crabs\Puff.hxx" />
+    <None Include="..\Crabs\README.md" />
+    <None Include="..\Crabs\RNG.hxx" />
+    <None Include="..\Crabs\Room.hxx" />
+    <None Include="..\Crabs\Slot.hxx" />
+    <None Include="..\Crabs\Stringf.hxx" />
+    <None Include="..\Crabs\Tasks.json" />
+    <None Include="..\Crabs\Test.hxx" />
+    <None Include="..\Crabs\TypeValue.hxx" />
+    <None Include="..\Crabs\_ConfigDefault.hxx" />
+    <None Include="..\Crabs\_ConfigFooter.hxx" />
+    <None Include="..\Crabs\_ConfigHeader.hxx" />
+    <None Include="..\Crabs\_Debug.hxx" />
+    <None Include="..\Crabs\_Package.hxx" />
+    <None Include="..\Crabs\_Release.hxx" />
+    <None Include="..\Crabs\_Seams\00.Core.hxx" />
+    <None Include="..\Crabs\_Seams\01.RNG.hxx" />
+    <None Include="..\Crabs\_Seams\01.Uniscanner.hxx" />
+    <None Include="..\Crabs\_Seams\02.ItoS.hxx" />
+    <None Include="..\Crabs\_Seams\02.Socket.hxx" />
+    <None Include="..\Crabs\_Seams\03.FtoS.hxx" />
+    <None Include="..\Crabs\_Seams\04.SPrinter.hxx" />
+    <None Include="..\Crabs\_Seams\05.Clock.hxx" />
+    <None Include="..\Crabs\_Seams\06.Stack.hxx" />
+    <None Include="..\Crabs\_Seams\07.Matrix.hxx" />
+    <None Include="..\Crabs\_Seams\08.String.hxx" />
+    <None Include="..\Crabs\_Seams\09.Loom.hxx" />
+    <None Include="..\Crabs\_Seams\10.List.hxx" />
+    <None Include="..\Crabs\_Seams\11.Book.hxx" />
+    <None Include="..\Crabs\_Seams\12.Map.hxx" />
+    <None Include="..\Crabs\_Seams\13.Table.hxx" />
+    <None Include="..\Crabs\_Seams\14.Dic.hxx" />
+    <None Include="..\Crabs\_Seams\15.Crabs.hxx" />
+    <None Include="..\Crabs\_Seams\16.Door.hxx" />
+    <None Include="..\Crabs\_Seams\17.Room.hxx" />
+    <None Include="..\Crabs\_Seams\17.Seam.s2" />
+    <None Include="..\Crabs\_Seams\18.Release.hxx" />
+    <None Include="..\Crabs\_Seams\README.md" />
+    <None Include="..\Crabs\_Seams\_Seams.hxx" />
+    <None Include="..\Crabs\_Seams\_Tests.hxx" />
+    <None Include="..\Crabs\_Undef.hxx" />
+    <None Include="BlackjackCardCombo.hxx" />
+    <None Include="BlackjackDealer.hxx" />
+    <None Include="BlackjackHand.hxx" />
+    <None Include="BlackjackPlayer.hxx" />
+    <None Include="Card.hxx" />
+    <None Include="CardCombo.hxx" />
+    <None Include="CardDeckDefault.hxx" />
+    <None Include="CardStack.hxx" />
+    <None Include="Dealer.hxx" />
+    <None Include="Deck.hxx" />
+    <None Include="DeckDefault.hxx" />
+    <None Include="Hand.hxx" />
+    <None Include="Player.hxx" />
+    <None Include="README.md" />
+    <None Include="_Impl.hxx" />
+    <None Include="_seams\00.CardStack.hxx" />
+    <None Include="_seams\01.Hand.hxx" />
+    <None Include="_seams\02.Deck.hxx" />
+    <None Include="_seams\03.Blackjack.hxx" />
+    <None Include="_seams\README.md" />
+    <None Include="_seams\Release.hxx" />
+    <None Include="_seams\_Debug.hxx" />
+    <None Include="_seams\_Release.hxx" />
+    <None Include="_seams\_Undef.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\iGeek\_Seams\CMakeLists.txt" />
+    <Text Include="..\KabukiToolkit\_Seams\CMakeFiles.txt" />
+    <Text Include="..\Crabs\CMakeLists.txt" />
+    <Text Include="..\Crabs\_Seams\CMakeLists.txt" />
+    <Text Include="_seams\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\iGeek\_Seams\_Main.cpp" />
+    <ClCompile Include="..\KabukiToolkit\_Seams\_Main.cpp" />
+    <ClCompile Include="..\Crabs\_Seams\_Main.cpp" />
+    <ClCompile Include="_seams\Main.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{685AADEC-4758-429A-93CD-DF62D126379E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>kabukicardsconsole</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>iGeek.CardsWorld</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)./;($ProjectDir)./_Seams;$(ProjectDir)./../</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
