@@ -1,0 +1,1184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="./">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Crabs">
+      <UniqueIdentifier>{45a0cbca-e225-45ae-97fa-e13f4cbf62fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crabs\_Seams">
+      <UniqueIdentifier>{ea743d6e-ec58-411b-9325-c82fa625ebd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit">
+      <UniqueIdentifier>{47d979c0-a403-4bd4-8eb1-a2d63d7813d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Audio">
+      <UniqueIdentifier>{8816dd36-fbf2-4c67-85be-39ca808e07af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Code">
+      <UniqueIdentifier>{acaaaedb-661a-419a-8520-e314befa3d16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Data">
+      <UniqueIdentifier>{65970460-48f2-4e80-a554-3ee2b0d90358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Forms">
+      <UniqueIdentifier>{d46f1717-f3f6-472f-8bde-f51a748c57b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\GUI">
+      <UniqueIdentifier>{6fa0946f-c602-4f98-9a89-ed901887babd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Image">
+      <UniqueIdentifier>{946eb5d3-ea90-456b-88c8-0ec540c2b24a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\IMUL">
+      <UniqueIdentifier>{3175ddaa-01dc-4265-be2b-5646d8e02b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Pro">
+      <UniqueIdentifier>{386baaee-0c23-4b8c-866d-f4e5cc48e6a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Touch">
+      <UniqueIdentifier>{a3ab5683-f870-479c-acf4-87eeeb2f09d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\Who">
+      <UniqueIdentifier>{0b1b2e9f-4972-44c1-ac60-6bfe733ad460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams">
+      <UniqueIdentifier>{84e64e57-e357-4ff5-97f6-c6cafdfede43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Audio">
+      <UniqueIdentifier>{e45f859c-232d-414e-a60f-8857818f244c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Code">
+      <UniqueIdentifier>{c73c80db-6a43-4933-8190-27165fe0e492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Data">
+      <UniqueIdentifier>{418a9b18-29be-476d-9183-adb105c6e62b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Forms">
+      <UniqueIdentifier>{2a5a592d-6e03-4f73-aece-5d1b2716c3d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\GUI">
+      <UniqueIdentifier>{8b3b3bda-df10-45f1-84d7-5d13860be59b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Image">
+      <UniqueIdentifier>{d5a491f1-7643-4831-897c-8648c90a809f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\IMUL">
+      <UniqueIdentifier>{0fe28712-d55a-4538-8e7f-1612383ae538}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Pro">
+      <UniqueIdentifier>{44f9a7c4-8797-4091-85a4-bce27bfbe680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Touch">
+      <UniqueIdentifier>{84ffc9ab-23e8-43f6-980d-c0f89e981ea8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KabukiToolkit\_Seams\Who">
+      <UniqueIdentifier>{5e91a5ab-755a-4477-996e-de26ab4ea8cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="./\_Seams">
+      <UniqueIdentifier>{bf6d73eb-a329-4324-839b-c163042c31b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="iGeek">
+      <UniqueIdentifier>{b82b7d2a-d486-423f-bf54-cbd7a4acdb46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="iGeek\_Seams">
+      <UniqueIdentifier>{1b934ecb-7d27-4f84-86c3-1b2fcd4597bb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Crabs\Varint.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Wall.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Wall.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\_Config.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Address.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Args.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Array.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Array.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Autoject.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BIn.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BIn.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Binary.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Book.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BOut.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BOut.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BSeq.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\BSeq.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Buffer.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\CIn.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Clock.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Clock.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\COut.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Crabs.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Dic.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Door.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Error.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Event.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\File.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\File.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Floor.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Folder.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Hash.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Interrupts.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Iterator.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Language.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Library.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\List.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Loom.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Map.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Matrix.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Mirror.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Op.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Op.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Operand.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Puff.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Puff.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\RNG.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Room.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Set.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Slot.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Slot.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Stack.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\String.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Stringf.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Stringf.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Table.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Test.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Test.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\TypeValue.h">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\TypeValue.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\Uniprinter.hpp">
+      <Filter>Crabs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\_Seams\TestWords.h">
+      <Filter>Crabs\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Crabs\_Seams\_Config.h">
+      <Filter>Crabs\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\AppClient.h">
+      <Filter>KabukiToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\AppServer.h">
+      <Filter>KabukiToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Document.h">
+      <Filter>KabukiToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Package.h">
+      <Filter>KabukiToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Forms\Validator.h">
+      <Filter>KabukiToolkit\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Audio\SoundWave.h">
+      <Filter>KabukiToolkit\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Audio\SoundWave.hpp">
+      <Filter>KabukiToolkit\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\_Seams\_Config.h">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\_Seams\Code\01.StripComments.h">
+      <Filter>KabukiToolkit\_Seams\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\_Seams\Code\01.StripComments.SourceExampleWithoutComments.h">
+      <Filter>KabukiToolkit\_Seams\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Code\Include.h">
+      <Filter>KabukiToolkit\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Code\stb_c_lexer.h">
+      <Filter>KabukiToolkit\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Code\stb_leakcheck.h">
+      <Filter>KabukiToolkit\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Code\CodeModule.h">
+      <Filter>KabukiToolkit\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Code\CommentStripper.h">
+      <Filter>KabukiToolkit\Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\image_DXT.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\image_helper.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\jo_jpeg.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\pkm_helper.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\pvr_helper.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\SOIL2.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stb_image.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stb_image_write.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_DDS.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_DDS_c.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_ext.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_ext_c.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pkm.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pkm_c.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pvr.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\stbi_pvr_c.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Image\etc1_utils.h">
+      <Filter>KabukiToolkit\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\IMUL\Doxygen.h">
+      <Filter>KabukiToolkit\IMUL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\IMUL\Parser.h">
+      <Filter>KabukiToolkit\IMUL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\IMUL\UML.h">
+      <Filter>KabukiToolkit\IMUL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Git.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Global.h">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Issue.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Mission.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Project.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Schedule.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Task.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\Workspace.hpp">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Pro\_Config.h">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Registrar.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Relationship.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Role.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Roster.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Symbol.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\UIDAssigner.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\User.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\UserList.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Acount.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Address.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\AddressEmail.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Authenticator.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\AuthenticatorDefault.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Entity.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\EntityGroup.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\EntityList.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Global.h">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Handle.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Name.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Organization.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Password.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Person.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Privilege.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Who\Profile.hpp">
+      <Filter>KabukiToolkit\Who</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Component.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlDMX.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Controller.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControllerISymmetric.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMaster.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMatrix.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlMidi.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ControlXY.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Event.h">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\GlobalConfig.h">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Library.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Mixer.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\MixerChannel.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\MixerPage.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Param.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ParamSet.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Set.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Tag.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\TagLibrary.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Widget.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetManager.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetMidi.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\WidgetPage.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\_Config.h">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ADSR.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\Button.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonDMX.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonDummy.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonEvent.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMacro.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMidi.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonMode.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonPage.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonRadio.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonScroller.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonSwap.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ButtonWidget.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\KabukiToolkit\Touch\ChannelGroup.hpp">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iGeek\EnvGoal.hpp">
+      <Filter>iGeek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iGeek\Shader.h">
+      <Filter>iGeek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iGeek\Env.h">
+      <Filter>iGeek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iGeek\_Seams\Release.h">
+      <Filter>iGeek\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iGeek\_Seams\_Config.h">
+      <Filter>iGeek\_Seams</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="_Config.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Blackjack.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="BlackjackCardCombo.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="BlackjackDealer.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="BlackjackHand.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="BlackjackPlayer.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Card.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="CardCombo.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="CardStack.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Dealer.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="DeckDefault.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Hand.h">
+      <Filter>./</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Crabs\_ConfigDefault.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_ConfigFooter.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_ConfigHeader.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_Debug.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_Package.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_Release.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_Undef.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Array.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\BIn.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\BOut.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\BSeq.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\CIn.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Clock.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\COut.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Crabs.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Error.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\File.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Floor.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Folder.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Interrupts.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\MorseCode.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Op.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Operand.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Puff.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\README.md">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\RNG.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Room.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Slot.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Stringf.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Tasks.json">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\Test.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\TypeValue.hxx">
+      <Filter>Crabs</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\02.ItoS.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\02.Socket.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\03.FtoS.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\04.SPrinter.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\05.Clock.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\06.Stack.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\07.Matrix.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\08.String.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\09.Loom.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\10.List.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\11.Book.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\12.Map.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\13.Table.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\14.Dic.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\15.Crabs.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\16.Door.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\17.Room.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\17.Seam.s2">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\18.Release.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\README.md">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\_Seams.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\_Tests.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\00.Core.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\01.RNG.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\Crabs\_Seams\01.Uniscanner.hxx">
+      <Filter>Crabs\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\AppClient.hxx">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\AppServer.hxx">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Document.hxx">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Package.hxx">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\README.md">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Package.hxx">
+      <Filter>KabukiToolkit</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Forms\README.md">
+      <Filter>KabukiToolkit\Forms</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Data\README.md">
+      <Filter>KabukiToolkit\_Seams\Data</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Data\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Data</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Forms\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Forms</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Forms\README.md">
+      <Filter>KabukiToolkit\_Seams\Forms</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\GUI\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\GUI</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\GUI\README.md">
+      <Filter>KabukiToolkit\_Seams\GUI</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Image\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Image\README.md">
+      <Filter>KabukiToolkit\_Seams\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Imul\README.md">
+      <Filter>KabukiToolkit\_Seams\IMUL</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Imul\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\IMUL</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Pro\README.md">
+      <Filter>KabukiToolkit\_Seams\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Pro\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Touch\README.md">
+      <Filter>KabukiToolkit\_Seams\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Touch\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Who\README.md">
+      <Filter>KabukiToolkit\_Seams\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Who\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Audio\README.md">
+      <Filter>KabukiToolkit\Audio</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Audio\README.md">
+      <Filter>KabukiToolkit\_Seams\Audio</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Audio\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Audio</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\_Release.hxx">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\_Seams.hxx">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\_Undef.hxx">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\README.md">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Release.hxx">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\_Debug.hxx">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\_Seams\Code\00.Core.hxx">
+      <Filter>KabukiToolkit\_Seams\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\CommentStripper.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\Include.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\README.md">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\stb_c_lexer.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\stb_leakcheck.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\_Seams.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Code\CodeModule.hxx">
+      <Filter>KabukiToolkit\Code</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Data\README.md">
+      <Filter>KabukiToolkit\Data</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\GUI\README.md">
+      <Filter>KabukiToolkit\GUI</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\GUI\_Package.hxx">
+      <Filter>KabukiToolkit\GUI</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\image_DXT.hxx">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\image_helper.hxx">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\README.md">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\SOIL2.hxx">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\_Package.hxx">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Image\etc1_utils.hxx">
+      <Filter>KabukiToolkit\Image</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\IMUL\README.md">
+      <Filter>KabukiToolkit\IMUL</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\IMUL\_Seams.hxx">
+      <Filter>KabukiToolkit\IMUL</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Library.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Release.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Seams.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Undef.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\README.md">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Config.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Pro\_Debug.hxx">
+      <Filter>KabukiToolkit\Pro</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Config.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Debug.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Library.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Release.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Seams.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\_Undef.hxx">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Who\README.md">
+      <Filter>KabukiToolkit\Who</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\README.md">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Config.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Debug.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Library.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Release.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Seams.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\KabukiToolkit\Touch\_Undef.hxx">
+      <Filter>KabukiToolkit\Touch</Filter>
+    </None>
+    <None Include="..\iGeek\README.md">
+      <Filter>iGeek</Filter>
+    </None>
+    <None Include="..\iGeek\core.frag">
+      <Filter>iGeek</Filter>
+    </None>
+    <None Include="..\iGeek\core.vs">
+      <Filter>iGeek</Filter>
+    </None>
+    <None Include="..\iGeek\Env.hxx">
+      <Filter>iGeek</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\_Seams.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\_Undef.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\00.Core.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\01.ImageBMP.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\02.OpenGLHelloWorld.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\README.md">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\_Debug.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="..\iGeek\_Seams\_Release.hxx">
+      <Filter>iGeek\_Seams</Filter>
+    </None>
+    <None Include="Hand.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Player.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Impl.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="BlackjackCardCombo.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="BlackjackDealer.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="BlackjackHand.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="BlackjackPlayer.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Card.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="CardCombo.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="CardDeckDefault.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="CardStack.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Dealer.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Deck.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="DeckDefault.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Seams\02.Deck.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\03.Blackjack.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\README.md">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\Release.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Debug.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Release.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Undef.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\00.CardStack.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\01.Hand.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Crabs\CMakeLists.txt">
+      <Filter>Crabs</Filter>
+    </Text>
+    <Text Include="..\Crabs\_Seams\CMakeLists.txt">
+      <Filter>Crabs\_Seams</Filter>
+    </Text>
+    <Text Include="..\KabukiToolkit\_Seams\CMakeFiles.txt">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </Text>
+    <Text Include="..\iGeek\_Seams\CMakeLists.txt">
+      <Filter>iGeek\_Seams</Filter>
+    </Text>
+    <Text Include="_Seams\CMakeLists.txt">
+      <Filter>./\_Seams</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Crabs\_Seams\_Main.cpp">
+      <Filter>Crabs\_Seams</Filter>
+    </ClCompile>
+    <ClCompile Include="..\KabukiToolkit\_Seams\_Main.cpp">
+      <Filter>KabukiToolkit\_Seams</Filter>
+    </ClCompile>
+    <ClCompile Include="..\iGeek\_Seams\_Main.cpp">
+      <Filter>iGeek\_Seams</Filter>
+    </ClCompile>
+    <ClCompile Include="_Seams\Main.cpp">
+      <Filter>./\_Seams</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
