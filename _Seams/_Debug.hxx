@@ -1,2 +1,2 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../Script2/_Debug.hxx"
+#include "../../ASCIICrabs/_Seams/_Debug.hxx"

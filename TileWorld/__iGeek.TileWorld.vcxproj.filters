@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="./">
+      <UniqueIdentifier>{ec72a015-c656-411e-9575-63b4a1593a36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="./\_Seams">
+      <UniqueIdentifier>{da483906-c696-4832-81a0-02d2531d2b8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WeaponMelee.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponRanged.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="_Config.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="AppClient.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Bow.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentAnimation.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentAttribute.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentHitbox.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentMovement.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSkill.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultEditorMode.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorMode.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorModes.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyEditorMode.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySystem.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="HerringboneWangTile.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuPause.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeEditor.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeEditorDefault.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeEditorEnemy.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="PackResource.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="PackTheme.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseMenu.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerGUI.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Rat.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsGraphics.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="StateEditor.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="StateGame.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMainMenu.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMenuMain.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="StateSettings.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Sword.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMapEditor.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="TileRegular.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="TileSpawner.h">
+      <Filter>./</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WeaponMelee.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="WeaponRanged.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="AppClient.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="AttributeComponent.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Bow.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ComponentAnimation.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ComponentAttribute.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ComponentHitbox.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ComponentMovement.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ComponentSkill.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="DefaultEditorMode.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="EasyFontMaker.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="EditorMode.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Enemy.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="EnemySystem.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Entity.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Game.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="GameState.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="GraphicsSettings.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="GUI.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="HerringboneWangTile.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Inventory.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Item.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Main.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="MenuPause.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ModeEditor.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ModeEditorDefault.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ModeEditorDefault2.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ModeEditorEnemy.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="MovementComponent.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="PackResource.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="PackTheme.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Player.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="PlayerGUI.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Rat.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>./</Filter>
+    </None>
+    <None Include="SettingsGraphics.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ShaderFragment.frag">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ShaderVertex.vert">
+      <Filter>./</Filter>
+    </None>
+    <None Include="State.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="StateEditor.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="StateGame.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="StateMenuMain.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="StateSettings.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Sword.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="text.slmp">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Tile.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="TileMap.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="TileMapEditor.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="TileRegular.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="TileSpawner.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Seams\_impl.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Release.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Undef.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\00.Core.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\README.md">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\_Debug.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+    <None Include="_Seams\01.Release.hxx">
+      <Filter>./\_Seams</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_Seams\_Main.cpp">
+      <Filter>./\_Seams</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
