@@ -27,7 +27,7 @@ namespace _ {
        episode is over (terminal). All dots eaten: episode over (won).
      - Fixed step budget (MaxSteps) also terminates.
 
-   Observation (fixed length, Puffer "scalar vector"): a (ObsRadius*2+1)^2
+   Observation (fixed length, fixed-length scalar vector): a (ObsRadius*2+1)^2
    local window around pac. Each cell is one-hot over {wall, dot, superdot,
    bonus, ghost, weakghost, pac}. That's 7 channels * (2R+1)^2 cells. With
    R=3 -> 7*49 = 343 features. Plus 1 "episode-progress" feature

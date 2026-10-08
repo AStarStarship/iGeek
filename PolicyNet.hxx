@@ -177,7 +177,7 @@ void TTransformer::SampleActions(const TTensor& logits, ISC* actions,
 
 /* Backward (M4): compute the PPO policy-surrogate + value-loss gradients
    w.r.t. the action logits and the value head. These are the exact quantities
-   PufferLib's fused kernel emits (grad_logits, grad_value).
+   the fused PPO kernel emits (grad_logits, grad_value).
 
    Per row b:
      p[b,a]   = softmax(logits[b])[a]

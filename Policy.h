@@ -19,7 +19,7 @@ struct TBlock {
 };
 
 /* A trainable policy: obs -> (action logits, value).
-   Puffer-informed: this is the neural head that PufferLib's fused PPO
+   vectorized-batch: this is the neural head that the fused-kernel fused PPO
    kernel calls — given a batch of obs it produces `logits` (action
    distribution) and `values_pred` (value baseline), and the PPO update
    writes gradients back into `grad_logits`/`grad_value`.
@@ -55,7 +55,7 @@ class TPolicy {
 
   /* Backward: given the current logits, the taken actions, the advantages,
      and the old log-probs, compute gradients w.r.t. the action logits and
-     the value head. These are the EXACT quantities PufferLib's fused kernel
+     the value head. These are the EXACT quantities the fused PPO kernel
      emits (grad_logits, grad_value). A concrete net then backprops through
      its own weights.
 
@@ -78,7 +78,7 @@ class TPolicy {
                         const TTensor& values, const TTensor& returns,
                         TTensor& grad_logits, TTensor& grad_value) = 0;
 
-  /* Learn rate (Adam/lr). Puffer-informed: the PPO kernel exposes lr. */
+  /* Learn rate (Adam/lr). vectorized-batch: the PPO kernel exposes lr. */
   virtual void SetLearnRate(FPC lr) { lr_ = lr; }
   FPC LearnRate() const { return lr_; }
 

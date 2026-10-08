@@ -133,10 +133,10 @@ the qualia scene state stays plain IUC scalar datums (grid positions + signature
 words, per plan 3.2) until her types land, so no collision is expected.
 
 
-## 0a. STATUS UPDATE — 2026-10-07: framework migrated + Puffer RL layer added (low-level)
+## 0a. STATUS UPDATE — 2026-10-07: framework migrated + vectorized RL layer added (low-level)
 
 The iGeek framework headers were **migrated to the latest ASCIICrabs API and
-extended with a PufferLib-informed RL layer** on 2026-10-07. This supersedes
+extended with a vectorized-batch RL layer** on 2026-10-07. This supersedes
 parts of the plan below (which still describes the *stale* headers). What
 changed, and what it means for the Qualia work:
 
@@ -147,7 +147,7 @@ changed, and what it means for the Qualia work:
 - `FPC` (float32) is now the per-step scalar reward type throughout
   (`Env::ComputeReward` returns `FPC`, `EnvReward` wraps an `FPC`). This
   matches the plan's section 3.1 "single scalar reward" decision and
-  PufferLib's `Agent.rewards`.
+  the flat per-env reward vector.
 
 **Why standalone (not `public TRoom`):** verified 2026-10-07 that
 `TRoom<CHD, CHD>` **fails to compile** against the latest ASCIICrabs —
@@ -159,21 +159,21 @@ world's `BlackjackEnv` standalone. **Logged to `../ASCIICrabs/AGENT_PLAN.md`
 standalone; the Script2 data-node role is served by `Crabs*` pointers in
 `EnvGoal`/`EnvReward` instead of embedded `TRoom` members.
 
-**New (Puffer-informed RL layer — the "AI gym" primitives):**
+**New (vectorized-batch RL layer — the "AI gym" primitives):**
 - `Tensor.h` — `TTensor` POD (row-major `FPC*` buffer) + declared linear
   kernels (MatMul/Softmax/LayerNorm/Relu/Add/Scale/RowLogSumExp). Impls are
   the next milestone; the *type* is the primitive. **The kernels themselves are
   an ASCIICrabs ask (Gap 2) — they don't yet exist anywhere.**
 - `Policy.h` — `TPolicy` interface (obs → logits+value, sample actions,
   backward → grad_logits/grad_value) + `TTransformer` (MuSE-style net,
-  declared, not yet implemented). This is the analog of PufferLib's policy
+  declared, not yet implemented). This is the analog of the fused-kernel policy
   head in `src/algo.cu`.
 - `PPO.h` — `TPPO` (GAE + clipped policy loss + value-clip + entropy) over a
-  vectorized `Gym` batch + a `TPolicy`. The direct analog of PufferLib's fused
+  vectorized `Gym` batch + a `TPolicy`. The direct analog of the fused-kernel fused
   PPO kernel, in CPU FPC (no CUDA).
 - `Gym.h` — now carries the **vectorized batch interface** (`Observations()`,
   `Actions()`, `Rewards()`, `Terminals()`, `ActionMask()`, `StepBatch()`,
-  `ResetBatch()`), the PufferLib `Env*`/`Agent*` analog. The PPO loop steps the
+  `ResetBatch()`), the vectorized-batch `Env*`/`Agent*` analog. The PPO loop steps the
   whole batch, never a single env.
 
 **Verified:** a probe TU including all migrated + new headers compiles clean
