@@ -82,31 +82,36 @@ int main() {
     pol.SetLearnRate(0.1f);
     TPPO ppo(gym, pol, /*horizon=*/2, /*epochs=*/2);
     ppo.SetGamma(0.99f); ppo.SetLambda(0.95f);
-    FPC greedy_before = GreedyReward(gym, pol);
-    for (ISC s = 0; s < 1; ++s) ppo.TrainStep();
-    FPC greedy_after = GreedyReward(gym, pol);
-    OK("ppo trainstep on pacworld (no crash)");
-    {
-      CHA b[64]; ISN n = 0;
-      const CHA* pre = "  greedy before="; while(pre[n]) b[n++]=pre[n];
+        FPC greedy_before = GreedyReward(gym, pol);
+            for (ISC s = 0; s < 1; ++s) ppo.TrainStep();
+        FPC greedy_after = GreedyReward(gym, pol);
+            OK("ppo trainstep on pacworld (no crash)");
+        {
+      // Fixed buffer (128) + bounded copy + a hard n cap: the 64-byte buffer
+      // overflowed the moment the greedy values grew, and the write landed
+      // past the buffer end. (The probe is throwaway, but it must not hang.)
+      CHA b[128]; ISN n = 0;
+      const CHA* pre = "  greedy before="; while(pre[n] && n < 120) b[n++] = pre[n];
       ISC ib = (ISC)(greedy_before*100); if(ib<0){b[n++]='-';ib=-ib;}
       CHA t2[16]; ISN t=0; if(ib==0)t2[t++]='0';
       while(ib>0&&t<12){t2[t++]=(CHA)('0'+ib%10);ib/=10;}
-      while(t>0&&n<60)b[n++]=t2[--t];
-      const CHA* mid = " after="; while(mid[n-n]){ } 
-      // append " after="
+      while(t>0&&n<110)b[n++]=t2[--t];
       b[n++]=' ';b[n++]='a';b[n++]='f';b[n++]='t';b[n++]='e';b[n++]='r';b[n++]='=';
       ISC ia = (ISC)(greedy_after*100); if(ia<0){b[n++]='-';ia=-ia;}
       t=0; if(ia==0)t2[t++]='0';
       while(ia>0&&t<12){t2[t++]=(CHA)('0'+ia%10);ia/=10;}
-      while(t>0&&n<62)b[n++]=t2[--t];
+      while(t>0&&n<120)b[n++]=t2[--t];
       b[n++]='\n';
+      if (n > 127) n = 127;
       write(1, b, (unsigned long)n);
     }
     // PacWorld is a hard, sparse-reward task; the hard gate is no-crash +
     // finite. The soft signal is the printed trend (may need a bigger net /
     // more steps to show a clear rise — that's the next milestone).
   }
-  if (fails == 0) { write(1, "PACWORLD_PROBE_OK\n", 18); return 0; }
+  if (fails == 0) {
+    write(1, "PACWORLD_PROBE_OK\n", 18);
+    return 0;
+  }
   return 1;
 }
