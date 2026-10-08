@@ -99,7 +99,7 @@ both before writing code against them):
     seeded deterministic maze layout per episode, fixed `MaxSteps` budget,
     terminal on reaching the finish.
   - Observation: fixed-length local window around the robot (one-hot per
-    cell channel + 1 progress feature), same Puffer "scalar vector" pattern
+    cell channel + 1 progress feature), same fixed-length scalar vector pattern
     as PacWorld.
   - Actions: 5 (Stay, Up, Down, Left, Right) — the legacy 8-direction enum
     is dropped for the headless version (the robot is horizontal-only).

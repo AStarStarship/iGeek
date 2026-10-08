@@ -8,10 +8,10 @@
 namespace _ {
 
 /* Minimal row-major float tensor for RL policy math.
-   NO standard library. This is the primitive the Puffer-informed policy
+   NO standard library. This is the primitive the vectorized-batch policy
    (TTransformer) and PPO loop (TPPO) are built on.
 
-   Puffer-informed: PufferLib's whole data model is tensor-valued
+   vectorized-batch: the whole RL data model is tensor-valued
    (obs_t*, float* actions/rewards, logits, grad_logits, grad_values_pred,
    action_mask). We need a flat float buffer with shape + the handful of
    elementwise/linear ops a policy forward/backward uses.
@@ -41,7 +41,7 @@ struct TTensor {
   BOL IsNil() const { return data_ == NILP; }
 };
 
-/* --- Allocation (Puffer pattern: preallocate at init, free at close) --- */
+/* --- Allocation (preallocate-at-init pattern: preallocate at init, free at close) --- */
 
 /* Allocate a rows x cols FPC tensor, zero-initialized. Returns a TTensor
    whose data_ is heap-owned (free with TTensorFree). */

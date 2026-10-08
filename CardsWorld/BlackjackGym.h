@@ -10,13 +10,13 @@ namespace _ {
 namespace CardsWorld {
 
 /* A vectorized Blackjack environment for PPO training.
-   Puffer-informed: batches N parallel blackjack tables and exposes the flat
+   vectorized-batch: batches N parallel blackjack tables and exposes the flat
    obs/actions/rewards/terminals/action-mask arrays the TPPO loop steps in one
-   call (the PufferLib `Env*`/`Agent*` analog). The iGeek `Gym` class carries
+   call (the the reference PPO kernel `Env*`/`Agent*` analog). The iGeek `Gym` class carries
    the same shape generically; this is the CardsWorld concrete adapter over
    the `Blackjack` engine.
 
-   Observation encoding (4 features, fixed length, Puffer "scalar vector"):
+   Observation encoding (4 features, fixed length, fixed-length scalar vector):
      [0] player hand value (0..21)
      [1] dealer up-card point value (0..10)
      [2] dealer hidden-card count (0..1)
@@ -38,11 +38,11 @@ class BlackjackGym {
 
   ISC Tables() const { return table_count_; }
 
-  /* Reset every table to a fresh round (Puffer puf_reset). */
+  /* Reset every table to a fresh round (batch ResetBatch). */
   void ResetBatch();
 
   /* Step the whole batch by actions_[b]; fills rewards_/terminals_/
-     observations_. One call = one batch step (Puffer puf_step).
+     observations_. One call = one batch step (batch StepBatch).
      @param actions One action (0=hit,1=stand) per table, length tables_. */
   void StepBatch(const ISC* actions);
 

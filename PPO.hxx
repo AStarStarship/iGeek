@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 // PPO.hxx — TPPO training loop (GAE + clipped PPO + value-clip + entropy).
 //
-// Puffer-informed: mirrors the structure of the local PufferLib fork's
+// vectorized-batch: mirrors the structure of the local reference PPO implementation's
 // src/algo.cu fused PPO kernel (clipped policy loss, vf-clip, entropy bonus,
 // GAE advantages) in CPU FPC on the ASCIICrabs no-stdlib type system.
 //
@@ -146,7 +146,7 @@ TPPOStats TPPO::UpdatePolicy() {
     adv_t.At(i, 0) = advantages_[i];
     ret_t.At(i, 0) = returns_[i];
   }
-  // Base gradients (the exact Puffer quantities).
+  // Base gradients (the exact fused-kernel quantities).
   TTensor grad_logits = TTensorAlloc(N, A);
   TTensor grad_value = TTensorAlloc(N, 1);
   policy_.Backward(logits, actions_, adv_t, old_logp_t, values, ret_t,

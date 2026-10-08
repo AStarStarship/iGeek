@@ -10,11 +10,13 @@ extern "C" { int write(int, const void*, unsigned long); }
 
 static ISC fails = 0;
 static void FAIL(const CHA* what) {
-  write(2, "FAIL: ", 6); write(2, what, 96); write(2, "\n", 1);
+  ISN n = 0; while (what[n] != 0) ++n;
+  write(2, "FAIL: ", 6); write(2, what, (unsigned long)n); write(2, "\n", 1);
   ++fails;
 }
 static void OK(const CHA* what) {
-  write(1, "ok: ", 4); write(1, what, 96); write(1, "\n", 1);
+  ISN n = 0; while (what[n] != 0) ++n;
+  write(1, "ok: ", 4); write(1, what, (unsigned long)n); write(1, "\n", 1);
 }
 // Greedy reward: run the policy's argmax on a fresh batch for 1 step, return
 // the mean per-env reward.

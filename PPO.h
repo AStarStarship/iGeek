@@ -8,14 +8,14 @@
 namespace _ {
 
 /* PPO training loop over a vectorized Gym + a TPolicy.
-   Puffer-informed: mirrors the structure of the local PufferLib fork's
+   vectorized-batch: mirrors the structure of the local reference PPO implementation's
    src/algo.cu fused PPO kernel — clipped policy loss, value-clip (vf-clip),
    entropy bonus, GAE advantages — but in CPU FPC (no CUDA) on the
    ASCIICrabs no-stdlib type system.
 
    The rollout buffer holds one full batch-step of experience:
      actions, rewards, terminals, old logits, old logp, values, obs,
-     action_mask.  Preallocated at init, freed at close (Puffer pattern).
+     action_mask.  Preallocated at init, freed at close (preallocate-at-init pattern).
 */
 struct TPPOStats {
   FPC policy_loss_;
@@ -40,7 +40,7 @@ class TPPO {
      for `epochs` epochs. Returns the stats of the last epoch. */
   TPPOStats TrainStep();
 
-  /* GAE hyperparameters (Puffer defaults-ish). */
+  /* GAE hyperparameters (standard defaults). */
   void SetGamma(FPC g) { gamma_ = g; }
   void SetLambda(FPC l) { lam_ = l; }
   void SetClipEps(FPC e) { clip_eps_ = e; }

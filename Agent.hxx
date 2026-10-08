@@ -2,7 +2,7 @@
 // Agent.hxx — implementations of the three generic iGeek agent tiers
 // (AgentBase contract + TTableAgent / TReflexAgent / TModelAgent).
 //
-// Puffer/plan-informed (iGeek AGENT_PLAN.md 3.3): these are the world-agnostic
+// batch/plan-informed (iGeek AGENT_PLAN.md 3.3): these are the world-agnostic
 // Percept->Action + state tiers. No world-specific stimulus knowledge lives
 // here — a world binds percepts/actions to its own tokens.
 #include "Agent.h"
