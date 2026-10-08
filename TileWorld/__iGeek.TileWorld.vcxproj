@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AppClient.h" />
+    <ClInclude Include="Bow.h" />
+    <ClInclude Include="ComponentAnimation.h" />
+    <ClInclude Include="ComponentAttribute.h" />
+    <ClInclude Include="ComponentHitbox.h" />
+    <ClInclude Include="ComponentMovement.h" />
+    <ClInclude Include="ComponentSkill.h" />
+    <ClInclude Include="DefaultEditorMode.h" />
+    <ClInclude Include="EditorMode.h" />
+    <ClInclude Include="EditorModes.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyEditorMode.h" />
+    <ClInclude Include="EnemySystem.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GUI.h" />
+    <ClInclude Include="HerringboneWangTile.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="MenuPause.h" />
+    <ClInclude Include="ModeEditor.h" />
+    <ClInclude Include="ModeEditorDefault.h" />
+    <ClInclude Include="ModeEditorEnemy.h" />
+    <ClInclude Include="PackResource.h" />
+    <ClInclude Include="PackTheme.h" />
+    <ClInclude Include="PauseMenu.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerGUI.h" />
+    <ClInclude Include="Rat.h" />
+    <ClInclude Include="SettingsGraphics.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="StateEditor.h" />
+    <ClInclude Include="StateGame.h" />
+    <ClInclude Include="StateMainMenu.h" />
+    <ClInclude Include="StateMenuMain.h" />
+    <ClInclude Include="StateSettings.h" />
+    <ClInclude Include="Sword.h" />
+    <ClInclude Include="Tile.h" />
+    <ClInclude Include="TileMap.h" />
+    <ClInclude Include="TileMapEditor.h" />
+    <ClInclude Include="TileRegular.h" />
+    <ClInclude Include="TileSpawner.h" />
+    <ClInclude Include="WeaponMelee.h" />
+    <ClInclude Include="WeaponRanged.h" />
+    <ClInclude Include="_Config.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppClient.hxx" />
+    <None Include="AttributeComponent.hxx" />
+    <None Include="Bow.hxx" />
+    <None Include="ComponentAnimation.hxx" />
+    <None Include="ComponentAttribute.hxx" />
+    <None Include="ComponentHitbox.hxx" />
+    <None Include="ComponentMovement.hxx" />
+    <None Include="ComponentSkill.hxx" />
+    <None Include="DefaultEditorMode.hxx" />
+    <None Include="EasyFontMaker.hxx" />
+    <None Include="EditorMode.hxx" />
+    <None Include="Enemy.hxx" />
+    <None Include="EnemySystem.hxx" />
+    <None Include="Entity.hxx" />
+    <None Include="Game.hxx" />
+    <None Include="GameState.hxx" />
+    <None Include="GraphicsSettings.hxx" />
+    <None Include="GUI.hxx" />
+    <None Include="HerringboneWangTile.hxx" />
+    <None Include="Inventory.hxx" />
+    <None Include="Item.hxx" />
+    <None Include="Main.hxx" />
+    <None Include="MenuPause.hxx" />
+    <None Include="ModeEditor.hxx" />
+    <None Include="ModeEditorDefault.hxx" />
+    <None Include="ModeEditorDefault2.hxx" />
+    <None Include="ModeEditorEnemy.hxx" />
+    <None Include="MovementComponent.hxx" />
+    <None Include="PackResource.hxx" />
+    <None Include="PackTheme.hxx" />
+    <None Include="Player.hxx" />
+    <None Include="PlayerGUI.hxx" />
+    <None Include="Rat.hxx" />
+    <None Include="README.md" />
+    <None Include="SettingsGraphics.hxx" />
+    <None Include="ShaderFragment.frag" />
+    <None Include="ShaderVertex.vert" />
+    <None Include="State.hxx" />
+    <None Include="StateEditor.hxx" />
+    <None Include="StateGame.hxx" />
+    <None Include="StateMenuMain.hxx" />
+    <None Include="StateSettings.hxx" />
+    <None Include="Sword.hxx" />
+    <None Include="text.slmp" />
+    <None Include="Tile.hxx" />
+    <None Include="TileMap.hxx" />
+    <None Include="TileMapEditor.hxx" />
+    <None Include="TileRegular.hxx" />
+    <None Include="TileSpawner.hxx" />
+    <None Include="WeaponMelee.hxx" />
+    <None Include="WeaponRanged.hxx" />
+    <None Include="_Seams\00.Core.hxx" />
+    <None Include="_Seams\README.md" />
+    <None Include="_Seams\01.Release.hxx" />
+    <None Include="_Seams\_Debug.hxx" />
+    <None Include="_Seams\_impl.hxx" />
+    <None Include="_Seams\_Release.hxx" />
+    <None Include="_Seams\_Undef.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_Seams\_Main.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{C38F7ECE-1801-46A5-9516-A82EBD8A4118}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>KabukiToolkitdata</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>iGeek.TileWorld</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir).\;$(ProjectDir).\..\..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

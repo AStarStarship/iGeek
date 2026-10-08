@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="igeek.autopilot">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="igeek.autopilot\seams">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="_config.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="_debug.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="_impl.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="_release.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="_seams.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="_undef.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="agentmaze.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="readme.md">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="xy.inl">
+      <Filter>igeek.autopilot</Filter>
+    </None>
+    <None Include="seams\readme.md">
+      <Filter>igeek.autopilot\seams</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_main.cpp">
+      <Filter>igeek.autopilot</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="agentmaze.h">
+      <Filter>igeek.autopilot</Filter>
+    </ClInclude>
+    <ClInclude Include="maze.h">
+      <Filter>igeek.autopilot</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>igeek.autopilot</Filter>
+    </ClInclude>
+    <ClInclude Include="xy.h">
+      <Filter>igeek.autopilot</Filter>
+    </ClInclude>
+    <ClInclude Include="_config.h">
+      <Filter>igeek.autopilot</Filter>
+    </ClInclude>
+    <ClInclude Include="seams\01.bar.h">
+      <Filter>igeek.autopilot\seams</Filter>
+    </ClInclude>
+    <ClInclude Include="seams\00.foo.h">
+      <Filter>igeek.autopilot\seams</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

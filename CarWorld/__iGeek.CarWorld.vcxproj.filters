@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="./">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="./\seams">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="_Config.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Debug.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Impl.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Release.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Seams.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Undef.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="AgentMaze.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>./</Filter>
+    </None>
+    <None Include="XY.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_seams\readme.md">
+      <Filter>./\seams</Filter>
+    </None>
+    <None Include="_seams\_seams.hxx">
+      <Filter>./\seams</Filter>
+    </None>
+    <None Include="_seams\00.core.hxx">
+      <Filter>./\seams</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_Main.cpp">
+      <Filter>./</Filter>
+    </ClCompile>
+    <ClCompile Include="_seams\main.cpp">
+      <Filter>./\seams</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AgentMaze.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Maze.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="XY.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="_Config.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="_seams\01.release.h">
+      <Filter>./\seams</Filter>
+    </ClInclude>
+    <ClInclude Include="_seams\release.h">
+      <Filter>./\seams</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_seams\CMakeLists.txt">
+      <Filter>./\seams</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
