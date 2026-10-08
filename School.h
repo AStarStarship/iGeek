@@ -1,17 +1,11 @@
-/* Interactive Gym Environment and Educaitonal Kit @version 0.x
-@link    https://github.com/KabukiStarship/iGeek.git
-@file    /School.h
-@author  Cale McCollough <https://cookingwithcale.org>
-@license Copyright (C) 2021 Kabuki Starship (TM) <kabukistarship.com>;
-This Source Code Form is subject to the terms of the Mozilla Public License,
-v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain
-one at <https://mozilla.org/MPL/2.0/>. */
+// Copyright AStarship <https://astarship.net>.
+
 #pragma once
 #include <_Config.h>
 #if SEAM >= IGEEK_CORE
 #ifndef IGEEK_COURSE_CODE
 #define IGEEK_COURSE_CODE
-#include "../Script2/Operand.h"
+#include "../ASCIICrabs/Operand.h"
 namespace _ {
 
 class School : public Operand {
@@ -22,7 +16,7 @@ class School : public Operand {
 
   void CreateRepo();
 
-  /* Script2 operations. */
+  /* Crabs operations. */
   virtual const Op* Star(CHC index, Crabs* crabs);
 
   private:

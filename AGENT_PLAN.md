@@ -5,6 +5,134 @@ Author: astar-mary
 Date: 2026-09-11 04:10 UTC
 Board: astarship
 
+## 0c. STATUS UPDATE — 2026-10-08: astar-mary verified the framework layer (t_197929d1)
+
+astar-mary **independently re-verified** the framework layer low-level
+reported in section 0b. Built a fresh probe TU against the current repo state
+(all files already in place, nothing rebuilt from scratch) and ran the full
+check suite:
+
+- `g++ -std=c++2b -O2 -I. -I../ASCIICrabs/_Seams -I../ASCIICrabs -I..`
+  — compiles clean, zero warnings from the iGeek headers.
+- Runtime: all six probe checks pass (AgentState round-trip, TTableAgent
+  lookup, TReflexAgent rules, TModelAgent state accumulation, BehaviorMetrics
+  tallies, LinearProbe end-to-end 100% train+eval accuracy on a synthetic
+  linearly-separable target).
+- `-fsanitize=address,undefined` — clean (no ASan/UBSan reports from the
+  framework files).
+
+The framework is confirmed ready for Qualia World Phase 1+. Phase 1
+(skeleton world: `_Main.cpp`, `QualiaWorld.h/.hxx`, `_Seams/`) can now
+proceed on this foundation.
+
+## 0d. STATUS UPDATE — 2026-10-08 (later): RL core verified headless + TileWorld headless spine + single-repo reorg planned (astar-mary)
+
+This session did three things that bear on iGeek as the single engine repo.
+All verified; nothing here changes the Qualia plan above — it adds the
+headless-RL + game-world engine layer the Qualia world will sit on.
+
+**1. RL core verified headless + fast; 4 memory-safety bugs fixed.**
+`TPPO::TrainStep()` on `PacWorldGym` (the PacWorld env, still at
+`iGeekPacWorld/` until the reorg) runs ~650–2,600 steps/s at `-O2` and is
+learning (greedy reward climbs over training). The prior "one TrainStep = 2
+min" was the `-O0` probe build, not a real bottleneck. Running the real `TPPO`
+loop at batch≥8 under ASan surfaced 4 bugs (all in the RL core, all fixed):
+(1) bias-broadcast overflow — `TTensorAdd(logits, b_, logits)` with a `[K,1]`
+bias and `[B,K]` logits → new `TTensorAddBiasInPlace` (Tensor.h/.hxx), 10 call
+sites in LinearPolicy.hxx + PolicyNet.hxx; (2) `TLinearPolicy::SampleActions`
+LSE out-buffer `[1,1]`→`[B,1]`; (3) VLAs in `TPPO::CollectRollout`→fixed
+`GymEnvMax`; (4) the duplicate `TTransformer::SampleActions` LSE bug (caught by
+the verifier — fix the class, not just the reported site). ASan-clean on both
+policies at envs=8.
+
+**2. Headless geometry + occlusion primitives landed in ASCIICrabs/.**
+`ASCIICrabs/TVec.h` (`TVec2F`/`TVec2I`/`TFloatRect`/`TIntRect`, VHT-conformant,
+no stdlib) and `ASCIICrabs/TOcclusion.h` (`TOcclusionMap`: occluder grid =
+static collision tiles ∪ dynamic `occlude_=1` sprites, ≤8 observers, DDA
+line-of-sight, per-observer visibility grid, no stdlib). This **resolves the
+open dependency in section 0b** ("`TVec2F`/`TFloatRect`/`TSprite` are hers to
+build") — `TVec2F`/`TFloatRect` now exist and are tested
+(`ASCIICrabs/_test_occlusion.cpp`, 9 hand-verified cases, ASan-clean,
+`OCCLUSION_TEST_PASS`). `TSprite` is deliberately NOT a render object: in the
+headless core a "sprite" is data only (`_::IUD texture_id` + `_::BOL occlude_`
+on the entity), and the occlusion map is the spatial-awareness layer a
+renderer (or an RL observation) reads.
+
+**3. TileWorld headless spine ported to `iGeek/TileWorld/`.**
+The SFML `iGeekTileWorld/` ECS core was stripped to a headless, no-stdlib spine
+at `iGeek/TileWorld/`: Entity (owns `_::TVec2F pos_`), ComponentHitbox,
+ComponentMovement, Tile, TileRegular, TileSpawner(Enemy), TileMap (with
+`TOcclusionMap` wired in — rebuilds occluders + recomputes visibility each
+`Update`), Enemy, EnemySystem, Player. `Render()` deleted (headless);
+`std::pow`/`std::stringstream`/`std::cout` all replaced; `Enemy::Chase` uses a
+no-`<cmath>` Newton–Raphson `1/sqrt`. **Incomplete:** the headless `_main`
+(demo: build a map, spawn player+enemies, step 200, print the visibility
+field) was being written when the session ended — that is the immediate next
+task. Attribute/Skill/Animation/weapons/Inventory are 2nd-pass (out of scope
+for the spine).
+
+**4. Single-repo reorg planned (NOT executed).** Decision: `iGeek/` becomes
+the single engine repo; each `iGeek*World` moves into `iGeek/<base>` (PacWorld,
+TileWorld, CarWorld, …), `.git` dropped; non-iGeek repos (CrabsTK, ASCIICrabs)
+stay separate. Dry-run verified (`scratch/reorg_dryrun.sh`); ~9 include-path
+edits (`../iGeek/X`→`../X`); headless port is canonical `iGeek/TileWorld/`,
+SFML original deleted locally (safe in frozen remote). **Blocked on the user's
+commits/push** (user owns tickets/branches; `iGeek` has 3 unpushed commits +
+69 dirty files, `iGeekCardsWorld` 3 unpushed — push both before any `.git`
+deletion). A subagent commit (`8e58b0b`) was made and then undone via
+`git reset --soft`; the working tree is back to the user's pre-commit state.
+
+**Invariants added this session (apply to all iGeek engine code):** functional
+casts `IUD(x)`/`ISC(x)`/`FPC(x)` (never C-style); no VLAs; profile at `-O2`
+before claiming a bottleneck; ASan is the gate for batch≥8; grep for sibling
+copies when fixing a bug. See `iGeekPacWorld/README.md` (speed table + the 4
+bugs) and `CrabsTK/AGENT_PLAN.md` (the "What the TileWorld headless
+extraction NEEDS" section) for the full writeup.
+
+## 0b. STATUS UPDATE — 2026-10-08: agent framework layer built + verified (low-level)
+
+The iGeek **framework layer** astar-mary builds on (plan sections 3.3-3.5) is now
+**implemented and verified**. All in `~/AStarStarship/iGeek/` (branch Issue10),
+compiled + run against the latest ASCIICrabs (GCC 13, C++23), ASan/UBSan clean,
+all probe checks pass (exit 0). Kanban task `t_197929d1` dispatched to
+astar-mary on the `astarship` board.
+
+New files (world-agnostic — NO red/blue/green knowledge in the framework):
+- `AgentState.h/.hxx` — the internal-state memory model (decision 3.5 #3):
+  flat fixed-size IUC word array in an `ObjectFactoryHeap` Autoject;
+  snapshot = copy buffer bytes; probe = linear read over words. DLL-ready.
+- `Agent.h/.hxx` — the three GENERIC agent tiers (section 3.3), canonical home,
+  per the constraint that this file stays free of world-specific stimulus
+  knowledge: `AgentBase` (Percept->Action + state contract), `TTableAgent`
+  (tier 1, history->action), `TReflexAgent` (tier 2, condition-action on the
+  current percept), `TModelAgent` (tier 3, maintains an internal `AgentState`
+  world model and exposes `State()` for the metrics to probe).
+- `Metrics.h/.hxx` — the measurement protocol (section 3.4): `BehaviorMetrics`
+  (correct/FP/FN/latency + rates), `StateRecord`/`StateRecordSet` (capture
+  internal state vectors tagged by context label, fixed-capacity, no
+  std::vector), and `LinearProbe` (full-batch logistic regression over the
+  state words). Verified end-to-end: on a synthetic linearly-separable target
+  the probe reaches 100% train+eval accuracy, proving the
+  capture->records->probe pipeline works.
+
+Verification: standalone probe TU (`_probe_agents.cpp`, since removed) ran all
+six checks -> "ALL iGeek AGENT-LAYER PROBE CHECKS PASSED" (exit 0);
+`-fsanitize=address,undefined` clean (the one UBSan misaligned-store note is a
+pre-existing upstream ASCIICrabs `Puff.hpp` issue, not in these files).
+
+What this does NOT do: it is the framework, not the world. `iGeekQualiaWorld`
+(Phase 1+) is still astar-mary's. The `TModelAgent` internal update is a
+deliberately simple generic linear transform (accumulate percept words into
+slots) so the tier is testable in isolation; specializing it (or adding a
+ProblemSolvingAgent tier) goes through a master-agent review card per the
+section 3.3 constraint.
+
+Open dependency (astar-mary, hetero-tuple): `TVec2F`/`TFloatRect`/`TSprite` are
+hers to build. I did NOT hand-roll float-vector/sprite types in the framework —
+the qualia scene state stays plain IUC scalar datums (grid positions + signature
+words, per plan 3.2) until her types land, so no collision is expected.
+
+
 ## 0a. STATUS UPDATE — 2026-10-07: framework migrated + Puffer RL layer added (low-level)
 
 The iGeek framework headers were **migrated to the latest ASCIICrabs API and
@@ -329,8 +457,11 @@ Phase 0 — Plan review (this doc). RESOLVED 2026-09-11: master-agent +
 low-level ruled section 3.5; their corrections folded in; the Crabs
 include-path blocker (2b) is fixed. Remaining Phase-1 prerequisite:
 confirm the build picks up the ASCIICrabs include root (sibling worlds'
-.vcxproj still list `..\Crabs\*` sources). Exit: build include root
-confirmed.
+.vcxproj still list `..\Crabs\*` sources). **RESOLVED 2026-10-08:**
+astar-mary verified the build picks up the ASCIICrabs include root —
+probe TU compiles clean with `-I../ASCIICrabs` against the current
+repo state (see section 0c). Framework layer is confirmed ready.
+Exit: build include root confirmed. **DONE.**
 Phase 1 — Skeleton world. _Main.cpp, QualiaWorld.h/.hxx (Env subclass
 with a stub ComputeReward), _Seams/ tree, builds and runs the stub.
 Exit: `g++` seam build succeeds, stub env runs one episode.
@@ -348,7 +479,8 @@ science).
 ## 5. Division of labor (proposed)
 
 - astar-mary: AI engine (agents, model-based state, probing), world
-  logic, metrics. Drives Phases 1-5.
+  logic, metrics. Drives Phases 1-5. Framework layer verified
+  2026-10-08 (section 0c); Phase 1 is unblocked.
 - low-level: ASCIICrabs support — verify data-type choices, confirm
   Room-to-bytes dump path for state snapshots, RAMFactory/Autoject
   memory model, any upstream constraint. Reviews the Crabs-facing parts

@@ -19,24 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Env.inl" />
-    <None Include="EnvGoal.inl" />
-    <None Include="EnvReward.inl" />
-    <None Include="Gym.inl" />
-    <None Include="Multiverse.inl" />
-    <None Include="ReadMe.md" />
-    <None Include="School.inl" />
-    <None Include="SchoolCourse.inl" />
-    <None Include="SchoolDegree.inl" />
-    <None Include="SchoolDepartment.inl" />
-    <None Include="_Seams\00.Core.inl" />
-    <None Include="_Seams\01.ImageBMP.inl" />
-    <None Include="_Seams\02.OpenGLHelloWorld.inl" />
-    <None Include="_Seams\ReadMe.md" />
-    <None Include="_Seams\_Debug.inl" />
-    <None Include="_Seams\_Release.inl" />
-    <None Include="_Seams\_Seams.inl" />
-    <None Include="_Seams\_Undef.inl" />
+    <None Include="Env.hxx" />
+    <None Include="EnvGoal.hxx" />
+    <None Include="EnvReward.hxx" />
+    <None Include="Gym.hxx" />
+    <None Include="Multiverse.hxx" />
+    <None Include="README.md" />
+    <None Include="School.hxx" />
+    <None Include="SchoolCourse.hxx" />
+    <None Include="SchoolDegree.hxx" />
+    <None Include="SchoolDepartment.hxx" />
+    <None Include="_Seams\00.Core.hxx" />
+    <None Include="_Seams\01.ImageBMP.hxx" />
+    <None Include="_Seams\02.OpenGLHelloWorld.hxx" />
+    <None Include="_Seams\README.md" />
+    <None Include="_Seams\_Debug.hxx" />
+    <None Include="_Seams\_Release.hxx" />
+    <None Include="_Seams\_Seams.hxx" />
+    <None Include="_Seams\_Undef.hxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Env.h" />
@@ -68,26 +68,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

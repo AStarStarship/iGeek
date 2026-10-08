@@ -10,58 +10,58 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="_Seams\_Release.inl">
+    <None Include="_Seams\_Release.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\_Seams.inl">
+    <None Include="_Seams\_Seams.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\_Undef.inl">
+    <None Include="_Seams\_Undef.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\00.Core.inl">
+    <None Include="_Seams\00.Core.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\01.ImageBMP.inl">
+    <None Include="_Seams\01.ImageBMP.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\02.OpenGLHelloWorld.inl">
+    <None Include="_Seams\02.OpenGLHelloWorld.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\ReadMe.md">
+    <None Include="_Seams\README.md">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="_Seams\_Debug.inl">
+    <None Include="_Seams\_Debug.hxx">
       <Filter>./\_Seams</Filter>
     </None>
-    <None Include="Env.inl">
+    <None Include="Env.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="EnvGoal.inl">
+    <None Include="EnvGoal.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="Gym.inl">
+    <None Include="Gym.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="ReadMe.md">
+    <None Include="README.md">
       <Filter>./</Filter>
     </None>
-    <None Include="EnvReward.inl">
+    <None Include="EnvReward.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="School.inl">
+    <None Include="School.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="SchoolCourse.inl">
+    <None Include="SchoolCourse.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="Multiverse.inl">
+    <None Include="Multiverse.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="SchoolDegree.inl">
+    <None Include="SchoolDegree.hxx">
       <Filter>./</Filter>
     </None>
-    <None Include="SchoolDepartment.inl">
+    <None Include="SchoolDepartment.hxx">
       <Filter>./</Filter>
     </None>
   </ItemGroup>

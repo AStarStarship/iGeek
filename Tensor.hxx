@@ -103,6 +103,16 @@ void TTensorAdd(const TTensor& A, const TTensor& B, TTensor& C) {
   }
 }
 
+void TTensorAddBiasInPlace(TTensor& X, const TTensor& bias) {
+  // X: [B, K], bias: [K, 1]. X[i, j] += bias[j, 0].
+  ISC B = X.rows_, K = X.cols_;
+  for (ISC i = 0; i < B; ++i) {
+    for (ISC j = 0; j < K; ++j) {
+      X.At(i, j) += bias.AtC(j, 0);
+    }
+  }
+}
+
 void TTensorScale(const TTensor& A, FPC s, TTensor& C) {
   for (ISC i = 0; i < A.rows_; ++i) {
     for (ISC j = 0; j < A.cols_; ++j) {
