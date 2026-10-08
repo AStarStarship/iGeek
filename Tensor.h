@@ -64,8 +64,15 @@ void TTensorLayerNormInPlace(TTensor& X);
 /* In-place ReLU: x = max(0, x). */
 void TTensorReluInPlace(TTensor& X);
 
-/* C = A + B (elementwise). */
+/* C = A + B (elementwise). A and B MUST have the same shape [r, c].
+   For a bias column [K, 1] added to a [B, K] tensor, use TTensorAddBias. */
 void TTensorAdd(const TTensor& A, const TTensor& B, TTensor& C);
+
+/* In-place bias broadcast: X is [B, K], bias is [K, 1]. Adds bias[j] to
+   every row's column j: X[i, j] += bias[j, 0]. This is the correct way to
+   add a learned bias (a [K, 1] column) to a batched [B, K] activation —
+   TTensorAdd would overflow because it assumes matching shapes. */
+void TTensorAddBiasInPlace(TTensor& X, const TTensor& bias);
 
 /* C = A * s (scalar broadcast). */
 void TTensorScale(const TTensor& A, FPC s, TTensor& C);

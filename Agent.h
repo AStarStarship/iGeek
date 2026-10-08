@@ -1,5 +1,9 @@
+// Copyright AStarship <https://astarship.net>.
 #ifndef IGEEK_AI_AGENT_T
 #define IGEEK_AI_AGENT_T 1
+
+#include "../ASCIICrabs/_Config.h"
+#include "AgentState.h"
 
 namespace _ {
 
@@ -1716,6 +1720,117 @@ if S is empty then // initialization phase
 return S
 @endcode
 */
+
+/* ===========================================================================
+ * iGeek agent tiers — GENERIC Percept->Action + state (added 2026-10-08)
+ * ---------------------------------------------------------------------------
+ * Canonical home for the iGeek agent engine (iGeek AGENT_PLAN.md section 3.3,
+ * decision 3.5 #2). Worlds include this header and instantiate the tiers; no
+ * per-world copies.
+ *
+ * CONSTRAINT (plan 3.3): this file stays FREE of world-specific stimulus
+ * knowledge. The tiers operate on a flat Percept IUC word array, a flat Action
+ * IUC word, and the AgentState internal buffer. They know nothing about red /
+ * grids / colors — a world binds those. Tier changes for a specific world go
+ * through a master-agent review card, not direct edits.
+ *
+ * Three tiers (plan 3.3), so the qualia study can measure WHERE structure
+ * appears:
+ *   1. TTableAgent  — lookup from percept history to action (baseline).
+ *   2. TReflexAgent — condition-action rules on the current percept.
+ *   3. TModelAgent  — maintains an internal AgentState world model; the tier
+ *                     whose internal state the metrics probe (plan 3.4).
+ * =========================================================================== */
+
+/* Minimal agent contract shared by all three tiers. Generic, no stimulus. */
+class AgentBase {
+ public:
+  virtual ~AgentBase() {}
+  /* Observe a percept (IUC word array, length percept_len); update state. */
+  virtual void OnPercept(const IUC* percept, ISC percept_len) = 0;
+  /* Choose the next action (a single IUC word). */
+  virtual IUC Action() = 0;
+  /* Internal state for inspection/snapshot. NILP for stateless tiers. */
+  virtual const AgentState* State() const { return NILP; }
+  /* Reset internal state to a fresh episode. */
+  virtual void Reset() = 0;
+  /* Number of distinct actions the tier can emit (the world's action count). */
+  virtual ISC ActionCount() const = 0;
+};
+
+/* Tier 1 — table-driven: maps the last history_len percepts (concatenated
+ * IUC words) to an action via a fixed lookup table. Shows whether the task is
+ * even learnable. */
+class TTableAgent : public AgentBase {
+ public:
+  TTableAgent(ISC action_count, ISC history_len, ISC percept_len);
+  ~TTableAgent() override;
+  void OnPercept(const IUC* percept, ISC percept_len) override;
+  IUC Action() override;
+  const AgentState* State() const override;
+  void Reset() override;
+  ISC ActionCount() const override;
+  /* Bind a key (history_len*percept_len IUC words) to an action. The world
+  fills the table; the agent just looks up. */
+  void SetEntry(const IUC* key, IUC action);
+
+ private:
+  ISC action_count_;
+  ISC history_len_;
+  ISC percept_len_;
+  ISC key_len_;
+  ISC key_count_;
+  const IUC* keys_;
+  IUC* actions_;
+  IUC* history_;
+  ISC hist_pos_;
+  ISC hist_len_;
+};
+
+/* Tier 2 — simple reflex: condition-action rules on the CURRENT percept only
+ * (no history). The world registers rules; the agent matches the first exact
+ * word-equal rule and takes its action, else the default. */
+class TReflexAgent : public AgentBase {
+ public:
+  TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap);
+  ~TReflexAgent() override;
+  void OnPercept(const IUC* percept, ISC percept_len) override;
+  IUC Action() override;
+  void Reset() override;
+  ISC ActionCount() const override;
+  /* If current percept == condition (percept_len words), take `action`. */
+  BOL AddRule(const IUC* condition, IUC action);
+  void SetDefaultAction(IUC action);
+
+ private:
+  ISC action_count_;
+  ISC percept_len_;
+  ISC rule_cap_;
+  ISC rule_count_;
+  IUC* conditions_;
+  IUC* rule_actions_;
+  IUC* current_;
+  IUC default_action_;
+};
+
+/* Tier 3 — model-based reflex: maintains an internal AgentState world model.
+ * On each percept it updates the model; on Action() it reads the model. This
+ * is the tier whose internal state the qualia metrics probe (plan 3.4). */
+class TModelAgent : public AgentBase {
+ public:
+  TModelAgent(ISC action_count, ISC state_slots);
+  ~TModelAgent() override;
+  void OnPercept(const IUC* percept, ISC percept_len) override;
+  IUC Action() override;
+  const AgentState* State() const override;
+  void Reset() override;
+  ISC ActionCount() const override;
+
+ private:
+  ISC action_count_;
+  ISC state_slots_;
+  AgentState state_;
+};
 
 }  //< namespace _
 #endif

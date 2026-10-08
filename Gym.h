@@ -58,11 +58,11 @@ class Gym {
 
   /* Step the whole batch by the actions in Actions(); fills Rewards/
   Terminals/ActionMask and advances observations. One call = one batch
-  step (Puffer's puf_step). */
-  void StepBatch();
+  step (Puffer's puf_step). Virtual so a toy gym can override it for tests. */
+  virtual void StepBatch();
 
   /* Reset every env in the batch to a fresh episode (Puffer's puf_reset). */
-  void ResetBatch();
+  virtual void ResetBatch();
 
  protected:
 
