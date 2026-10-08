@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="./">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="./\_Seams">
+      <UniqueIdentifier>{5d45f3f8-9500-44e5-b6f7-af91f93df2d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="_Library.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Block.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Chunk.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ChunkRow.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Config.imul">
+      <Filter>./</Filter>
+    </None>
+    <None Include="CraftingTable.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Entity.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Game.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="GlobalConfig.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Inventory.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Item.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="ItemGroup.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Main.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Mob.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Module.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Recipe.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Server.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="Spawn.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="World.hxx">
+      <Filter>./</Filter>
+    </None>
+    <None Include="_Impl.hxx">
+      <Filter>./</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_Main.cpp">
+      <Filter>./</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>./</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="A.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkRow.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="CraftingTable.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Enchantment.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemGroup.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Mob.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Recipe.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="Spawn.h">
+      <Filter>./</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>./</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
