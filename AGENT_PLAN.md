@@ -5,6 +5,97 @@ Author: astar-mary
 Date: 2026-09-11 04:10 UTC
 Board: astarship
 
+## 0e. STATUS UPDATE — 2026-10-08 (overnight): MONOREPO DONE + PPO actually learns now (astar-mary)
+
+This is the biggest structural change since the plan was written: **iGeek is now
+the single engine repo.** Section 0d's "single-repo reorg planned (NOT executed)"
+is executed, plus the PPO core turned out to have a degenerate-policy bug that
+made training silently do nothing — fixed and verified.
+
+**1. Monorepo: all worlds moved into `iGeek/` (done, committed).**
+- `iGeek/` now contains: the framework (Env/Gym/Multiverse/Tensor/Policy/PPO/
+  Agent/AgentState/Metrics/School), plus `PacWorld/`, `TileWorld/`, `CarWorld/`,
+  `Ulator/`, `WikiWorld/`, `CardsWorld/`, `MazeWorld/`, `PolygonWorld/`,
+  `TypingWorld/`, `VirusWorld/`, `Cookbook/`. No more `iGeek*World` siblings at
+  the AStarship top level (verified: `ls iGeek*` → only `iGeek`).
+- `iGeekVirusWorld.Old` archived into `iGeek/VirusWorld/_Old`.
+- Include depths fixed: iGeek-core includes `../iGeek/X` → `../X`; ASCIICrabs
+  stays at the AStarship top level (still `../../ASCIICrabs` from a world).
+- Commits on branch `Issue10`: `87d5805` (framework cleanup: .inl→.hxx, agent/
+  RL/metrics layers, TileWorld spine, seams migrated), `5b268cc` (monorepo move
+  + include depths), `2bfcf12`/`4085fbc` (de-nest CardsWorld/PacWorld/VirusWorld
+  — git had tracked them as gitlinks), `6788ce5` (reference-name strip + PacWorld
+  fixes), `4ad6a6c` (PacWorld probe overflow fix). Working tree clean.
+- **NOT pushed** (user owns pushes). `origin/Issue10` is stale; `origin/master`
+  has PR #11 merged (55d7e85). Issue10 needs a PR or push by the user.
+- **Stale sibling includes remain** in the frozen SFML/Qt-era worlds (Script2,
+  KabukiToolkit, SFML dirs no longer exist in the tree). Those worlds' .vcxprojs
+  won't build headless anyway. Decision pending: leave as-is or strip.
+
+**2. PPO root cause + fix: argmax sampling made training a no-op (the real bug).**
+- Symptoms: CardsWorld's PPO seam test segfaulted pre-move (stale binary masked
+  it — "gradcheck PASSED" was from a build that predated the PPO test running).
+  After the ASan fix, the test ran but *failed*: `r1 > r0` false, reward flat at
+  0.0 across 300 steps, weights just decaying.
+- Two bugs found and fixed:
+  1. `TToyGym` (CardsWorld `_Seams/06.PPO.hxx`) never allocated `Gym::actions_`
+     → `TPPO::CollectRollout` wrote `gym_.Actions()[i]` to null (SEGV). Fixed:
+     toy gym allocates/frees `actions_`.
+  2. **The load-bearing one:** `TLinearPolicy::SampleActions` was pure argmax —
+     a degenerate deterministic policy. Zero exploration → PPO's gradient carries
+     no signal, the value head can't bootstrap, weights drift but reward never
+     moves. Replaced with seeded-stochastic sampling (seeded LCG + CDF over the
+     softmax), matching the reference fused-kernel's `sample_logits` pattern.
+- Verified: CardsWorld full seam suite passes under ASan/UBSan (exit 0). The
+  PacWorld PPO probe (same TPPO + TLinearPolicy path) benefits too.
+
+**3. Reference-name strip (user directive 2026-10-08).**
+- All `Puffer`/`PufferLib`/`puf_*` references removed from iGeek source + docs.
+  Replaced with neutral terms: "vectorized-batch", "fused PPO kernel",
+  "reference PPO fork", "preallocate-at-init pattern". The `~/3P/PufferLib` clone
+  stays (it's a real reference), but iGeek's code no longer names it.
+- Kept: `TypingWorld/item.hxx` "Pufferfish" (a fish species, not the lib).
+- Verified: `grep -ri puffer` in iGeek (excl .git, excl Pufferfish) → 0 hits.
+
+**4. PacWorld env + probe fixes (verified by actual runs).**
+- `PacWorldEnv::Reset` now rewinds `rng_` to `seed_` before regenerating the
+  maze. Without the rewind, consecutive episodes saw consecutive LCG states and
+  the layout drifted every episode (not i.i.d. per seed).
+- `_probe_pacworld.cpp`: `OK()`/`FAIL()` had hardcoded `write(1, what, 96)` — a
+  global-buffer-overflow caught by ASan. Fixed to strlen. Then a *second*
+  overflow: the greedy-value print block used a 64-byte stack buffer that
+  overflowed once the greedy values grew, and the write landed on corrupted data
+  → the probe hung after printing "ok: ppo trainstep". Fixed: 128-byte buffer,
+  bounded copies, hard cap. Ad-hoc verification (11/11 checks): ASan clean,
+  -O2 clean, `PACWORLD_PROBE_OK` exit 0.
+- **The trend is real now:** probe prints `greedy before=-10 after=239` (reward
+  in hundredths) — one TrainStep already moves the needle on PacWorld.
+- `_verify_pacworld.cpp`: `PASS linear-learns (envs=8) before=0.5 after=65.5`,
+  `PASS transformer-runs (envs=8)`, `VERIFY_TRAIN_PASS`, exit 0.
+
+**5. What this means for the Qualia plan (sections 3–5).**
+- The engine layer the Qualia world sits on is now a single repo with a *working*
+  RL core (not just headers). Phase 1 (skeleton `QualiaWorld`) can proceed on
+  `iGeek/` directly — no more cross-repo includes.
+- The agent framework (0b) + RL core (0a/0d) + now stochastic sampling = the
+  `TModelAgent` tier can be driven by a real `TPolicy`/`TPPO` instead of a
+  hand-written update, which is exactly what the qualia study needs to measure
+  internal-state structure under learning.
+- The "red representation" probe (section 3.5) is the natural next experiment:
+  train a `TLinearPolicy` on a red-token stimulus, then run the `LinearProbe`
+  (Metrics.h) over the `AgentState` words to see if "red present" is
+  linearly-decodable from internal state.
+
+**Open items (not done):**
+- Push `Issue10` (user owns). `origin/Issue10` is 8 commits behind.
+- Stale sibling includes in frozen SFML/Qt worlds (Script2/KabukiToolkit/SFML) —
+  decision: leave or strip.
+- CrabsTK + ASCIICrabs housekeeping (stale includes, dead references) — not started.
+- `TTransformer` full block backprop wired into `TPPO` (currently only
+  `TLinearPolicy` has `SgdStep`; the transformer runs clean but its gradients
+  aren't used by the PPO update yet). That's the next RL milestone.
+- `QualiaWorld` Phase 1 skeleton — unblocked, not started.
+
 ## 0c. STATUS UPDATE — 2026-10-08: astar-mary verified the framework layer (t_197929d1)
 
 astar-mary **independently re-verified** the framework layer low-level
