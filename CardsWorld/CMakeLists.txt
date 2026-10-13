@@ -15,3 +15,11 @@ target_include_directories (iGeekCardsWorld PRIVATE
   "${PROJECT_SOURCE_DIR}/_Seams"
   "${CRABS_DIR}"
 )
+
+# Independent headless demo and seam-test entrypoint; no external test framework.
+add_executable (blackjack_demo blackjack_demo.cpp)
+add_executable (blackjack_demo_tests demo_tests.cpp)
+foreach (demo_target blackjack_demo blackjack_demo_tests)
+  target_include_directories (${demo_target} PRIVATE
+    "${PROJECT_SOURCE_DIR}/_Seams" "${PROJECT_SOURCE_DIR}" "${CRABS_DIR}")
+endforeach ()

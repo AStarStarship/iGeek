@@ -20,7 +20,7 @@ class HitboxComponent {
   _::FPC offset_y;
   _::FPC width_;
   _::FPC height_;
-  _::TFloatRect next_position_;
+  mutable _::TFloatRect next_position_;  //< Cache for the const bounds query.
 
  public:
   HitboxComponent(_::FPC offset_x, _::FPC offset_y, _::FPC width, _::FPC height);
