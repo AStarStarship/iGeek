@@ -132,9 +132,13 @@ void PacWorldEnv::ResetGhosts() {
 }
 
 void PacWorldEnv::Reset() {
-  // Regenerate a fresh maze per episode (new seed offset) for variety, but
-  // keep the SAME layout within an episode. For training reproducibility we
-  // regenerate from seed_ each Reset so episodes are i.i.d. per seed.
+  // Regenerate a fresh maze per episode for variety, but keep the SAME
+  // layout within an episode. Episodes are i.i.d. per seed ONLY IF every
+  // reset returns to the same starting point of the RNG stream — so rewind
+  // to seed_ before regenerating. Without the rewind, consecutive episodes
+  // saw consecutive LCG states and the layout drifted every episode (the
+  // maze regenerated in place mid-RNG-stream).
+  rng_ = seed_;
   GenerateMaze();
   pac_x_ = 1; pac_y_ = 1;
   pac_dir_ = ActionStay;

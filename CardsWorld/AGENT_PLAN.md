@@ -1,9 +1,8 @@
-# AGENT_PLAN — iGeekCardsWorld AI Gym (CrabsTK/ASCIICrabs, PufferLib-informed)
+# AGENT_PLAN — iGeekCardsWorld AI Gym (CrabsTK/ASCIICrabs, vectorized-batch)
 
 Status: PLAN (not yet executed). Owner: low-level engineer. Date: 2026-10-07.
 Goal: turn the working `BlackjackEnv` into a real, trainable RL gym on the
-ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from
-`~/3P/PufferLib` (PPO + MuSE-transform) — implemented in C/C++, not Python.
+ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from a local C/CUDA PPO reference clone (PPO + MuSE-transform) — implemented in C/C++, not Python.
 
 ## 0. Why this plan exists
 - `iGeekCardsWorld` now builds, runs, and passes its seam unit tests
@@ -11,19 +10,19 @@ ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from
   Credit/RunPolicy`. But there is no *learner*: `RunPolicy` takes a hand-written
   C function pointer, not a neural policy. To "train agents to play card games"
   we need a policy network + a PPO update loop.
-- `~/3P/PufferLib` is a heavily modified **C/CUDA** PufferLib fork (no Python
-  `pufferlib` package; `src/algo.cu` is a fused PPO kernel + MuSE-transform
-  decoder, `src/pufferenv.h` is the env contract). It is the reference
+- The reference is a heavily modified **C/CUDA** PPO fork (no Python
+  package; its `algo.cu` is a fused PPO kernel + MuSE-transform decoder, and
+  its env header is the env contract). It is the reference
   *architecture*, but it cannot be dropped in as-is: it is CUDA, C99, uses
   `raylib`/`cJSON`/`glad`, and a `Float`/`Dict`/`obs_t` data model that does not
   match our `CHA/ISC/BOL` + `TStack/ALoom` no-stdlib system. So the plan is to
   **port the algorithm's shape**, not copy the tree.
 
-## 1. What PufferLib actually is (grounded, from the local fork)
-Env contract — `src/pufferenv.h`:
+## 1. What the reference kernel actually is (grounded, from the local fork)
+Env contract (the env header in the reference clone):
 - `typedef struct Agent { obs_t* observations; float* actions; float* rewards;
   float* terminals; unsigned char* action_mask; int policy; } Agent;`
-- Backend hooks: `puf_init(Env*, Dict*)`, `puf_reset(Env*)`, `puf_step(Env*)`,
+- Backend hooks: `puf_init(Env*, Dict*)`, `ResetBatch(Env*)`, `StepBatch(Env*)`,
   `puf_render(Env*)`, `puf_close(Env*)`, `puf_log(Log*, Dict*)`;
   optional `puf_set_bot_policy(Env*, int)` for scripted opponents.
 - `bf16` = `uint16_t` with `f32_to_bf16`/`bf16_to_f32` helpers (half-precision
@@ -77,8 +76,8 @@ CARDSWORLD_TRAIN seam  (verify learning happens on a toy target)
   `dtype_`); free fns `TTensorAlloc`, `TTensorFree`, `TTensorMatMul`,
   `TTensorSoftmax`, `TTensorLayerNorm`, `TTensorRelu`, `TTensorAdd`.
 - Precision: store `FPC`; optionally a `bf16` (`IUB`) packed path later for
-  throughput (mirrors PufferLib's `bf16`). Start `FPC` for correctness.
-- **Determinism requirement (PufferLib values this):** all RNG through
+  throughput (mirrors the reference's `bf16`). Start `FPC` for correctness.
+- **Determinism requirement (the reference values this):** all RNG through
   `_::Random` with a **clamped** index where it indexes (we already hit the
   half-normal `TRandom` bug); expose a seed setter so rollouts are reproducible.
 
@@ -91,21 +90,21 @@ CARDSWORLD_TRAIN seam  (verify learning happens on a toy target)
 - Forward: obs -> `logits[B, A]` + `values[B]` + (optionally) `logstd[B, A]`
   if we ever go continuous.
 - Backward: analytic PPO gradients -> `grad_logits`, `grad_value` (the exact
-  quantities PufferLib's fused kernel produces) -> backprop through the blocks.
+  quantities the fused kernel produces) -> backprop through the blocks.
 - This is the biggest piece. Plan it as its own milestone with its own seam
   unit tests (forward shape checks, a known-input gradient check against a
   hand-computed case).
 
 ### 3.3 `TPPO` (seam `IGEEK_PPO`)
-- Rollout buffer (PufferLib-shaped): `actions`, `rewards`, `terminals`,
+- Rollout buffer (fixed-layout): `actions`, `rewards`, `terminals`,
   `logits` (old policy), `values`, `action_mask`, `obs` — fixed-size
-  `TTensor`s, preallocated at init (PufferLib style: preallocate at init, free
+  `TTensor`s, preallocated at init (style: preallocate at init, free
   at close).
 - **GAE** advantage estimate: `delta = r + gamma*V(s')*(1-done) - V(s)`,
   `adv_t = sum lambda^k delta`.
 - Update: K epochs, minibatches; loss =
   `-min(ratio*adv, clip(ratio,1-eps,1+eps)*adv)  +  vf_coef*value_loss  -
-  ent_coef*entropy`, with `ratio = exp(new_logp - old_logp)` and PufferLib's
+  ent_coef*entropy`, with `ratio = exp(new_logp - old_logp)` and the reference's
   **value-clip** (`vf-clip`) on the value loss.
 - Output: updated `TTransformer` weights + a `TPPOStats` (policy_loss,
   value_loss, entropy, approx_kl, explained_var) for logging.
@@ -115,7 +114,7 @@ CARDSWORLD_TRAIN seam  (verify learning happens on a toy target)
   parallel game states and the flat arrays `observations[B*obs_len]`,
   `actions[B]`, `rewards[B]`, `terminals[B]`, `action_mask[B*A]`.
   Methods: `GymInit(N)`, `GymReset()`, `GymStep(actions[B])`, `GymClose()`,
-  `GymLog()`. This is the direct analog of PufferLib's `puf_*` contract.
+  `GymLog()`. This is the direct analog of the flat-array env contract.
 - `BlackjackGym` adapts the existing `Blackjack`/`BlackjackEnv` to `TGym`:
   - **Observation encoding** (critical design decision — see §4): the current
     `Observe()` returns a *text* percept (`"P:15 D:5 H:1 R:0\nKs 5d"`). For a
@@ -135,7 +134,7 @@ port `Env/Gym/EnvGoal/EnvReward` to `TRoom<...>` + `CHA*` and have
 
 ## 4. Open decisions (need the Captain's call before Milestone 2+)
 1. **Action space**: start **discrete** (hit/stand, A=2) — matches the current
-   engine and is the tractable start. PufferLib's `NUM_ATNS` head is general, so
+   engine and is the tractable start. The reference `NUM_ATNS` head is general, so
    we keep the door open to combo/continuous actions later. *Recommendation:
    discrete first.*
 2. **Observation encoding**: (a) fixed scalar vector (hand value, up-card,
@@ -150,7 +149,7 @@ port `Env/Gym/EnvGoal/EnvReward` to `TRoom<...>` + `CHA*` and have
    the same forward/gradient structure? A real MuSE-port is a large lift.
    *Recommendation: standard small transformer first (proves the PPO loop
    learns), then swap in MuSE-block internals as an optimization.*
-5. **CPU only** (this VM has no GPU — do not assume CUDA). The PufferLib CUDA
+5. **CPU only** (this VM has no GPU — do not assume CUDA). The reference CUDA
    kernels are reference-only; we write CPU FPC kernels. Confirm we are not
    expecting GPU training on this box.
 
@@ -204,7 +203,7 @@ Aggregate them in `_Tests.hxx` (extend `TTestTree<CWTest::Core, ...>`).
 - **No GPU on this VM.** All M1–M6 are CPU FPC. If GPU training is the actual
   goal, that's a separate hardware/VM task — say so and I'll re-plan the
   kernels for CUDA.
-- **Do not vendor the PufferLib tree.** It is CUDA/C99/raylib/cJSON and
+- **Do not vendor the reference PPO tree.** It is CUDA/C99/raylib/cJSON and
   incompatible with the no-stdlib ASCIICrabs system; only its *algorithm shape*
   is reusable. Copying `src/`/`vendor/` in would break the single-TU no-stdlib
   build.

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 
 // The card world's GYM seam unit: unit tests for the vectorized BlackjackGym
-// (Puffer-informed) and the TTensor ops it's built on. Gated on
+// (vectorized-batch) and the TTensor ops it's built on. Gated on
 // CARDSWORLD_CORE so it runs with the default build (the first seam).
 
 #if SEAM >= CARDSWORLD_CORE

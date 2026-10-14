@@ -10,8 +10,8 @@ namespace _ {
    8 is a sane console default; raise for larger vectorization. */
 enum { GymEnvMax = 8 };
 
-/* A container for one or more Envs. Puffer-informed: this is the analog of
-   PufferLib's vectorized `Env*`/`Agent*` — a Gym batches N parallel envs so
+/* A container for one or more Envs. vectorized-batch: this is the analog of
+   the fused-kernel vectorized `Env*`/`Agent*` — a Gym batches N parallel envs so
    the policy can step them all in one call (the `Agent{observations,
    actions, rewards, terminals, action_mask}` arrays).
 Migrated 2026-10-07:
@@ -19,7 +19,7 @@ Migrated 2026-10-07:
     (TRoom instantiation is broken upstream; logged to ASCIICrabs/AGENT_PLAN.md).
   - `Gym(const CHA* name)` (was `const STA*` dead type).
   - Added the vectorized batch accessors the PPO loop needs (see
-    iGeek AGENT_PLAN.md, Puffer section).
+    iGeek AGENT_PLAN.md, batch section).
 */
 class Gym {
  public:
@@ -36,10 +36,10 @@ class Gym {
 
   void LoadDLL(const CHA* library);
 
-  /* --- Vectorized batch interface (Puffer-informed) -------------------
+  /* --- Vectorized batch interface (vectorized-batch) -------------------
   The PPO loop never calls a single env; it steps the whole batch. These
   return pointers to the flat per-batch arrays (owned by the Gym,
-  preallocated at init — the PufferLib "preallocate at init, free at close"
+  preallocated at init — the the reference PPO kernel "preallocate at init, free at close"
   pattern). The arrays are indexed [env_count][feature]. */
 
   /* Number of envs in the batch (= EnvCount of the added envs). */
@@ -58,10 +58,10 @@ class Gym {
 
   /* Step the whole batch by the actions in Actions(); fills Rewards/
   Terminals/ActionMask and advances observations. One call = one batch
-  step (Puffer's puf_step). Virtual so a toy gym can override it for tests. */
+  step (one batch step). Virtual so a toy gym can override it for tests. */
   virtual void StepBatch();
 
-  /* Reset every env in the batch to a fresh episode (Puffer's puf_reset). */
+  /* Reset every env in the batch to a fresh episode (full-batch reset). */
   virtual void ResetBatch();
 
  protected:

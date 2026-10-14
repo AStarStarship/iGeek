@@ -26,7 +26,7 @@ class EnvGoal : public Operand {
   /* Script2 operation. */
   const Op* Star(CHC index, Crabs* crabs) override;
 
-  /* Accessors (Puffer-informed: the policy reads observation, the reward
+  /* Accessors (vectorized-batch: the policy reads observation, the reward
   compares achieved vs desired). */
   Crabs* Observation() { return observation_; }
   Crabs* DesiredGoal() { return desired_goal_; }

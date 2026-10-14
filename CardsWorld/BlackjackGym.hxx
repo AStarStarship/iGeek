@@ -8,7 +8,7 @@ BlackjackGym::BlackjackGym(ISC tables)
     : table_count_(tables < 1 ? 1 : (tables > TableMax ? TableMax : tables)),
       observations_(NILP), rewards_(NILP), terminals_(NILP),
       action_mask_(NILP), last_batch_reward_(0.0f) {
-  // Preallocate the flat batch arrays (Puffer: init at ctor, free at dtor).
+  // Preallocate the flat batch arrays (preallocate at ctor, free at dtor).
   observations_ = new FPC[table_count_ * ObsLength]();
   rewards_ = new FPC[table_count_]();
   terminals_ = new FPC[table_count_]();

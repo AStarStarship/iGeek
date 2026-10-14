@@ -19,7 +19,7 @@ Migrated 2026-10-07 to the latest ASCIICrabs API:
     as Crabs datums) is opt-in per world, NOT the base class. Logged to
     ../ASCIICrabs/AGENT_PLAN.md.
   - `STA*` (dead type; in memory `const CHA*`) replaced with `const CHA*`.
-  - `FPC` (float32) is the per-step scalar reward — matches PufferLib's
+  - `FPC` (float32) is the per-step scalar reward — matches the fused-kernel
     `Agent.rewards` and the Qualia plan's "single scalar reward" decision.
 */
 class Env {
@@ -33,7 +33,7 @@ class Env {
   ISC StateCount() const { return state_count_; }
 
   /* Per-step reward. Achieved vs desired EnvGoal -> scalar reward.
-  Puffer-informed: reward is a single scalar per env per step (FPC); multi-
+  vectorized-batch: reward is a single scalar per env per step (FPC); multi-
   metric episode data streams separately, NOT through EnvReward.
   @param crabs        The Crabs to read/write the reward to. May be NILP.
   @param achieved     What the agent actually did this step.

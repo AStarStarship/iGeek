@@ -15,7 +15,7 @@ that the PPO loop can step deterministically.
 
 - **Grid, discrete**: one cell per action (no sub-cell motion). The original
   was continuous pixel-based; discrete is cleaner + deterministic for RL.
-- **Observation** (fixed length, Puffer "scalar vector"): a `(2R+1)^2` local
+- **Observation** (fixed length, fixed-length scalar vector): a `(2R+1)^2` local
   window around pac, `R=3` → 49 cells × 7 channels (wall/dot/superdot/bonus/
   ghost/weakghost/pac) + 1 progress feature = **344 features**.
 - **Actions**: 5 (Stay, Up, Down, Left, Right).

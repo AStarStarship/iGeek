@@ -27,7 +27,7 @@
 #include <Blackjack.hxx>
 #include <BlackjackEnv.h>
 #include <BlackjackEnv.hxx>
-// The Puffer-informed RL layer (iGeek tensor ops + the vectorized gym).
+// The vectorized-batch RL layer (iGeek tensor ops + the vectorized gym).
 #include "../Tensor.h"
 #include "../Tensor.hxx"
 #include "../Policy.h"

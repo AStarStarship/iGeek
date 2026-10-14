@@ -69,7 +69,7 @@ class TLinearPolicy : public TPolicy {
     TTensor lse = TTensorAlloc(B, 1);
     TTensorRowLogSumExp(logits, lse);
     for (ISC b = 0; b < B; ++b) {
-      // Sampled-stochastic (PufferLib's sample_logits pattern): a seeded LCG
+      // Sampled-stochastic (the sample-from-CDF pattern): a seeded LCG
       // draws u in [0,1) and the action is the first index whose CDF exceeds
       // u. Pure argmax here is a degenerate policy (zero exploration -> PPO
       //'s gradient carries no signal and the value head can't bootstrap);

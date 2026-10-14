@@ -46,6 +46,20 @@ class TileMap {
   const _::TVec2I& SizeGridMax() const;
   const _::TVec2F& SizeMaxF() const;
 
+  /** Cell width in world units; clients can choose metres for simulation. */
+  _::FPC GridSize() const { return grid_size_f_; }
+  /** Read-only tile data. NILP denotes an empty cell or invalid coordinates. */
+  const Tile* TileAt(_::ISC x, _::ISC y) const {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return NILP;
+    return map_[_::IUD(y) * _::IUD(width_) + _::IUD(x)];
+  }
+  /** Collision flag, independent of type; outside the map is solid. */
+  _::BOL CellBlocked(_::ISC x, _::ISC y) const {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return true;
+    const Tile* tile = TileAt(x, y);
+    return tile != NILP && tile->GetCollision();
+  }
+
   void AddTile(const _::ISC x, const _::ISC y, const _::TIntRect& texture_rect,
                const _::BOL collision, const _::ISM type);
   void AddSpawnerTile(const _::ISC x, const _::ISC y,
