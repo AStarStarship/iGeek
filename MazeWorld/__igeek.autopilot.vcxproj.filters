@@ -33,16 +33,16 @@
     <None Include="_undef.inl">
       <Filter>igeek.autopilot</Filter>
     </None>
-    <None Include="agentmaze.inl">
+    <None Include="AgentMaze.inl">
       <Filter>igeek.autopilot</Filter>
     </None>
-    <None Include="readme.md">
+    <None Include="README.md">
       <Filter>igeek.autopilot</Filter>
     </None>
     <None Include="xy.inl">
       <Filter>igeek.autopilot</Filter>
     </None>
-    <None Include="seams\readme.md">
+    <None Include="seams\README.md">
       <Filter>igeek.autopilot\seams</Filter>
     </None>
   </ItemGroup>
@@ -52,25 +52,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="agentmaze.h">
+    <ClInclude Include="AgentMaze.h">
       <Filter>igeek.autopilot</Filter>
     </ClInclude>
-    <ClInclude Include="maze.h">
+    <ClInclude Include="Maze.h">
       <Filter>igeek.autopilot</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
+    <ClInclude Include="Test.h">
       <Filter>igeek.autopilot</Filter>
     </ClInclude>
-    <ClInclude Include="xy.h">
+    <ClInclude Include="Xy.h">
       <Filter>igeek.autopilot</Filter>
     </ClInclude>
     <ClInclude Include="_config.h">
       <Filter>igeek.autopilot</Filter>
     </ClInclude>
-    <ClInclude Include="seams\01.bar.h">
+    <ClInclude Include="Seams\01.Bar.h">
       <Filter>igeek.autopilot\seams</Filter>
     </ClInclude>
-    <ClInclude Include="seams\00.foo.h">
+    <ClInclude Include="Seams\00.Foo.h">
       <Filter>igeek.autopilot\seams</Filter>
     </ClInclude>
   </ItemGroup>
