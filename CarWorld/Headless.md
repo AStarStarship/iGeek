@@ -12,7 +12,7 @@ Python is optional test/verification tooling.
 
 ## Build and execute
 
-From `/home/astarcale/AStarStarship/iGeek`:
+From the iGeek repo root:
 
 ```sh
 cmake -S CarWorld -B CarWorld/build -DCMAKE_BUILD_TYPE=Release
@@ -254,7 +254,7 @@ contact-normal representation, a 6-DOF chassis/orientation, suspension/load
 transfer and per-wheel contact state. Compare the new model with this archived
 planar baseline before claiming a gain. A future learned driver must be tested
 against the classical baseline on held-out layouts, not credited with this
-controller's successful drives. Laplacian/MUSE policy integration and GPU
+controller's successful drives. Learned-policy integration and GPU
 training are not implemented by this change.
 
 All implementation/test files in this task are additive under `CarWorld/`.

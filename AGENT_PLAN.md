@@ -5,6 +5,279 @@ Author: astar-mary
 Date: 2026-09-11 04:10 UTC
 Board: astarship
 
+## 0f. PUBLICATION READINESS — 2026-10-18: full review + cleanup pass (astar-mary)
+
+Goal: get the iGeek + CrabsTK + ASCIICrabs trees ready to publish for
+inspection by external experts ("big wigs") and to start attracting CrabsTK /
+ASCIICrabs users. This section is the canonical problem list + fix sequence.
+It supersedes the stale "open items" scattered in 0a–0e.
+
+### 0f.0 Context: IP structure (user directive 2026-10-18)
+
+- **iGeek** = for-profit, **source-available non-commercial** (AStarship
+  Strong Source-available License: no third-party commercialization, mandatory
+  improvement donations). Contains patented IP. Trade secrets are documented
+  on GitHub as the de facto protection.
+- **CrabsTK / ASCIICrabs** = the reusable non-iGeek code (game engine / app
+  API / math that other apps reuse). ASCIICrabs was hand-built over years; it
+  is the foundation, not a clone.
+- **NEVER publish**: Laplacian Tokenization, Quaternion Fourier, MUSE
+  (architecture), Puffer/PufferLib, private machine paths
+  (`/mnt/MuhNAS/...`, `/home/astarcale/...`, `3P/...`), internal agent
+  orchestration (Qwen/Gemini handoffs).
+
+### 0f.1 DONE this session (verified)
+
+1. **IP scrub (all three trees).** Removed/neutralized every public
+   MUSE/MuSE/Puffer/PufferLib/Laplacian/quaternion-Fourier reference and every
+   private path:
+   - iGeek code: `Policy.h`, `PolicyNet.hxx` ("MuSE-style" → "compact
+     transformer policy" — then REVERTED 2026-10-18: user clarified MUSE is a
+     licensed product name and may ship; only the mechanism — monoid
+     sphere→ellipsoid transform — stays private).
+   - iGeek docs: `CarWorld/Presentation.md` (title, Fourier/Laplacian mentions,
+     NAS + MUSETransformer paths), `CarWorld/Headless.md`,
+     `CardsWorld/AGENT_PLAN.md` (11 spots), `CardsWorld/BlackjackDemo.md`.
+   - ASCIICrabs: `UnificationPlan.md` (spectral-tokenizer → MUSE refs).
+   - CrabsTK: `Math/Blas.h` (MUSEWorld → TMatrix), `AGENT_PLAN.md` (hermes
+     scratch path), `HANDOFF.md` (Qwen/Gemini/investor lines).
+   - Verified: `grep -rni 'muse|puffer|laplacian|quaternion'` across all three
+     trees (excl. iGeek/AGENT_PLAN.md internal history) → 0 hits.
+   - NOTE: iGeek `AGENT_PLAN.md` (this file) keeps its 0a–0e history which
+     mentions Puffer/MuSE as internal record. DECISION NEEDED: strip this file
+     from the public tree or accept it as internal-only (it is the most
+     sensitive doc in the repo).
+2. **License.** `LICENSE.md` created (iGeek) with the AStarship Strong
+   Source-available License; `README.md` rewritten with repo map + build
+   instructions + corrected license text (typos fixed: purchae/comrechial/
+   refereed/bound-to). DECISION NEEDED: do CrabsTK + ASCIICrabs get the same
+   license, or a permissive one (their READMEs currently carry MIT-style text
+   that says "sell copies" — inconsistent with the non-commercial intent)?
+3. **Core framework self-test (new, green).** `CMakeLists.txt` (root) +
+   `_Seams/_Main.cpp` + `_Seams/core_test.cpp` + `_Seams/_Config.h` (rebuilt
+   ASCII; was UTF-16) + `_Seams/00.Core.hxx`. Single-TU build links the whole
+   core layer and checks: TTensor kernels vs hand values, TLinearPolicy
+   determinism + sampling, TPPO over a toy Gym (finite stats), the 3 agent
+   tiers, LinearProbe end-to-end. **Release + ASan/UBSan/leak: PASS (exit 0).**
+   Replaced the dead `_Seams` tree (`_Main.cpp` included nonexistent
+   `../../Graphics/_Package.hxx`; `01.ImageBMP.hxx`/`02.OpenGLHelloWorld.hxx`
+   needed SDL/glm/glew; `_Seams.hxx` had stale `KABUKITOOLKIT_RELEASE` +
+   15 `SCRIPT2_*` levels; CMakeLists was C++11-era). Dead files removed.
+4. **Broken includes fixed.** `EnvGoal.hxx` + `EnvReward.hxx`
+   `#include <Script2/Operand.h>` (dead project) → their own headers.
+5. **Chimera+ functional casts restored in core.** ~50 C-style casts
+   `(IUD)x`/`(FPC)x`/`(ISC)x` → `IUD(x)`/`FPC(x)`/`ISC(x)` across
+   `Agent.hxx`, `AgentState.hxx`, `LinearPolicy.hxx`, `PolicyNet.hxx`,
+   `PPO.hxx`, `Tensor.hxx`, `Metrics.hxx`.
+6. **Real bug fixed (found by the new test): LinearProbe scale mismatch.**
+   `Train` normalized features by `1/max_abs` but `Predict`/`Accuracy` did
+   not, so reported accuracy was computed on a different scale than training
+   (stuck at 56% on separable data). Added `inv_scale_` member, applied in
+   `Predict`. Probe now reaches 100% on the test target.
+7. **Regression check.** BikeWorld + CarWorld (the worlds that compile the
+   modified core `.hxx` files) rebuild clean after the changes.
+
+### 0f.2 MAJOR PROBLEMS — the list (talk-out + fix sequence)
+
+Severities: [C]ritical (publish-blocker), [M]ajor, [m]inor.
+
+**A. IP / licensing**
+- A1 [C] `iGeek/AGENT_PLAN.md` itself is the most IP-sensitive doc (Puffer,
+  MuSE, "dunk on him with MuSE Transform", NAS paths in history). Strip from
+  public tree OR gate it private. (DECISION)
+- A2 [C] CrabsTK + ASCIICrabs have NO LICENSE file; their READMEs carry
+  MIT-style "sell copies" text that contradicts the non-commercial intent.
+  (DECISION: same AStarship license vs permissive)
+- A3 [M] ~35 iGeek files lack the `Copyright AStarship` header (all of
+  MazeWorld/, most of CarWorld/ XY.h+xy.hxx+agentmaze.hxx+_Main.cpp,
+  TypingWorld/_seams, PolygonWorld/_Config.h, Ulator/_Config.h,
+  WikiWorld/_Config.h).
+- A4 [m] Two third-party licenses embedded (PolygonWorld/Resources/LICENSE_OFL.
+  txt, TileWorld/data/herringbone/license.txt) with no top-level NOTICE.
+
+**B. Core framework API**
+- B1 [C] DONE — Script2 includes (see 0f.1.4).
+- B2 [M] DONE — C-style casts (see 0f.1.5).
+- B3 [M] Module-file mismatch: `LinearPolicy.hxx` declares `TLinearPolicy` but
+  has no `LinearPolicy.h`; `TTransformer` declared in `Policy.h` but
+  implemented in `PolicyNet.hxx` (no `PolicyNet.h`). External reader can't tell
+  the canonical declaration. FIX: add the missing `.h` decls (or fold the
+  decl into the existing header) so each impl maps to one declaration.
+- B4 [M] `Agent.h` is 1,836 lines: ~1,423 lines of Russell & Norvig textbook
+  excerpts (figures/tables/chapter text) precede the 4 agent classes.
+  Copyrighted-book-content + review-quality problem. FIX: move the reference
+  text to a `_Spec/`-style doc or an appendix file; keep only the classes +
+  a citation in `Agent.h`.
+- B5 [M] `Gym` API leaks raw internal pointers (`Observations()/Actions()/
+  Rewards()/Terminals()/ActionMask()`) with no const overload and no lifetime
+  doc; `LoadDLL()` is a public no-op stub; base `StepBatch()/ResetBatch()` are
+  silent no-ops. FIX: document ownership (Gym owns, valid until ResetBatch /
+  dtor), add const overloads, mark `LoadDLL` `@deprecated stub` or remove.
+- B6 [m] `TTensor.dtype_` is set but never used ("reserved for bf16").
+- B7 [M] DONE — dead `_Seams` tree (see 0f.1.3).
+- B8 [m] `Multiverse` is a hollow class (named "container" but holds no
+  envs; `ComputeReward` returns 0.0f). Either implement or mark experimental.
+- B9 [m] `School*` (School/SchoolCourse/SchoolDegree/SchoolDepartment) extend
+  `Operand` but nothing in the tree uses them; verify they compile or move to
+  a clearly-labeled experimental set.
+
+**C. Worlds (the monorepo is not uniformly publish-ready)**
+- C1 [M] Only 4 of 13 worlds integrate with the RL core (BikeWorld, CarWorld,
+  CardsWorld, PacWorld). The rest (HBM, MazeWorld, PolygonWorld,
+  PrisonerWorld, SudokuWorld, TileWorld, TypingWorld, Ulator, WikiWorld) are
+  standalone. The "AI gym" claim doesn't cover most of the tree. FIX: label
+  each world's README with status: RL-integrated / simulation-only /
+  experimental / legacy.
+- C2 [C] Frozen SFML/legacy worlds that won't compile headless:
+  `PacWorld/{Bonus,Character,Dot,GameState,PacWorld}.h` include `<SFML/...>`;
+  `PacWorld/Animator.h` + `TypingWorld/A.h` + `WikiWorld/_Main.cpp` +
+  `Ulator/_Main.cpp` include old `<Crabs/...>` paths (pre-rename, don't
+  resolve). `PacWorld/CMakeLists.txt` is broken (unterminated string,
+  references nonexistent `main.cc`, links SFML). FIX: quarantine the SFML
+  files (move to `_Old/` or a `legacy/` dir) or strip them; the headless
+  PacWorld env is the live code.
+- C3 [M] `TileWorld` is a fork mid-port: 11 spine files still carry SFML-era
+  includes + `<TVec.h>`/`<_ConfigHeader.h>` angle-bracket includes that assume
+  a specific -I; `_Seams/_Main.cpp` calls `iGeek::Env(...).Run()` via
+  `../../iGeek/Env.hxx` (path + namespace that don't match the current root).
+  No CMakeLists. FIX: finish the headless port or quarantine TileWorld.
+- C4 [M] Divergent duplicates: `CarWorld/AgentMaze.h` vs `MazeWorld/AgentMaze.h`
+  are different encodings (one UTF-16); CarWorld also has `XY.h`+`xy.hxx`+
+  `agentmaze.hxx` (no copyright) duplicating MazeWorld `Xy.h`.
+  `PolygonWorld/Agent.h` is a second copy of root `Agent.h` (same
+  `IGEEK_AI_AGENT_T` guard → redefinition hazard). FIX: dedupe; one canonical
+  Agent.h, one AgentMaze.
+- C5 [M] Probe/debug files in source tree: `CardsWorld/{_diag_ppo.cpp,
+  _probe_ppo.cpp}`, `PacWorld/{_probe_pacworld.cpp,_probe_pacworld.hxx,
+  _verify_pacworld.cpp}`. FIX: move to `_Seams/` or delete.
+- C6 [m] Empty/ghost dirs: `VirusWorld/` (only .vs + x64), `CardsWorld/_seams`
+  (empty), `SudokuWorld/_Seams` + `SudokuWorld/data` (empty), `iGeek/x64/Debug`.
+- C7 [m] 3 untracked new worlds (PrisonerWorld, SudokuWorld, HBM) not in the
+  publish baseline. DECISION: ship them (commit) or exclude from this publish.
+- C9 [C] **DONE — CardsWorld unblocked (was: cannot compile against current
+  ASCIICrabs, pre-existing).** Root cause: `ASCIICrabs/_Package.hxx:13`
+  included `Floor.hxx`, deleted upstream 2026-10-13 (commit `4da1d3b`,
+  message ".") without removing the include — broke every world building
+  through the package root. Fix applied this session: deleted the one dead
+  include line (verified zero other references). CardsWorld rebuilt from
+  scratch against fixed upstream: **seam tests exit 0** (Core card logic,
+  Gym tensor ops, PolicyNet determinism + gradcheck max err 179e-6, PPO
+  learns the blackjack rule — mean reward 0 → 10000 after 300 steps).
+  The old 10-08 binary's PPO segfault (exit 139) was the symptom of the
+  upstream drift, not a CardsWorld bug.
+- C10 [m] Docs with absolute private paths fixed this session (were [C]):
+  `CardsWorld/BlackjackDemo.md` (cd path), `CarWorld/Headless.md`,
+  `CrabsTK/IMUL/ImplementationPlan.md` (handoff header + 2 path refs —
+  orchestration metadata scrubbed). `AStarCale` GitHub-handle refs in
+  CrabsTK (issue templates, IMUL READMEs) are the user's own org identity —
+  acceptable, not scrubbed.
+- C8 [M] Build matrix inconsistent: CMake only in BikeWorld/CarWorld/
+  CardsWorld/HBM/PacWorld(broken)/SudokuWorld. MazeWorld/PolygonWorld/
+  TileWorld/TypingWorld/Ulator/WikiWorld have only stale .vcxproj. (Root core
+  CMake added this session — 0f.1.3.) FIX: add CMake to the shippable worlds
+  or mark the rest legacy.
+
+**D. ASCIICrabs**
+- D1 [C] `TRoom` is broken and stays broken in a published tree —
+  `Room.hpp` `Main()`/`Star()` have 3 verified bugs (TDoor has no `ExecAll`;
+  OpFirst/OpLast const-ISC* vs const-DTB* mismatch; `OpPush` undeclared).
+  Every new user who instantiates `TRoom` hits a landmine. FIX: repair the 3
+  bugs, or clearly mark `TRoom::Main/Star` as deprecated/unsupported with a
+  note pointing to the standalone pattern iGeek uses.
+- D2 [M] No-stdlib violations in the core: `Interrupts.h:12`
+  `struct RoomCrashException : public std::exception` (and `Room.hpp::Main`
+  does `try/catch`); `Puff.hpp:9`/`CIn.hxx`/`COut.hxx` `<iostream>`;
+  `Clock.hxx` `<ctime>`; `File.h` `<dirent.h>`; `conio.h` `<termios.h>/
+  <unistd.h>`; `_ConfigHeader.h` `<cstdint>/<intrin.h>`. The iostream/
+  exception ones contradict the no-stdlib claim in the README. FIX: document
+  the exact no-stdlib boundary (which headers are "platform I/O" and allowed)
+  or replace the std::exception + iostream paths.
+- D3 [m] Test files at repo root: `_test_occlusion.cpp`, `test_regex.cpp`
+  should live under `_Seams/`.
+- D4 [M] `README.md` still says "Crabs" and links
+  `github.com/AStarStarship/Crabs` (old repo name). FIX: rename to
+  ASCIICrabs + correct link.
+- D5 [M] `UnificationPlan.md` (183 lines) + `CoreUpdatePlan.md` (288 lines) at
+  repo root are internal planning docs. FIX: move to `_Spec/` or an internal
+  dir, or gate from public.
+
+**E. CrabsTK**
+- E1 [M] No CMakeLists at root (only in Hatch templates); README is 31 lines
+  (mission + license, no build instructions). The only build doc is the
+  HANDOFF.md g++ one-liner (links `-lGL`). FIX: add a root CMake + a real
+  "Build" section.
+- E2 [M] Subdir quality spread: GUI/ is a 1-file stub, Hatch/ is a template
+  dir, Math/ is a single Blas.h, Audio/Forms/IMUL/Pro/Touch/Who have no
+  `_Package.h`. The "toolkit" reads as a grab-bag of 12 subdirs at wildly
+  different completeness. FIX: per-subdir status labels (complete / partial /
+  stub) in the README.
+- E3 [m] std headers: Who/TMessage.hpp + TRoom.hpp `<cstring>/<cstdlib>/
+  <atomic>`, TRoster.hpp `<ctime>`, Math/Blas.h `<cblas.h>` (MKL — fine,
+  but undocumented dependency). FIX: document the MKL/OpenBLAS option.
+- E4 [m] CrabsTK/Pro|Touch|Who `_Undef.h` include `<ASCIICrabs/_Footer.h>` —
+  verify the path (file is actually `_ConfigFooter.h`).
+
+**F. _Spec (the RFC that gets the expert eyes)**
+- F1 [C] Top `README.md` content table out of sync: 8 of 50 links broken —
+  `Data/HomoTuples`, `Addressing/MostLongitudinalBit`, `Protocol/Time`,
+  `Protocol/Operations`, `Protocol/Handshake` (actual: GenericHandshake.md),
+  `Protocol/CongestionControl` (actual: CongestionControlTable.md),
+  `Crabs/MonoidChineseRoom` (actual: ASCIIListChineseRoom.md), and
+  `../Requirements.md` (resolves outside _Spec where it doesn't exist).
+- F2 [M] Sub-READMEs incomplete: Data/ 6 unlinked (Types, Numbers, Strings,
+  BSequences, Clock, ExtendedTypes, TypeAliases, MetaTypes, Ideas),
+  Overview/ 3, DNS/ 4, Protocol/ 9, Addressing/ 2. The whole DNS/ section is
+  absent from the top table.
+- F3 [M] Stale refs: `Protocol/Slots.md:46` links to
+  `github.com/AStarStarship/KabukiToolkit/wiki/...` (dead org name);
+  README links `github.com/AStarStarship/Crabs` (old name). Spec is branded
+  "SCRIPT" throughout while the code is Crabs/ASCIICrabs — three names
+  (SCRIPT, Crabs, ASCIICrabs) with no mapping.
+- F4 [m] README self-declares "plenty of errors" — fine as RFC honesty, but
+  with 8 broken links + 20+ unlinked files it reads unfinished.
+
+### 0f.3 FIX SEQUENCE (post-compact execution plan)
+
+**Window 1 — publish blockers (do first).**
+- ~~C9: delete dead `#include "Floor.hxx"` from `ASCIICrabs/_Package.hxx` +
+  rebuild CardsWorld~~ — DONE this session (verified, seam tests exit 0).
+- A1 decision + strip/gate `iGeek/AGENT_PLAN.md` from public (or accept).
+- A2 decision + LICENSE files for CrabsTK + ASCIICrabs; fix their README
+  license text.
+- A3: add missing copyright headers (scriptable — ~35 files).
+- C2: quarantine PacWorld SFML files + fix/strip `PacWorld/CMakeLists.txt`;
+  strip the dead `<Crabs/...>` includes in TypingWorld/WikiWorld/Ulator.
+- D1: repair or deprecate `TRoom` (the single most-landmine-prone API).
+- F1: fix the 8 broken top-level _Spec links (cheap, high visibility).
+
+**Window 2 — core API polish.**
+- B3: module-file decl/impl mapping (LinearPolicy.h, PolicyNet.h).
+- B4: Agent.h book-text extraction (move ~1,400 lines to an appendix doc).
+- B5: Gym ownership docs + const overloads + LoadDLL status.
+- B6/B8/B9: dtype_, Multiverse, School* status labels.
+- D2: document/fix the no-stdlib boundary.
+- D4/D5: ASCIICrabs README rename + move internal plans.
+- E1/E2: CrabsTK root CMake + subdir status labels.
+
+**Window 3 — worlds + spec completeness.**
+- C1/C8: per-world status labels + CMake for shippable worlds.
+- C3: finish or quarantine TileWorld.
+- C4: dedupe AgentMaze / Agent.h copies.
+- C5: move probes to _Seams or delete.
+- C6: remove ghost dirs.
+- C7 decision: ship the 3 untracked worlds or exclude.
+- F2/F3/F4: complete the _Spec TOC (sub-READMEs), fix stale org/repo names,
+  add the SCRIPT↔Crabs↔ASCIICrabs name mapping.
+- E3/E4: CrabsTK MKL doc + _Footer.h path check.
+- A4: top-level NOTICE for the two third-party licenses.
+
+### 0f.4 Open decisions (need the user before Windows 1–2)
+1. A1: strip `iGeek/AGENT_PLAN.md` from the public tree, or keep it internal?
+2. A2: CrabsTK + ASCIICrabs license — same AStarship non-commercial, or
+   permissive (MIT-style) for the reusable libs?
+3. C7: ship PrisonerWorld/SudokuWorld/HBM in this publish, or exclude?
+4. D1: repair TRoom (3 bugs) or deprecate it publicly?
+
 ## 0e. STATUS UPDATE — 2026-10-08 (overnight): MONOREPO DONE + PPO actually learns now (astar-mary)
 
 This is the biggest structural change since the plan was written: **iGeek is now
@@ -578,6 +851,10 @@ science).
   of each phase.
 - master-agent: plan arbitration (section 3.5), cross-world coordination
   (PrisonerWorld_ relationship), scope/governance.
+- sudoku: SudokuWorld built using iGeek project-types only (IUD, ISC).
+  No C++ standard library code. Built with CMake targeting Release.
+  Uses backtracking solver. Verified working with classic Wikipedia
+  puzzle (exit 0).
 
 ## 6. Handoff messages (this plan's first dispatch)
 

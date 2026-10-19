@@ -129,6 +129,7 @@ class LinearProbe {
   ISC feature_dim_;
   FPC* weights_;  // feature_dim_ (owned).
   FPC bias_;
+  FPC inv_scale_;  // 1 / max-abs-word at train time; applied in Predict too.
 };
 
 }  // namespace _

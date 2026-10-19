@@ -2,7 +2,7 @@
 
 Status: PLAN (not yet executed). Owner: low-level engineer. Date: 2026-10-07.
 Goal: turn the working `BlackjackEnv` into a real, trainable RL gym on the
-ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from a local C/CUDA PPO reference clone (PPO + MuSE-transform) — implemented in C/C++, not Python.
+ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from a local C/CUDA PPO reference clone — implemented in C/C++, not Python.
 
 ## 0. Why this plan exists
 - `iGeekCardsWorld` now builds, runs, and passes its seam unit tests
@@ -11,7 +11,7 @@ ASCIICrabs no-stdlib C++23 stack, learning the training-loop shape from a local 
   C function pointer, not a neural policy. To "train agents to play card games"
   we need a policy network + a PPO update loop.
 - The reference is a heavily modified **C/CUDA** PPO fork (no Python
-  package; its `algo.cu` is a fused PPO kernel + MuSE-transform decoder, and
+  package; its `algo.cu` is a fused PPO kernel + transformer decoder, and
   its env header is the env contract). It is the reference
   *architecture*, but it cannot be dropped in as-is: it is CUDA, C99, uses
   `raylib`/`cJSON`/`glad`, and a `Float`/`Dict`/`obs_t` data model that does not
@@ -30,13 +30,13 @@ Env contract (the env header in the reference clone):
 - Trainer — `src/algo.cu`: fused PPO kernel `PPOKernelArgs` with
   `grad_logits`, `grad_logstd` (continuous actions), `grad_values_pred`,
   `logits`, `actions`, `advantages`, `values_pred`, `action_mask`, `ent_coef`;
-  value-clip (`mb_values` = "frozen rollout V (vf-clip)"); MuSE-transform
+  value-clip (`mb_values` = "frozen rollout V (vf-clip)"); transformer
   decoder (`decoder_backward`, `grad_logits`/`grad_logstd`/`grad_value`);
   `NUM_ATNS` = number of action heads, `PPO_THREADS = 256`, `PPO_MAX_HEAD_A`.
 
 Takeaways we copy: (a) a flat **vectorized** env with obs/actions/rewards/
 terminals/action-mask arrays; (b) PPO with clipped policy loss + value-clip +
-entropy bonus; (c) a transformer (MuSE-style) policy+value head; (d) bf16/
+entropy bonus; (c) a compact transformer policy+value head; (d) bf16/
 low-precision activations for throughput.
 
 ## 2. Target architecture (ASCIICrabs, C++23, no stdlib, console)
@@ -46,7 +46,7 @@ seam-gated headers, single-TU build. New seams after `IGEEK_BLACKJACKENV (37)`:
 | Seam | Value | Contents |
 |---|---|---|
 | `IGEEK_TENSOR` | 42 | `TTensor` (row-major float/isc buffer) + matmul/softmax/layer-norm |
-| `IGEEK_POLICY` | 43 | `TTransformer` MuSE-style policy+value net (forward + backward) |
+| `IGEEK_POLICY` | 43 | `TTransformer` compact policy+value net (forward + backward) |
 | `IGEEK_PPO` | 44 | `TPPO` update loop: rollout buffer, advantages (GAE), clipped loss |
 | `IGEEK_GYM` | 45 | `TGym` (vectorized env batch) + `BlackjackGym` adapter |
 | `CARDSWORLD_TRAIN` | 46 | test seam: overfit toy, reward-goes-up check |
@@ -60,7 +60,7 @@ BlackjackEnv  (done — single-agent step/observe/done)
         |
 TGym / BlackjackGym  (vectorized: N parallel tables, obs/actions/rewards/terminals/mask)
         |
-TTransformer policy  (MuSE-style: token embed -> L transformer blocks -> action
+TTransformer policy  (compact: token embed -> L transformer blocks -> action
                       logits + value head; bf16 activations)
         |
 TPPO  (rollout collect -> GAE -> K epochs of clipped PPO+value+entropy)
@@ -82,7 +82,7 @@ CARDSWORLD_TRAIN seam  (verify learning happens on a toy target)
   half-normal `TRandom` bug); expose a seed setter so rollouts are reproducible.
 
 ### 3.2 `TTransformer` policy (seam `IGEEK_POLICY`)
-- MuSE-style, small: token embedding (obs tokens -> dim D), L = 2–4 transformer
+- Compact, small: token embedding (obs tokens -> dim D), L = 2–4 transformer
   blocks (MHSA + FFN + layernorm, residual), then two heads:
   - **action head**: logits over the discrete action set (blackjack = 2:
     hit/stand; keep `NUM_ATNS` general for combo games later).
@@ -139,16 +139,15 @@ port `Env/Gym/EnvGoal/EnvReward` to `TRoom<...>` + `CHA*` and have
    discrete first.*
 2. **Observation encoding**: (a) fixed scalar vector (hand value, up-card,
    hidden count, done) — simplest, works now; vs (b) per-card token sequence
-   fed to the transformer — more faithful to a MuSE-transform policy but more
+   fed to the transformer — more faithful to a sequence-aware policy but more
    work. *Recommendation: (a) for Milestone 1–2, add (b) when we want
    sequence-aware play.*
 3. **Precision**: `FPC` everywhere for correctness first; add the `bf16` packed
    path later if throughput matters (we're console, not chasing SPS yet).
-4. **Scope of "dunk on him with MuSE Transform"**: are we implementing a *real*
-   MuSE (multi-head, gated) transformer, or a small standard transformer with
-   the same forward/gradient structure? A real MuSE-port is a large lift.
-   *Recommendation: standard small transformer first (proves the PPO loop
-   learns), then swap in MuSE-block internals as an optimization.*
+4. **Transformer scope**: small standard transformer with residual blocks
+   and layernorm, or a more elaborate gated architecture? *Recommendation:
+   standard small transformer first (proves the PPO loop learns), then
+   optimize the block internals as an optimization.*
 5. **CPU only** (this VM has no GPU — do not assume CUDA). The reference CUDA
    kernels are reference-only; we write CPU FPC kernels. Confirm we are not
    expecting GPU training on this box.
@@ -174,7 +173,7 @@ port `Env/Gym/EnvGoal/EnvReward` to `TRoom<...>` + `CHA*` and have
   `BlackjackGym` for K steps, assert the learned policy's win rate > the
   hit-to-17 baseline (or reward strictly increases). Wire into `_Main.cpp`
   release seam as a `--train` mode.
-- **M7 — (optional) real MuSE blocks + bf16 + iGeek framework conformance.**
+- **M7 — (optional) advanced transformer blocks + bf16 + iGeek framework conformance.**
 
 ## 6. Testing (use the ASCIICrabs seam API — NOT CTest)
 Per AGENTS.md: tests are seam-gated `.hxx` units in `_Seams/`, using the
@@ -192,8 +191,8 @@ Aggregate them in `_Tests.hxx` (extend `TTestTree<CWTest::Core, ...>`).
   bug will look like "training doesn't converge." Mitigated by the M4
   finite-difference gradcheck gate — do not skip it.
 - **Card obs are sparse/short** — a transformer may be overkill for
-  hit/stand; the scalar-vector obs (M2) may learn faster. The MuSE-transform
-  "dunk" is most justified once obs are per-card sequences.
+  hit/stand; the scalar-vector obs (M2) may learn faster. A sequence-aware
+  transformer is most justified once obs are per-card sequences.
 - **Single-deck blackjack is nearly intractable to beat with basic policy** —
   the baseline is already near-optimal, so "reward goes up" may be a small
   delta. The toy-env check (M5) isolates *whether the learner works* from

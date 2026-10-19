@@ -1,10 +1,16 @@
-# [IGEEK Cookbook](../)
+# [iGeek Cookbook](../)
 
 ## Getting Started
 
-IGEEK Cookbook is a template for a Cookbook for software products.
+The iGeek Cookbook is the worked-example trail for the iGeek AI gym. Start
+with the Quickstart Guide to build and run the first world.
 
-**[<< Previous Section:]() | [Next Section: >>]()**
+- [Quickstart Guide](./QuickstartGuide.md)
+- [Command Line Usage](./CommandLineUsage.md)
+- [Configuration and Build System](./ConfigurationAndBuildSystem.md)
+- [Mission and Vision](./MissionAndVision.md)
+
+**[<< Previous Section: iGeek Cookbook](../) | [Next Section: Quickstart Guide >>](./QuickstartGuide.md)**
 
 ## License
 

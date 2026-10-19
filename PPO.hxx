@@ -115,13 +115,13 @@ void TPPO::ComputeAdvantages() {
   FPC mean = 0.0f, var = 0.0f;
   ISC N2 = horizon_ * B;
   for (ISC i = 0; i < N2; ++i) mean += advantages_[i];
-  mean /= (FPC)N2;
+  mean /= FPC(N2);
   for (ISC i = 0; i < N2; ++i) {
     FPC d = advantages_[i] - mean;
     var += d * d;
   }
-  var /= (FPC)N2;
-  FPC inv = 1.0f / ((FPC)sqrt(var) + 1e-8f);
+  var /= FPC(N2);
+  FPC inv = 1.0f / (FPC(sqrt(var)) + 1e-8f);
   for (ISC i = 0; i < N2; ++i) {
     advantages_[i] = (advantages_[i] - mean) * inv;
     returns_[i] = advantages_[i] + values_.At(i, 0);
@@ -160,11 +160,11 @@ TPPOStats TPPO::UpdatePolicy() {
     FPC mx = logits.AtC(i, 0);
     for (ISC a = 1; a < A; ++a) if (logits.AtC(i, a) > mx) mx = logits.AtC(i, a);
     FPC s = 0.0f;
-    for (ISC a = 0; a < A; ++a) s += (FPC)exp(logits.AtC(i, a) - mx);
-    lse = mx + (FPC)log(s);
+    for (ISC a = 0; a < A; ++a) s += FPC(exp(logits.AtC(i, a) - mx));
+    lse = mx + FPC(log(s));
     FPC ent = 0.0f;
     for (ISC a = 0; a < A; ++a) {
-      FPC p = (FPC)exp(logits.AtC(i, a) - lse);
+      FPC p = FPC(exp(logits.AtC(i, a) - lse));
       if (p > 0.0f) ent += -p * (logits.AtC(i, a) - lse);
     }
     entropy += ent;
@@ -172,9 +172,9 @@ TPPOStats TPPO::UpdatePolicy() {
     val_loss += grad_value.AtC(i, 0) * grad_value.AtC(i, 0);
     for (ISC a = 0; a < A; ++a) pol_loss += grad_logits.AtC(i, a) * grad_logits.AtC(i, a);
   }
-  entropy /= (FPC)N;
-  val_loss /= (FPC)N;
-  pol_loss /= (FPC)N;
+  entropy /= FPC(N);
+  val_loss /= FPC(N);
+  pol_loss /= FPC(N);
   (void)approx_kl;
   // Weight step: only TLinearPolicy has SgdStep; cast (the toy test uses it).
   if (TLinearPolicy* lp = dynamic_cast<TLinearPolicy*>(&policy_)) {

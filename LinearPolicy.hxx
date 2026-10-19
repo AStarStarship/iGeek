@@ -45,11 +45,11 @@ class TLinearPolicy : public TPolicy {
     for (ISC i = 0; i < obs_len_; ++i) {
       for (ISC j = 0; j < action_count_; ++j) {
         s = s * 6364136223846793005ULL + 1442695040888963407ULL;
-        FPC u = (FPC)(((s >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
+        FPC u = FPC(((s >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
         W_.At(i, j) = (u * 2.0f - 1.0f) * 0.5f;
       }
       s = s * 6364136223846793005ULL + 1442695040888963407ULL;
-      FPC u2 = (FPC)(((s >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
+      FPC u2 = FPC(((s >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
       W_v_.At(i, 0) = (u2 * 2.0f - 1.0f) * 0.5f;
     }
     built_ = true;
@@ -75,11 +75,11 @@ class TLinearPolicy : public TPolicy {
       //'s gradient carries no signal and the value head can't bootstrap);
       // the old argmax was a debugging leftover, not the design.
       seed_ = seed_ * 6364136223846793005ULL + 1442695040888963407ULL;
-      FPC u = (FPC)(((seed_ >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
+      FPC u = FPC(((seed_ >> 11) & 0xFFFFFFFFu) / (double)0xFFFFFFFFu);
       FPC cumsum = 0.0f;
       ISC sampled = logits.cols_ - 1;
       for (ISC a = 0; a < logits.cols_; ++a) {
-        cumsum += (FPC)exp(logits.AtC(b, a) - lse.At(b, 0));
+        cumsum += FPC(exp(logits.AtC(b, a) - lse.At(b, 0)));
         if (u < cumsum) { sampled = a; break; }
       }
       actions[b] = sampled;
@@ -136,7 +136,7 @@ class TLinearPolicy : public TPolicy {
       dbv.At(0, 0) += grad_value.AtC(b, 0);
     }
     // Average over the batch.
-    FPC invB = 1.0f / (FPC)B;
+    FPC invB = 1.0f / FPC(B);
     for (ISC f = 0; f < obs_len_; ++f)
       for (ISC a = 0; a < action_count_; ++a)
         W_.At(f, a) -= lr * invB * dW.At(f, a);
