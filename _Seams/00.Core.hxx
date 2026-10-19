@@ -1,17 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
+// iGeek core seam unit: the RL/agent layer self-test (SEAM >= IGEEK_CORE).
 #include <_Config.h>
-#if SEAM == IGEEK_TEST
-#include "_Debug.hxx"
-#else
-#include "_Release.hxx"
-#endif
-using namespace _;
-namespace _ {
-inline const CHA* Core(const CHA* args) {
 #if SEAM >= IGEEK_CORE
-  TEST_BEGIN;
-
+#include "../../ASCIICrabs/_Debug.h"
+#include "core_test.cpp"
 #endif
-  return 0;
-}
-}  //< namespace _

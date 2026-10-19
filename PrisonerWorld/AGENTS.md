@@ -7,10 +7,37 @@ This project belongs to the **AStarship** organization; its Kanban board slug is
 Greenfield [iGeek](https://github.com/AStarStarship/iGeek) world for evaluating
 **agentic game theory** (prisoner's-dilemma-style repeated games between AI
 agents) on the [Crabs](https://github.com/AStarStarship/ASCIICrabs) ASCII
-Data Specification. No build system, code, or tests exist yet — only this file
-and an empty `_Seams/`.
+Data Specification.
 
-## Sibling references (the real sources of truth)
+## Implementation
+
+This world implements a repeated Prisoner's Dilemma simulation with two agents
+who simultaneously choose Cooperate (0) or Defect (1) each round. The
+payoff matrix uses T > R > P > S (Temptation > Reward > Punishment > Sucker),
+with default values T=5, R=3, P=1, S=0.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `PrisonerWorld.h` | Environment class declaring `PrisonerEnv` with `ComputeReward`, `Step`, and payoff configuration |
+| `PrisonerWorld.cpp` | Environment implementation with reward computation and history tracking |
+| `_Main.cpp` | CLI entry point: `--episodes N --payoffs T R P S --seed S` |
+| `_Seams/CMakeLists.txt` | CMake build configuration |
+| `_Seams/Main.cpp` | Seam entry point |
+| `_Seams/Release.h` | Seam release header |
+| `AGENTS.md` | This file |
+
+### How to Build and Run
+
+```sh
+# From /home/astar/AStarStarship/iGeek:
+cmake -S PrisonerWorld -B PrisonerWorld/build -DCMAKE_BUILD_TYPE=Release
+cmake --build PrisonerWorld/build -j 4
+PrisonerWorld/build/PrisonerWorld --episodes 10 --payoffs 5 3 1 0
+```
+
+### Sibling references (the real sources of truth)
 
 - `../iGeek/` — the iGeek framework itself: `Env` (a `Room` with pure-virtual
   `ComputeReward(Crabs*, EnvGoal, EnvGoal, STA*)`), `Agent`, `Gym`,

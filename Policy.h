@@ -25,7 +25,7 @@ struct TBlock {
    writes gradients back into `grad_logits`/`grad_value`.
 
    Kept as an INTERFACE (pure virtuals) so:
-     - TTransformer (the MuSE-style net, milestone M3/M4) implements it.
+     - TTransformer (the compact transformer net, milestone M3/M4) implements it.
      - A hand-written policy (e.g. the card world's hit-to-17) can implement
        it for baselines, no network needed.
      - The PPO loop depends only on this, not on any concrete net.
@@ -87,7 +87,7 @@ class TPolicy {
   FPC lr_;
 };
 
-/* Concrete MuSE-style transformer policy (milestone M3/M4). Declared here
+/* Concrete MUSE-style compact transformer policy (milestone M3/M4). Declared here
    so the PPO loop can name it; implemented in PolicyNet.hxx once TTensor
    ops land. Kept out of this header's required surface so the interface
    compiles before the net does. */

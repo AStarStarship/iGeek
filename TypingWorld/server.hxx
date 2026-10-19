@@ -218,7 +218,6 @@ need to change it every day. The MOTD is displayed when people join the server.
 grow-trees	boolean		Whether or not the server will allow planted
 saplings to grow into trees. true - the server will allow saplings to grow into
 trees. false - the server will not allow saplings to grow into trees.
-
 */
 
 Server::Server() {}

@@ -1,4 +1,4 @@
-# Presentation evidence: CarWorld and MUSE
+# Presentation evidence: CarWorld classical control
 
 Copyright AStarship <https://astarship.net>.
 
@@ -30,24 +30,18 @@ The successful drives use a CLASSICAL controller. The fixed-fixture sample
 is not random-road coverage, a deployment guarantee, calibrated real-car
 validation, precision parking or a GPU benchmark.
 
-Executable:
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/carworld`
+Executable: `CarWorld/build/carworld` (built via CMake, see below).
 
 Run from the iGeek root:
 
 ```sh
+cmake -S CarWorld -B CarWorld/build -DCMAKE_BUILD_TYPE=Release
+cmake --build CarWorld/build -j
 CarWorld/build/carworld --scenario all --episodes 100 --seed 7
 ```
 
-Exact metrics:
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/verified_900_02/drives.csv`
-
-Counts, timing samples, hashes and trace checks:
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/verified_900_02/verification_summary.json`
-
-Frozen executable and project-owned build inputs:
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/verified_900_02/bin/`
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/verified_900_02/code/`
+Evidence artifacts (per-ride CSV, verification summary, frozen build inputs)
+are written under `CarWorld/build/verified_*/` by the verification run.
 
 Model equations, assumptions, build commands and limits: `Headless.md`.
 
@@ -84,15 +78,12 @@ bias for a restricted task, NOT a requirement for radians or a general LLM win.
 Important denominator: only **4,894 of 10,379** eligible test suffix occurrences
 are selected/scored (**47.153%**). These SDs are variation over three model seeds,
 not population confidence intervals. One bounded corpus/split with five test
-articles does not establish broad generalization or corpus-scale MUSE quality.
+articles does not establish broad generalization or corpus-scale quality.
 
-Archive:
-`/mnt/MuhNAS/AStar/Training/muse_runs/laplacian_learning_20261010_01/results.json`
+Archive: internal research archive (paths omitted; see AStarship research
+records).
 
-Full protocol/report:
-`/home/astarcale/AStarStarship/MUSETransformer/Research/laplacian_learning_pilot.md`
-
-For this car task, the 31 original archive hashes were rechecked and metrics
+For this car task, the original archive hashes were rechecked and metrics
 recomputed from all 21 run records; the current 14 targeted learning/wiki/scale
 tests passed. The original protocol records checkpoint replay verification.
 This task did not retrain those 21 models or re-run that checkpoint audit.
@@ -102,7 +93,8 @@ This task did not retrain those 21 models or re-run that checkpoint audit.
 RL repeatedly observes a state, chooses an action, receives a reward and observes
 the next state. Policy updates favor actions associated with better returns.
 A learned graph representation could encode those observations, but RL does
-not inherently require a square correlation table, token ordering or a Laplacian.
+not inherently require a square correlation table, token ordering, or graph
+structure.
 
 Frequent words can be highly connected graph hubs. Placing them centrally is a
 layout hypothesis, not automatically a measured compression/prediction gain.
@@ -113,8 +105,9 @@ layout can matter when a limited feature map/local architecture uses proximity.
 
 The honest bridge is: a working in-house simulator supplies controllable,
 repeatable observations/actions/rewards; a separate matched experiment can test
-whether a MUSE/Laplacian representation improves learned control. That bridge
-has not yet been built. Do not attribute classical driving success to MUSE.
+whether a learned graph representation improves learned control. That bridge
+has not yet been built. Do not attribute classical driving success to the
+archived text experiment.
 
 ## Next evidence needed
 
@@ -127,5 +120,5 @@ has not yet been built. Do not attribute classical driving success to MUSE.
 3. For 3D, add calibrated contact normals, suspension/load transfer and 6-DOF
    chassis dynamics, preserving this planar archive as the regression baseline.
 
-No publication, commits, pushes or changes to the original MUSE archive were
-made by this task. All current driving evidence is CPU-only.
+No publication, commits, pushes or changes to the original research archive
+were made by this task. All current driving evidence is CPU-only.

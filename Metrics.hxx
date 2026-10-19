@@ -15,7 +15,7 @@ void BehaviorMetrics::RecordTrial(BOL was_present, BOL did_report,
   if (was_present && did_report) {
     ++correct;
     if (steps_to_report >= 0) {
-      first_correct_step += (IUD)steps_to_report;
+      first_correct_step += IUD(steps_to_report);
     }
   } else if (!was_present && did_report) {
     ++false_positives;
@@ -29,21 +29,21 @@ FPC BehaviorMetrics::Accuracy() const {
   if (trials == 0) {
     return 0.0f;
   }
-  return (FPC)correct / (FPC)trials;
+  return FPC(correct) / FPC(trials);
 }
 
 FPC BehaviorMetrics::FalsePositiveRate() const {
   if (trials == 0) {
     return 0.0f;
   }
-  return (FPC)false_positives / (FPC)trials;
+  return FPC(false_positives) / FPC(trials);
 }
 
 FPC BehaviorMetrics::FalseNegativeRate() const {
   if (trials == 0) {
     return 0.0f;
   }
-  return (FPC)false_negatives / (FPC)trials;
+  return FPC(false_negatives) / FPC(trials);
 }
 
 // --- StateRecord ----------------------------------------------------------
@@ -101,7 +101,7 @@ BOL StateRecordSet::Push(const AgentState& state, ISC label) {
 
 LinearProbe::LinearProbe(ISC feature_dim)
     : feature_dim_(feature_dim < 1 ? 1 : feature_dim),
-      weights_(new FPC[feature_dim_]()), bias_(0.0f) {}
+      weights_(new FPC[feature_dim_]()), bias_(0.0f), inv_scale_(1.0f) {}
 
 LinearProbe::~LinearProbe() {
   delete[] weights_;
@@ -120,7 +120,7 @@ FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
   for (ISC i = 0; i < n; ++i) {
     const IUC* w = data.At(i).words;
     for (ISC f = 0; f < feature_dim_; ++f) {
-      FPC a = (FPC)w[f];
+      FPC a = FPC(w[f]);
       if (a < 0.0f) {
         a = -a;
       }
@@ -130,6 +130,7 @@ FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
     }
   }
   FPC inv_scale = 1.0f / max_abs;
+  inv_scale_ = inv_scale;  // remember for Predict/Accuracy (same scale).
   for (ISC e = 0; e < epochs; ++e) {
     FPC dw[64];  // feature_dim_ is small for a probe; guard below.
     if (feature_dim_ > 64) {
@@ -139,13 +140,13 @@ FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
         for (ISC i = 0; i < n; ++i) {
           FPC z = bias_;
           for (ISC k = 0; k < feature_dim_; ++k) {
-            z += weights_[k] * (FPC)data.At(i).words[k] * inv_scale;
+            z += weights_[k] * FPC(data.At(i).words[k]) * inv_scale;
           }
-          FPC p = 1.0f / (1.0f + (FPC)exp(-z));
-          grad += (p - (FPC)data.At(i).label) * (FPC)data.At(i).words[f] *
+          FPC p = 1.0f / (1.0f + FPC(exp(-z)));
+          grad += (p - FPC(data.At(i).label)) * FPC(data.At(i).words[f]) *
                   inv_scale;
         }
-        weights_[f] -= lr * grad / (FPC)n;
+        weights_[f] -= lr * grad / FPC(n);
       }
     } else {
       for (ISC f = 0; f < feature_dim_; ++f) {
@@ -155,19 +156,19 @@ FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
       for (ISC i = 0; i < n; ++i) {
         FPC z = bias_;
         for (ISC k = 0; k < feature_dim_; ++k) {
-          z += weights_[k] * (FPC)data.At(i).words[k] * inv_scale;
+          z += weights_[k] * FPC(data.At(i).words[k]) * inv_scale;
         }
-        FPC p = 1.0f / (1.0f + (FPC)exp(-z));
-        FPC err = p - (FPC)data.At(i).label;
+        FPC p = 1.0f / (1.0f + FPC(exp(-z)));
+        FPC err = p - FPC(data.At(i).label);
         db += err;
         for (ISC k = 0; k < feature_dim_; ++k) {
-          dw[k] += err * (FPC)data.At(i).words[k] * inv_scale;
+          dw[k] += err * FPC(data.At(i).words[k]) * inv_scale;
         }
       }
       for (ISC f = 0; f < feature_dim_; ++f) {
-        weights_[f] -= lr * dw[f] / (FPC)n;
+        weights_[f] -= lr * dw[f] / FPC(n);
       }
-      bias_ -= lr * db / (FPC)n;
+      bias_ -= lr * db / FPC(n);
     }
   }
   return Accuracy(data);
@@ -180,7 +181,7 @@ ISC LinearProbe::Predict(const IUC* words, ISC feature_dim) const {
   FPC z = bias_;
   ISC n = feature_dim < feature_dim_ ? feature_dim : feature_dim_;
   for (ISC f = 0; f < n; ++f) {
-    z += weights_[f] * (FPC)words[f];
+    z += weights_[f] * FPC(words[f]) * inv_scale_;
   }
   return z > 0.0f ? 1 : 0;
 }
@@ -197,7 +198,7 @@ FPC LinearProbe::Accuracy(const StateRecordSet& data) const {
       ++correct;
     }
   }
-  return (FPC)correct / (FPC)n;
+  return FPC(correct) / FPC(n);
 }
 
 FPC LinearProbe::Weight(ISC i) const {

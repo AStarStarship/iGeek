@@ -89,7 +89,7 @@ ISC TTableAgent::ActionCount() const {
 void TTableAgent::SetEntry(const IUC* key, IUC action) {
   // Grow the table by one slot (realloc). keys_/actions_ are owned here.
   ISC new_count = key_count_ + 1;
-  IUC* new_keys = new IUC[(IUD)new_count * (IUD)key_len_]();
+  IUC* new_keys = new IUC[IUD(new_count) * IUD(key_len_)]();
   IUC* new_actions = new IUC[new_count]();
   if (keys_ != NILP) {
     for (ISC i = 0; i < key_count_ * key_len_; ++i) {
@@ -102,7 +102,7 @@ void TTableAgent::SetEntry(const IUC* key, IUC action) {
     delete[] actions_;
   }
   for (ISC i = 0; i < key_len_; ++i) {
-    new_keys[(IUD)key_count_ * key_len_ + i] = key[i];
+    new_keys[IUD(key_count_) * key_len_ + i] = key[i];
   }
   new_actions[key_count_] = action;
   keys_ = new_keys;
@@ -118,7 +118,7 @@ TReflexAgent::TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap)
       rule_cap_(rule_cap < 1 ? 1 : rule_cap), rule_count_(0),
       conditions_(NILP), rule_actions_(NILP), current_(NILP),
       default_action_(0) {
-  conditions_ = new IUC[(IUD)rule_cap_ * (IUD)percept_len_]();
+  conditions_ = new IUC[IUD(rule_cap_) * IUD(percept_len_)]();
   rule_actions_ = new IUC[rule_cap_]();
   current_ = new IUC[percept_len_]();
 }
@@ -220,7 +220,7 @@ IUC TModelAgent::Action() {
   if (best >= action_count_) {
     best = action_count_ - 1;
   }
-  return (IUC)best;
+  return IUC(best);
 }
 
 const AgentState* TModelAgent::State() const {

@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include <Script2/Operand.h>
+#include "EnvReward.h"
 namespace _ {
 
 EnvGoal::EnvGoal() : reward_() {}

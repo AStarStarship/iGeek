@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-// PolicyNet.hxx — TTransformer forward (small MuSE-style transformer policy).
+// PolicyNet.hxx — TTransformer forward (MUSE-style compact transformer policy).
 //
 // Architecture (forward; backward is M4):
 //   obs [B, obs_len]
@@ -27,7 +27,7 @@ struct TLcg {
   FPC Next() {  // [0, 1)
     state_ = state_ * 6364136223846793005ULL + 1442695040888963407ULL;
     IUD hi = (state_ >> 11) & 0xFFFFFFFFu;
-    return (FPC)(hi / (double)0xFFFFFFFFu);
+    return FPC(hi / (double)0xFFFFFFFFu);
   }
 };
 void InitRand(TTensor& t, TLcg& rng, FPC scale) {
@@ -88,7 +88,7 @@ void TTransformer::Build() {
     return;
   }
   TLcg rng(seed_);
-  FPC s = 1.0f / (FPC)sqrt((FPC)dim_);
+  FPC s = 1.0f / FPC(sqrt(FPC(dim_)));
   W_e_ = TTensorAlloc(obs_len_, dim_);
   b_e_ = TTensorAlloc(dim_, 1);
   InitRand(W_e_, rng, 0.5f);
@@ -225,8 +225,8 @@ FPC TPolicyLoss(const TTensor& logits, const ISC* actions,
     for (ISC a = 1; a < A; ++a)
       if (logits.AtC(b, a) > maxv) maxv = logits.AtC(b, a);
     FPC sum = 0.0f;
-    for (ISC a = 0; a < A; ++a) sum += (FPC)exp(logits.AtC(b, a) - maxv);
-    FPC lse = maxv + (FPC)log(sum);
+    for (ISC a = 0; a < A; ++a) sum += FPC(exp(logits.AtC(b, a) - maxv));
+    FPC lse = maxv + FPC(log(sum));
     ISC a_b = (actions != NILP) ? actions[b] : 0;
     FPC logp = logits.AtC(b, a_b) - lse;
     total += -logp * advantages.AtC(b, 0);

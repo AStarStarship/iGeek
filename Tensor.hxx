@@ -58,7 +58,7 @@ void TTensorSoftmaxInPlace(TTensor& X) {
     }
     FPC sum = 0.0f;
     for (ISC j = 0; j < X.cols_; ++j) {
-      FPC e = (FPC)exp(X.At(i, j) - maxv);
+      FPC e = FPC(exp(X.At(i, j) - maxv));
       X.At(i, j) = e;
       sum += e;
     }
@@ -74,14 +74,14 @@ void TTensorLayerNormInPlace(TTensor& X) {
   for (ISC i = 0; i < X.rows_; ++i) {
     FPC mean = 0.0f;
     for (ISC j = 0; j < X.cols_; ++j) mean += X.At(i, j);
-    mean /= (FPC)X.cols_;
+    mean /= FPC(X.cols_);
     FPC var = 0.0f;
     for (ISC j = 0; j < X.cols_; ++j) {
       FPC d = X.At(i, j) - mean;
       var += d * d;
     }
-    var /= (FPC)X.cols_;
-    FPC inv = 1.0f / (FPC)sqrt(var + eps);
+    var /= FPC(X.cols_);
+    FPC inv = 1.0f / FPC(sqrt(var + eps));
     for (ISC j = 0; j < X.cols_; ++j) X.At(i, j) = (X.At(i, j) - mean) * inv;
   }
 }
@@ -130,9 +130,9 @@ void TTensorRowLogSumExp(const TTensor& A, TTensor& out) {
     }
     FPC sum = 0.0f;
     for (ISC j = 0; j < A.cols_; ++j) {
-      sum += (FPC)exp(A.AtC(i, j) - maxv);
+      sum += FPC(exp(A.AtC(i, j) - maxv));
     }
-    out.At(i, 0) = maxv + (FPC)log(sum);
+    out.At(i, 0) = maxv + FPC(log(sum));
   }
 }
 

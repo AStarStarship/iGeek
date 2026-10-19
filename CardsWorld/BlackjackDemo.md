@@ -33,13 +33,13 @@ chosen action, allowing common-deal comparisons across evaluation policies.
 ## Compile and run
 
 ```sh
-cd /home/astarcale/AStarStarship/iGeek/CardsWorld
+cd iGeek/CardsWorld   # from the AStarship workspace root
 cmake -S . -B build/rl_demo/cmake -DCMAKE_BUILD_TYPE=Release
 cmake --build build/rl_demo/cmake --target blackjack_demo blackjack_demo_tests -j2
 build/rl_demo/cmake/blackjack_demo_tests
-mkdir -p /mnt/MuhNAS/AStar/Training/muse_runs/igeek_blackjack_demo
+mkdir -p build/blackjack_demo
 build/rl_demo/cmake/blackjack_demo > \
-  /mnt/MuhNAS/AStar/Training/muse_runs/igeek_blackjack_demo/learning_curve.csv
+  build/blackjack_demo/learning_curve.csv
 ```
 
 Direct compiler equivalent:
@@ -104,8 +104,8 @@ and **13.71 s** with ASan+UBSan, including evaluation. The release, direct -O2,
 and sanitizer CSV outputs were byte-identical (42 data rows).
 
 Artifacts:
-- `/mnt/MuhNAS/AStar/Training/muse_runs/igeek_blackjack_demo/learning_curve.csv`
-- `/mnt/MuhNAS/AStar/Training/muse_runs/igeek_blackjack_demo/learning_curve.svg`
+- `build/blackjack_demo/learning_curve.csv`
+- `build/blackjack_demo/learning_curve.svg`
 - Executable: `/home/astarcale/AStarStarship/iGeek/CardsWorld/build/rl_demo/cmake/blackjack_demo`
 - Test/sanitizer logs and binaries: `/home/astarcale/AStarStarship/iGeek/CardsWorld/build/rl_demo/`
 
@@ -141,5 +141,5 @@ but do not establish correct value targets or full PPO. Fixing those requires
 separate engine TDD, and was not indispensable to this bounded demo.
 
 No transformer backprop, full Blackjack strategy, physics, token geometry,
-consciousness, or MUSE hypothesis is established by this experiment. No commits
+consciousness by this experiment alone. No commits
 or pushes were made; pre-existing untracked PrisonerWorld work was preserved.
