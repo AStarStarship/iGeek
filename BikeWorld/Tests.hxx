@@ -26,7 +26,7 @@
 using namespace _;
 static ISC failures = 0;
 #define CHECK(condition) do { if (!(condition)) { \
-  D_COUT("FAIL " << __FILE__ <<  << __LINE__ <<  << #condition <<); \
+  D_COUT("FAIL " << __FILE__ << " " << __LINE__ << " " << #condition << '\n'); \
   ++failures; } } while (false)
 
 // Runtime RED even before the additive read-only TileWorld API exists.
@@ -126,7 +126,7 @@ static void BalanceControl() {
     CHECK(fabs(control.steer) <= params.steer_limit);
     CHECK(TBikeStep(bike, params, control, surface, surface, 0.005));
   }
-  D_COUT("bike.roll=" << bike.roll <<);
+  D_COUT("bike.roll=" << bike.roll << '\n');
   CHECK(!bike.fallen);
   CHECK(fabs(bike.roll) < 0.005);
   CHECK(fabs(bike.y - 32.5) < 0.25);
@@ -143,7 +143,7 @@ static void HeadlessRoute() {
   TBikeState initial; initial.x = 8.5; initial.y = 32.5; initial.forward = 3;
   ABikeEnv env(map, route, initial, 7);
   while (!env.Done()) env.Step(BikeCruise);
-  D_COUT("TBikeStatusName=" << TBikeStatusName(env.Status()) <<);
+  D_COUT("TBikeStatusName=" << TBikeStatusName(env.Status()) << '\n');
   CHECK(env.Status() == BikeGoal);
   CHECK(env.GoalDistance() < 1.2);
   CHECK(env.State().forward < 0.1 && env.State().supported);
@@ -168,7 +168,7 @@ static void ScenarioRoutes() {
     CHECK(TBikeScenarioBuild(map, scenario, *planner, route, initial));
     ABikeEnv env(map, route, initial, 19);
     while (!env.Done()) env.Step();
-    D_COUT("TBikeScenarioName=" << TBikeScenarioName(scenario) <<  << TBikeStatusName(env.Status()) <<);
+    D_COUT("TBikeScenarioName=" << TBikeScenarioName(scenario) << " " << TBikeStatusName(env.Status()) << '\n');
     CHECK(env.Status() == BikeGoal);
     CHECK(env.Metrics().max_roll < 0.35);
     CHECK(env.Metrics().max_cross_track < 3.0);
@@ -267,7 +267,7 @@ static void FailurePaths() {
   ABikeEnv emergency(map, route, initial, 7);
   for (ISC y = 0; y < 64; ++y) map.AddTile(28, y, TIntRect(), true, VehicleWall);
   while (!emergency.Done()) emergency.Step();
-  D_COUT("TBikeStatusName=" << TBikeStatusName(emergency.Status()) <<);
+  D_COUT("TBikeStatusName=" << TBikeStatusName(emergency.Status()) << '\n');
   CHECK(emergency.Status() == BikeBlocked);
   CHECK(emergency.State().x < 27.2 && emergency.State().supported);
   CHECK(28 - 0.8 - emergency.State().x > 0.5);
@@ -313,6 +313,6 @@ ISC RunAllTests() {
   PhysicsInvariants();
   FailurePaths();
   ResetContracts();
-  D_COUT("failures=" << failures <<);
+  D_COUT("failures=" << failures << '\n');
   return failures;
 }

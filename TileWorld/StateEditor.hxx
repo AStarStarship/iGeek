@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "state_editor.h"
 
@@ -16,7 +17,7 @@ void StateEditor::initEditorStateData() {
 }
 
 void StateEditor::InitView() {
-  view_.setSize(sf::Vector2f(
+  view_.setSize(_::FPC2(
       static_cast<float>(state_data_->grfx_settings_->resolution.width),
       static_cast<float>(state_data_->grfx_settings_->resolution.height)));
 
@@ -47,7 +48,7 @@ void StateEditor::InitKeybinds() {
 }
 
 void StateEditor::InitPauseMenu() {
-  const sf::VideoMode& vm = state_data_->grfx_settings_->resolution;
+  const _::TVideoMode& vm = state_data_->grfx_settings_->resolution;
   pmenu = new PauseMenu(state_data_->grfx_settings_->resolution, font_);
 
   pmenu->AddButton("QUIT", gui::p2pY(74.f, vm), gui::p2pX(13.f, vm),
@@ -198,7 +199,7 @@ void StateEditor::Render(sf::RenderTarget* target) {
   if (!target) target = window;
 
   target->setView(view_);
-  tiles_->Render(*target, mouse_pos_grid, nullptr, sf::Vector2f(), true);
+  tiles_->Render(*target, mouse_pos_grid, nullptr, _::FPC2(), true);
   tiles_->RenderDeferred(*target);
 
   target->setView(window->getDefaultView());

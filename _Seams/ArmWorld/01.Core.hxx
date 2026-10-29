@@ -239,6 +239,17 @@ static void PpoSmoke() {
 // Converted from a standalone ISC main() — now a callable the seam unit
 // invokes. (D_COUT kept as legacy debt, same as BikeWorld/Tests.hxx.)
 ISC RunAllTests() {
+  ForwardKinematics();
+  GravityBalance();
+  FreeFall();
+  BoundClamping();
+  InputRejection();
+  TargetReachable();
+  ReachingPolicy();
+  GymBasics();
+  ObservationFinite();
+  PpoSmoke();
+  return failures ? 1 : 0;
 }
 
 // The core unit test. Returns NILP on success, an error string on failure

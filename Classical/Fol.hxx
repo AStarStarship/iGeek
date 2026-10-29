@@ -28,14 +28,12 @@ static inline void FolWipe(IUW* origin, IUD bytes) {
 
 // --- Fig 9.1 UNIFY ---------------------------------------------------------
 
-/* Resolve a node through the substitution (follow var bindings until the
- * node is not a bound var; bounded by theta_n steps — cyclic bindings
- * resolve to a node already seen). */
-static IUD FolApplyNC(const TFolTerm* pool, IUD node, const TFolSubst* theta,
+/* Resolve a node through the substitution (follow var bindings until the node is not a bound var; bounded by theta_n steps — cyclic bindings resolve to a node already seen). */
+static IUD FolApplyNC(const FolTerm* pool, IUD node, const FolSubst* theta,
                       ISC theta_n) {
   ISC guard = theta_n + 1;
   for (;;) {
-    const TFolTerm* t = &pool[node];
+    const FolTerm* t = &pool[node];
     if (t->kind != 1) {
       return node;
     }
@@ -58,12 +56,11 @@ static IUD FolApplyNC(const TFolTerm* pool, IUD node, const TFolSubst* theta,
   }
 }
 
-/* Does var (a pool node id of a var) occur in node, after applying θ at
- * each step (the book's OCCUR-CHECK). */
-static BOL FolOccursNC(const TFolTerm* pool, IUD var_node, IUD node,
-                       const TFolSubst* theta, ISC theta_n) {
+/* Does var (a pool node id of a var) occur in node, after applying θ at each step (the book's OCCUR-CHECK). */
+static BOL FolOccursNC(const FolTerm* pool, IUD var_node, IUD node,
+                       const FolSubst* theta, ISC theta_n) {
   node = FolApplyNC(pool, node, theta, theta_n);
-  const TFolTerm* t = &pool[node];
+  const FolTerm* t = &pool[node];
   if (t->kind == 1) {
     return t->value == pool[var_node].value;
   }
@@ -74,15 +71,15 @@ static BOL FolOccursNC(const TFolTerm* pool, IUD var_node, IUD node,
   return false;
 }
 
-static BOL FolUnifyRecNC(const TFolTerm* pool, IUD x, IUD y,
-                         const TFolSubst* theta, ISC theta_n,
-                         TFolSubst* out_theta, ISC out_cap, ISC* out_n) {
+static BOL FolUnifyRecNC(const FolTerm* pool, IUD x, IUD y,
+                         const FolSubst* theta, ISC theta_n,
+                         FolSubst* out_theta, ISC out_cap, ISC* out_n) {
   // θ grows as the book's: the first child unifies against the input θ; the
   // second child sees the bindings the first added (out_theta, *out_n).
   x = FolApplyNC(pool, x, theta, theta_n);
   y = FolApplyNC(pool, y, theta, theta_n);
-  const TFolTerm* tx = &pool[x];
-  const TFolTerm* ty = &pool[y];
+  const FolTerm* tx = &pool[x];
+  const FolTerm* ty = &pool[y];
   if (tx->kind == ty->kind &&
       (tx->kind == 3 ||
        (tx->kind == 0 && tx->value == ty->value) ||
@@ -96,7 +93,7 @@ static BOL FolUnifyRecNC(const TFolTerm* pool, IUD x, IUD y,
     if (*out_n >= out_cap) {
       return false;
     }
-    out_theta[(*out_n)++] = (TFolSubst){ISC(tx->value), y};
+    out_theta[(*out_n)++] = (FolSubst){ISC(tx->value), y};
     return true;
   }
   if (ty->kind == 1) {
@@ -106,7 +103,7 @@ static BOL FolUnifyRecNC(const TFolTerm* pool, IUD x, IUD y,
     if (*out_n >= out_cap) {
       return false;
     }
-    out_theta[(*out_n)++] = (TFolSubst){ISC(ty->value), x};
+    out_theta[(*out_n)++] = (FolSubst){ISC(ty->value), x};
     return true;
   }
   if (tx->kind == 2 && ty->kind == 2) {
@@ -119,8 +116,8 @@ static BOL FolUnifyRecNC(const TFolTerm* pool, IUD x, IUD y,
   return false;
 }
 
-BOL FolUnify(const TFolTerm* pool, IUD x, IUD y, const TFolSubst* theta,
-             ISC theta_n, ISC var_count, TFolSubst* out_theta, ISC out_cap,
+BOL FolUnify(const FolTerm* pool, IUD x, IUD y, const FolSubst* theta,
+             ISC theta_n, ISC var_count, FolSubst* out_theta, ISC out_cap,
              ISC* out_n) {
   if (pool == NILP || var_count < 0 || out_cap < 0 || theta_n < 0) {
     return false;
@@ -132,44 +129,44 @@ BOL FolUnify(const TFolTerm* pool, IUD x, IUD y, const TFolSubst* theta,
   return FolUnifyRecNC(pool, x, y, theta, theta_n, out_theta, out_cap, out_n);
 }
 
-// --- TFolKb (Fig 9.6) ------------------------------------------------------
+// --- FolKb (Fig 9.6) ------------------------------------------------------
 
 /* Clause record: conclusion atom id + premises slice into the term pool.
- * The pool stores TFolTerm nodes. */
+The pool stores FolTerm nodes. */
 struct TFolClauseRec {
   IUD conclusion;
   ISC prem_start;
   ISC prem_count;
 };
 
-static TFolClauseRec* FolTabNC(const TFolKb* kb) {
+static TFolClauseRec* FolTabNC(const FolKb* kb) {
   return TPtr<TFolClauseRec>(kb->tab_.origin);
 }
 
-TFolKb::TFolKb()
+FolKb::FolKb()
     : tab_(NILP, &ObjectFactoryHeap), pool_(NILP, &ObjectFactoryHeap),
       var_count_(0), clause_cap_(0), clause_count_(0), pool_count_(0) {}
 
-TFolKb::~TFolKb() {
+FolKb::~FolKb() {
   tab_.origin = FolFree(tab_.origin);
   pool_.origin = FolFree(pool_.origin);
 }
 
-BOL TFolKb::Init(ISC clause_cap, ISC var_count) {
+BOL FolKb::Init(ISC clause_cap, ISC var_count) {
   if (clause_cap < 1 || var_count < 1) {
     return false;
   }
   tab_.origin = ObjectFactoryHeap(
       NILP, IUD(clause_cap) * IUD(sizeof(TFolClauseRec)));
   pool_.origin =
-      ObjectFactoryHeap(NILP, IUD(clause_cap * 32) * IUD(sizeof(TFolTerm)));
+      ObjectFactoryHeap(NILP, IUD(clause_cap * 32) * IUD(sizeof(FolTerm)));
   if (IsError(tab_.origin) || IsError(pool_.origin)) {
     tab_.origin = FolFree(tab_.origin);
     pool_.origin = FolFree(pool_.origin);
     return false;
   }
   FolWipe(tab_.origin, IUD(clause_cap) * IUD(sizeof(TFolClauseRec)));
-  FolWipe(pool_.origin, IUD(clause_cap * 32) * IUD(sizeof(TFolTerm)));
+  FolWipe(pool_.origin, IUD(clause_cap * 32) * IUD(sizeof(FolTerm)));
   var_count_ = var_count;
   clause_cap_ = clause_cap;
   clause_count_ = 0;
@@ -177,13 +174,13 @@ BOL TFolKb::Init(ISC clause_cap, ISC var_count) {
   return true;
 }
 
-BOL TFolKb::Tell(const TFolTerm* premises, ISC premise_count,
+BOL FolKb::Tell(const FolTerm* premises, ISC premise_count,
                  IUD conclusion_atom) {
   if (premises == NILP || premise_count > 32 || clause_count_ >= clause_cap_) {
     return false;
   }
   ISC start = pool_count_;
-  TFolTerm* pool = TPtr<TFolTerm>(pool_.origin);
+  FolTerm* pool = TPtr<FolTerm>(pool_.origin);
   for (ISC i = 0; i < premise_count; ++i) {
     if (pool_count_ >= clause_cap_ * 32) {
       return false;
@@ -196,11 +193,11 @@ BOL TFolKb::Tell(const TFolTerm* premises, ISC premise_count,
 }
 
 /* Goal-directed backward chaining. Premise vars are existential wildcards
- * (documented deviation: θ is not carried through premise bindings — the
- * module's queries are ground atoms, so no binding information is needed
- * downstream). The path mask is the visited set: a goal already on the
- * current chain fails (loop avoidance). */
-static BOL FolAskRecNC(const TFolKb* kb, IUD goal, ISC depth, IUD path) {
+documented deviation: θ is not carried through premise bindings — the
+module's queries are ground atoms, so no binding information is needed
+downstream). The path mask is the visited set: a goal already on the
+current chain fails (loop avoidance). */
+static BOL FolAskRecNC(const FolKb* kb, IUD goal, ISC depth, IUD path) {
   if (depth <= 0) {
     return false;
   }
@@ -211,7 +208,7 @@ static BOL FolAskRecNC(const TFolKb* kb, IUD goal, ISC depth, IUD path) {
     return false;
   }
   TFolClauseRec* tab = FolTabNC(kb);
-  TFolTerm* pool = TPtr<TFolTerm>(kb->pool_.origin);
+  FolTerm* pool = TPtr<FolTerm>(kb->pool_.origin);
   path |= IUD(1) << goal;
   for (ISC c = 0; c < kb->clause_count_; ++c) {
     if (tab[c].conclusion != goal) {
@@ -220,7 +217,7 @@ static BOL FolAskRecNC(const TFolKb* kb, IUD goal, ISC depth, IUD path) {
     BOL all = true;
     for (ISC i = tab[c].prem_start;
          i < tab[c].prem_start + tab[c].prem_count && all; ++i) {
-      const TFolTerm* p = &pool[i];
+      const FolTerm* p = &pool[i];
       if (p->kind == 1) {
         continue;  // existential wildcard: any atom satisfies
       }
@@ -237,7 +234,7 @@ static BOL FolAskRecNC(const TFolKb* kb, IUD goal, ISC depth, IUD path) {
   return false;
 }
 
-BOL TFolKb::Ask(IUD goal_atom, ISC max_depth) const {
+BOL FolKb::Ask(IUD goal_atom, ISC max_depth) const {
   if (max_depth < 1) {
     return false;
   }
@@ -246,7 +243,7 @@ BOL TFolKb::Ask(IUD goal_atom, ISC max_depth) const {
 
 // --- Fig 9.3 NAIVE-ENTAILS -------------------------------------------------
 
-BOL TFolKb::NaiveEntails(const TFolTerm* goal, const IUD* constants,
+BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
                          ISC domain_size) const {
   if (goal == NILP || constants == NILP || domain_size < 1 || domain_size > 8 ||
       goal->kind != 0 && goal->kind != 1) {
@@ -258,7 +255,7 @@ BOL TFolKb::NaiveEntails(const TFolTerm* goal, const IUD* constants,
   for (ISC c = 0; c < clause_count_; ++c) {
     ISC distinct = 0;
     TFolClauseRec* tab = TPtr<TFolClauseRec>(tab_.origin);
-    TFolTerm* pool = TPtr<TFolTerm>(pool_.origin);
+    FolTerm* pool = TPtr<FolTerm>(pool_.origin);
     IUD seen = 0;
     for (ISC i = tab[c].prem_start; i < tab[c].prem_start + tab[c].prem_count;
          ++i) {
@@ -294,7 +291,7 @@ BOL TFolKb::NaiveEntails(const TFolTerm* goal, const IUD* constants,
   TFolClauseRec* ground = TPtr<TFolClauseRec>(tmp.origin);
   ISC ground_n = 0;
   TFolClauseRec* tab = TPtr<TFolClauseRec>(tab_.origin);
-  TFolTerm* pool = TPtr<TFolTerm>(pool_.origin);
+  FolTerm* pool = TPtr<FolTerm>(pool_.origin);
   for (ISC c = 0; c < clause_count_; ++c) {
     // Enumerate assignments of the clause's distinct premise vars.
     ISC var_ids[8];

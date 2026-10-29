@@ -19,6 +19,24 @@ ACarGym::ACarGym(const TileMap& map, const TVehicleRoute& route,
     cars_[i] = new ACarEnv(map, route, initial, seed_ + IUD(i) * 0x9E37u);
     envs_[i] = NILP;
   }
+  CopyStr(manifest_.name, ManifestNameLen, "carworld");
+  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  manifest_.kind = ManifestKindEnv;
+  manifest_.domain = ManifestDomainRobotics;
+  CopyStr(manifest_.description, ManifestDescriptionLen,
+          "2D car driving with classical driver and MPC");
+  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  manifest_.reward_low = FPC(-1.0);
+  manifest_.reward_high = FPC(1.0);
+  manifest_.reward_higher_is_better = true;
+  manifest_.determinism = ManifestDeterminismSeeded;
+  manifest_.obs_count = obs_len_;
+  manifest_.action_count = action_count_;
+  manifest_.max_episode_steps = ACarEnv::MaxFrames;
+  manifest_.env_count_max = GymEnvMax;
+  CopyStr(manifest_.world_name, ManifestWorldLen, "CarWorld");
+  manifest_.seam_number = IGEEK_CARWORLD_CORE;
+  manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
 ACarGym::~ACarGym() {

@@ -1,5 +1,9 @@
 # BikeWorld
 
+Status: **tested headless** — standalone headless build/test entry point
+passes. Not validated as a learned policy; the autopilot is classical
+(speed commands), not end-to-end learned steering.
+
 Native headless bicycle simulator and classical autopilot, built on iGeek and
 TileWorld. No LLM inference, Python runtime, downloaded assets, SFML, CUDA,
 external physics engine, or C++ standard-library containers are required by

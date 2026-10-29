@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #ifndef TILEWORLD_ENEMYEDITORMODE
 #define TILEWORLD_ENEMYEDITORMODE
@@ -17,7 +18,7 @@ class EnemyEditorMode : public EditorMode {
   sf::Text cursor_text_;
   sf::RectangleShape sidebar_;
   sf::RectangleShape selector_rect_;
-  sf::IntRect texture_rect_;
+  _::ISC4 texture_rect_;
 
   ISN type_;
   ISN amount_;

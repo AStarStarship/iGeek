@@ -195,6 +195,24 @@ class ASudokuGym : public Gym {
     boards_ = new TBoard[env_count_];
     targets_ = new TBoard[env_count_];
     for (ISC b = 0; b < env_count_; ++b) ResetEnv(b);
+    CopyStr(manifest_.name, ManifestNameLen, "sudoku");
+    CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+    manifest_.kind = ManifestKindEnv;
+    manifest_.domain = ManifestDomainGame;
+    CopyStr(manifest_.description, ManifestDescriptionLen,
+            "9x9 Sudoku puzzle solving");
+    CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+    manifest_.reward_low = FPC(0.0);
+    manifest_.reward_high = FPC(1.0);
+    manifest_.reward_higher_is_better = true;
+    manifest_.determinism = ManifestDeterminismSeeded;
+    manifest_.obs_count = obs_len_;
+    manifest_.action_count = action_count_;
+    manifest_.max_episode_steps = SudokuCells * 9;
+    manifest_.env_count_max = GymEnvMax;
+    CopyStr(manifest_.world_name, ManifestWorldLen, "SudokuWorld");
+    manifest_.seam_number = IGEEK_SUDOKUWORLD_CORE;
+    manifest_.manifest_version = ISC(1);
   }
   ~ASudokuGym() override {
     delete[] observations_;

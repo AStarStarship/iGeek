@@ -6,12 +6,8 @@
 #include "../Gym.h"
 #if SEAM >= CRABS_ARMWORLD
 namespace iGeek {
-/** Real native Gym buffers for the 2-link reacher. Categorical actions
- * (8) drive joint torques. Terminal rewards/flags survive the seeded
- * auto-reset; the returned observation is the next episode's.
- */
-class AArmGym : public Gym
-{
+/* Real native Gym buffers for the 2-link reacher. Categorical actions (8) drive joint torques. Terminal rewards/flags survive the seeded auto-reset; the returned observation is the next episode's. */
+class AArmGym : public Gym {
  public:
   AArmGym(const TArmParams& params, ISC count = 4, IUD seed = 7);
   ~AArmGym() override;

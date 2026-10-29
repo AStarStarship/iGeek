@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "state_game.h"
 #include "stdafx.h"
@@ -8,16 +9,16 @@ void GameState::initDeferredRender() {
 
   renderSprite.setTexture(renderTexture.getTexture());
   renderSprite.setTextureRect(
-      sf::IntRect(0, 0, stateData->gfxSettings->resolution.width,
+      _::ISC4(0, 0, stateData->gfxSettings->resolution.width,
                   stateData->gfxSettings->resolution.height));
 }
 
 void GameState::initView() {
-  view.setSize(sf::Vector2f(
+  view.setSize(_::FPC2(
       static_cast<float>(stateData->gfxSettings->resolution.width),
       static_cast<float>(stateData->gfxSettings->resolution.height)));
 
-  view.setCenter(sf::Vector2f(
+  view.setCenter(_::FPC2(
       static_cast<float>(stateData->gfxSettings->resolution.width) / 2.f,
       static_cast<float>(stateData->gfxSettings->resolution.height) / 2.f));
 }
@@ -56,7 +57,7 @@ void GameState::InitTextures() {
 }
 
 void GameState::InitPauseMenu() {
-  const sf::VideoMode& vm = stateData->gfxSettings->resolution;
+  const _::TVideoMode& vm = stateData->gfxSettings->resolution;
   pmenu_ = new PauseMenu(stateData->gfxSettings->resolution, font_);
 
   pmenu_->AddButton("QUIT", gui::p2pY(74.f, vm), gui::p2pX(13.f, vm),

@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #ifndef TILEWORLD_DEFAULTEDITORMODE_DECL
 #define TILEWORLD_DEFAULTEDITORMODE_DECL
@@ -17,7 +18,7 @@ class DefaultEditorMode : public EditorMode {
   sf::RectangleShape sidebar;
   sf::RectangleShape selectorRect;
   gui::TextureSelector* textureSelector;
-  sf::IntRect textureRect;
+  _::ISC4 textureRect;
   bool collision;
   short type;
   ISN layer;

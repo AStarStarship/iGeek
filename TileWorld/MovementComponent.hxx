@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "stdafx.h"
 //
@@ -14,7 +15,7 @@ MovementComponent::~MovementComponent() {}
 
 const float& MovementComponent::VelocityMax() const { return velocity_max_; }
 
-const sf::Vector2f& MovementComponent::Velocity() const { return velocity_; }
+const _::FPC2& MovementComponent::Velocity() const { return velocity_; }
 
 const bool MovementComponent::GetState(const short unsigned state) const {
   switch (state) {

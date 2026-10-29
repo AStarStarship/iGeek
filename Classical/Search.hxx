@@ -53,8 +53,7 @@ static inline void SearchWipe(IUW* origin, ISW bytes) {
   }
 }
 
-/* Node pool: append-only arrays; node i's state is at
- * states + i * state_words. All five arrays are RAMFactory-owned. */
+/* Node pool: append-only arrays; node i's state is at states + i * state_words. All five arrays are RAMFactory-owned. */
 struct SearchPool {
   Autoject states_;
   Autoject parents_;
@@ -160,7 +159,7 @@ static ISC SearchPoolAdd(SearchPool* pool, const IUC* state, ISC parent,
 }
 
 /* Extract the action path from root to `node` (exclusive of the root's
- * action). Returns -1 when the path is longer than path_cap. */
+action). Returns -1 when the path is longer than path_cap. */
 static ISC SearchPoolPath(const SearchPool* pool, ISC node, IUC* path,
                           ISC path_cap) {
   ISC len = 0;
@@ -181,9 +180,9 @@ static ISC SearchPoolPath(const SearchPool* pool, ISC node, IUC* path,
 }
 
 /* Visited set: open addressing, power-of-two capacity. A slot is occupied
- * when vals != 0 (stored node index + 1); keys holds the raw FNV hash.
- * Hash collisions are resolved by re-probing on the full state words.
- * Both tables are RAMFactory-owned. */
+when vals != 0 (stored node index + 1); keys holds the raw FNV hash.
+Hash collisions are resolved by re-probing on the full state words.
+Both tables are RAMFactory-owned. */
 struct SearchVisited {
   Autoject keys_;
   Autoject vals_;
@@ -259,8 +258,8 @@ static void SearchVisitedRehash(SearchVisited* vis, ISC new_cap) {
 }
 
 /* Inserts the state of node `node` into the visited set.
- * Returns true when newly inserted, false when an equal state was already
- * present. */
+Returns true when newly inserted, false when an equal state was already
+present. */
 static BOL SearchVisitedInsert(SearchVisited* vis, const SearchPool* pool,
                                ISC state_words, IUD hash, ISC node) {
   const IUC* state = pool->States() + IUD(node) * IUD(state_words);
@@ -497,7 +496,7 @@ ISC SearchUCS(const Problem* problem, IUC* path, ISC path_cap) {
 }
 
 /* Figure 3.24 depth-limited search, iterative with an explicit stack.
- * Frame child_result: 0 = none, -1 = failure, -2 = cutoff. */
+Frame child_result: 0 = none, -1 = failure, -2 = cutoff. */
 struct DlsFrame {
   ISC node;
   ISC cursor;
@@ -629,8 +628,8 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
 }
 
 /* Figure 3.30 iterative-deepening search. DLS reports -1 only when the
- * whole tree below the limit was exhausted without a goal, so -1 is a
- * definitive no-solution; -2 means "deeper". */
+whole tree below the limit was exhausted without a goal, so -1 is a
+definitive no-solution; -2 means "deeper". */
 ISC SearchIDS(const Problem* problem, IUC* path, ISC path_cap, ISC max_limit) {
   if (max_limit < 0) {
     return -1;
@@ -644,8 +643,8 @@ ISC SearchIDS(const Problem* problem, IUC* path, ISC path_cap, ISC max_limit) {
   return -2;
 }
 
-/* Figure 3.38 recursive best-first search, iterative with an explicit
- * stack. The heuristic must be admissible. */
+/* Figure 3.38 recursive best-first search, iterative with an explicit stack.
+The heuristic must be admissible. */
 struct RbfsFrame {
   ISC node;
   FPC alt;

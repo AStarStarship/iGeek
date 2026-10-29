@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #ifndef TILEWORLD_PAUSEMENU
 #define TILEWORLD_PAUSEMENU
@@ -19,7 +20,7 @@ class PauseMenu {
   // Private Functions
 
  public:
-  PauseMenu(sf::VideoMode& vm, sf::Font& font);
+  PauseMenu(_::TVideoMode& vm, sf::Font& font);
   virtual ~PauseMenu();
 
   // Accessor
@@ -30,7 +31,7 @@ class PauseMenu {
   void addButton(const _::AString key, const FPC y, const FPC width,
                  const FPC height, const unsigned char_size,
                  const _::AString text);
-  void Update(const sf::Vector2i& mousePosWindow);
+  void Update(const _::ISC2& mousePosWindow);
   void Render(sf::RenderTarget& target);
 };
 

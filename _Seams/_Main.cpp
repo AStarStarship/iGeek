@@ -11,6 +11,6 @@ ISN main(ISN arg_count, CHA** args) {
 #if SEAM == SEAM_N
   return SeamResult(iGeekTest::Release(argss));
 #else
-  return TTestTree<iGeekTests>(arg_count, args);
+  return TTestTree<iGeekTest::iGeekTests>(arg_count, args);
 #endif
 }

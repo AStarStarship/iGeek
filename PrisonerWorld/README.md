@@ -1,5 +1,9 @@
 # PrisonerWorld
 
+Status: **simulation-only** — repeated Prisoner's Dilemma with
+hand-coded strategies (Tit-for-Tat, Grim Trigger, Random, etc.).
+Not a Gym subclass; no PPO loop. Strategies are analytical, not learned.
+
 Repeated Prisoner's Dilemma simulation for iGeek.
 
 ## Building

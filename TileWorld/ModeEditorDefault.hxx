@@ -1,8 +1,9 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "mode_editor_default.h"
 
 void DefaultEditorMode::InitVariables() {
-  textureRect = sf::IntRect(0, 0, static_cast<int>(state_data_->grid_size),
+  textureRect = _::ISC4(0, 0, static_cast<int>(state_data_->grid_size),
                             static_cast<int>(state_data_->grid_size));
   collision = false;
   type = TileTypes::DEFAULT;
@@ -13,24 +14,24 @@ void DefaultEditorMode::InitVariables() {
 void DefaultEditorMode::InitGUI() {
   // Text
   cursorText.setFont(*editor_state_data_->font);
-  cursorText.setFillColor(sf::Color::White);
+  cursorText.setFillColor(IUN::White);
   cursorText.setCharacterSize(12);
   cursorText.SetPosition(editor_state_data_->mouse_pos_value_->x,
                          editor_state_data_->mouse_pos_value_->y);
 
   // General GUI
-  sidebar.setSize(sf::Vector2f(
+  sidebar.setSize(_::FPC2(
       80.f, static_cast<float>(state_data_->gfxSettings->resolution.height)));
-  sidebar.setFillColor(sf::Color(50, 50, 50, 100));
-  sidebar.setOutlineColor(sf::Color(200, 200, 200, 150));
+  sidebar.setFillColor(IUN(50, 50, 50, 100));
+  sidebar.setOutlineColor(IUN(200, 200, 200, 150));
   sidebar.setOutlineThickness(1.f);
 
   selectorRect.setSize(
-      sf::Vector2f(state_data_->grid_size, state_data_->grid_size));
+      _::FPC2(state_data_->grid_size, state_data_->grid_size));
 
-  selectorRect.setFillColor(sf::Color(255, 255, 255, 150));
+  selectorRect.setFillColor(IUN(255, 255, 255, 150));
   selectorRect.setOutlineThickness(1.f);
-  selectorRect.setOutlineColor(sf::Color::Green);
+  selectorRect.setOutlineColor(IUN::Green);
 
   selectorRect.setTexture(tiles_->TileSheet());
   selectorRect.setTextureRect(textureRect);
@@ -55,7 +56,7 @@ void DefaultEditorMode::UpdateInput(const float& dt) {
   // Add a tile to the tilemap
   if (sf::Mouse::IsButtonPressed(sf::Mouse::Left) && KeyTime()) {
     if (!sidebar.GlobalBounds().contains(
-            sf::Vector2f(*editor_state_data_->mouse_pos_window))) {
+            _::FPC2(*editor_state_data_->mouse_pos_window))) {
       if (!textureSelector->getActive()) {
         if (tileAddLock) {
           if (tiles_->TileEmpty(editor_state_data_->mouse_pos_grid->x,
@@ -77,7 +78,7 @@ void DefaultEditorMode::UpdateInput(const float& dt) {
   // Remove a tile from the tilemap
   else if (sf::Mouse::IsButtonPressed(sf::Mouse::Right) && KeyTime()) {
     if (!sidebar.GlobalBounds().contains(
-            sf::Vector2f(*editor_state_data_->mouse_pos_window))) {
+            _::FPC2(*editor_state_data_->mouse_pos_window))) {
       if (!textureSelector->getActive())
         tiles_->RemoveTile(editor_state_data_->mouse_pos_grid->x,
                            editor_state_data_->mouse_pos_grid->y, 0);

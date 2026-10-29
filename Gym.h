@@ -4,6 +4,7 @@
 #define IGEEK_GYM_DECL
 #include "Env.h"
 #include "EnvGoal.h"
+#include "GymManifest.h"
 namespace iGeek {
 
 /* Max parallel envs in one Gym batch. Fixed-size (no std vector).
@@ -20,6 +21,26 @@ Migrated 2026-10-07:
   - `Gym(const CHA* name)` (was `const STA*` dead type).
   - Added the vectorized batch accessors the PPO loop needs (see
     iGeek AGENT_PLAN.md, batch section).
+
+Buffer ownership, shape, mutability, lifetime:
+  - All five batch arrays (observations_, actions_, rewards_,
+    terminals_, action_mask_) are allocated in the subclass constructor
+    (either heap `new[]` or stack storage) and freed in the subclass
+    destructor. The base Gym never allocates or frees them.
+  - Shape: flat 1-D, indexed [env * feature + i].
+    observations_ has env_count * obs_len_ floats.
+    actions_, rewards_, terminals_ have env_count elements.
+    action_mask_ has env_count * action_count_ floats.
+  - Mutability: the policy WRITES actions_, the Gym WRITES
+    observations_/rewards_/terminals_/action_mask_ after StepBatch.
+    The PPO loop reads rewards_/terminals_/observations_ after
+    StepBatch, writes actions_ before StepBatch.
+  - Lifetime: valid from constructor return through StepBatch/
+    ResetBatch calls. Invalid after the destructor runs.
+  - LoadDLL is a stub: it does nothing and returns void. Calling it
+    has no effect — DLL loading is not implemented.
+  - AddEnv stores the pointer in envs_[] but does not take ownership;
+    the caller must keep the Env alive for the Gym's lifetime.
 */
 class Gym {
  public:
@@ -27,14 +48,18 @@ class Gym {
   Gym(const CHA* gym_name = "gym")
       : gym_name_(gym_name), env_count_(0), observations_(NILP),
         actions_(NILP), rewards_(NILP), terminals_(NILP), action_mask_(NILP),
-        obs_len_(0), action_count_(0) {}
+        obs_len_(0), action_count_(0) {
+    TManifestInit(&manifest_);
+  }
   virtual ~Gym() {}
 
   const CHA* Name() const { return gym_name_; }
+  const TManifest& Manifest() const { return manifest_; }
+  void SetManifest(const TManifest& m) { manifest_ = m; }
 
   void AddEnv(Env* env);
 
-  void LoadDLL(const CHA* library);
+  BOL LoadDLL(const CHA* library);
 
   /* --- Vectorized batch interface (vectorized-batch) -------------------
   The PPO loop never calls a single env; it steps the whole batch. These
@@ -67,6 +92,7 @@ class Gym {
  protected:
 
   const CHA* gym_name_;
+  TManifest manifest_;
   ISC env_count_;
   FPC* observations_;
   ISC* actions_;

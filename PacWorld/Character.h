@@ -2,42 +2,60 @@
 #pragma once
 #ifndef PACWORLD_CHARACTER
 #define PACWORLD_CHARACTER
-#include <SFML/Graphics.hpp>
+
 #include "Maze.h"
-//
-#include <array>
+
 namespace PacWorld {
 
-class Character : public sf::Drawable, public sf::Transformable {
-  float speed_;             //< The spped in ???.
-  sf::Vector2i direction_,  //< The current direction.
-      next_direction_;      //< The next direction to face.
-  Maze* maze_;              //< The maze this is in.
+/* A headless character (pac or ghost) that moves on the maze grid.
+   Position is an explicit FPC2 member (was sf::Transformable). No SFML,
+   no stdlib. The `Update(delta)` method advances position by
+   speed * delta along `direction_`, handles wall collisions, and triggers
+   `ChangeDirection()` at intersections (overridden by Ghost for AI). */
+class Character {
+  FPC speed_;                    // pixels per second.
+  FPC2 position_;                // current pixel position (was Transformable).
+  ISC2 direction_;               // current direction (unit vector in cells).
+  ISC2 next_direction_;          // next direction to face.
+  ISC2 previous_intersection_;   // last intersection cell we were at.
+  BOL available_directions_[4];  // which of the 4 dirs are open at last xsect.
+  Maze* maze_;                   // the maze this character is in.
 
-  sf::Vector2i previous_intersection_;
-  std::array<bool, 4> available_directions_;
-
-  public:
+ public:
   Character();
 
-  virtual void Update(sf::Time delta);
+  /* Advance the character by `delta` seconds. */
+  virtual void Update(FPC delta);
 
-  void DirectionSet(sf::Vector2i direction);
+  void SetDirection(ISC2 direction);
+  ISC2 Direction() const;
 
-  sf::Vector2i Direction() const;
+  void SetSpeed(FPC speed);
+  FPC Speed() const;
 
-  void SpeedSet(float speed);
+  void SetPosition(FPC2 position);
+  FPC2 Position() const;
 
-  float Speed() const;
+  /* The character's collision box in pixel space (FPC4 AABB). */
+  FPC4 CollisionBox() const;
 
-  sf::FloatRect CollisionBox() const;
+  void SetMaze(Maze* maze);
 
-  void MazeSet(Maze* maze);
-
-  bool WillMove();
+  /* Can the character move in its next direction from the last xsect? */
+  BOL WillMove() const;
 
  protected:
+  /* Check if there's a wall in the given direction from the current cell.
+     Used by Ghost's AI to pick open directions. */
+  BOL IsWallAhead(ISC2 direction) const {
+    if (NILP == maze_) return true;
+    ISC2 cell = maze_->PixelToCell(Position());
+    return maze_->IsWall(cell + direction);
+  }
+
+  /* Hook for subclasses to pick a new direction at an intersection.
+     Ghost overrides this with its AI; Pac leaves it as a no-op. */
   virtual void ChangeDirection() {}
 };
-}  //< namespace PacWorld
+}  // namespace PacWorld
 #endif

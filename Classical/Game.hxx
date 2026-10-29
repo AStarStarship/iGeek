@@ -30,9 +30,7 @@ static inline IUW* GameFree(IUW* origin) {
   return ObjectFactoryHeap(origin, RAMFactoryDelete);
 }
 
-/* One state row per depth level: the state currently being examined at
- * that depth. The row at level L+1 is written by Result before the
- * recursion descends; siblings overwrite it on backtracking. */
+/* One state row per depth level: the state currently being examined at that depth. The row at level L+1 is written by Result before the recursion descends; siblings overwrite it on backtracking. */
 struct GameStateStack {
   IUW* mem;
   ISC cap;
@@ -66,9 +64,9 @@ static BOL GameStackEnsure(GameStateStack* stk, ISC level) {
 }
 
 /* Figures 5.3/5.7 minimax with alpha-beta pruning. `prune` false passes
- * -inf/+inf bounds and never cuts off (plain minimax); `prune` true cuts
- * off on beta <= alpha. Best action on ties is the first one encountered.
- * A non-terminal state with no actions scores 0.0 (documented). */
+-inf/+inf bounds and never cuts off (plain minimax); `prune` true cuts
+off on beta <= alpha. Best action on ties is the first one encountered.
+A non-terminal state with no actions scores 0.0 (documented). */
 static IUC GameMinimaxRec(const Game* game, ISC level, GameStateStack* stk,
                           const IUC* state, FPC alpha, FPC beta,
                           ISC* out_nodes, FPC* value_out, BOL prune,

@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "stdafx.h"
 //
@@ -14,24 +15,24 @@ void ModeEditorEnemy::InitVariables() {
 void ModeEditorEnemy::InitGUI() {
   // Text
   cursor_text_.setFont(*editor_state_data_->font);
-  cursor_text_.setFillColor(sf::Color::White);
+  cursor_text_.setFillColor(IUN::White);
   cursor_text_.setCharacterSize(12);
   cursor_text_.PositionSet(editor_state_data_->mouse_pos_value_->x,
                            editor_state_data_->mouse_pos_value_->y);
 
-  sidebar_.setSize(sf::Vector2f(
+  sidebar_.setSize(_::FPC2(
       80.f,
       static_cast<float>(state_data_->grfx_settings_->resolution.height)));
-  sidebar_.setFillColor(sf::Color(50, 50, 50, 100));
-  sidebar_.setOutlineColor(sf::Color(200, 200, 200, 150));
+  sidebar_.setFillColor(IUN(50, 50, 50, 100));
+  sidebar_.setOutlineColor(IUN(200, 200, 200, 150));
   sidebar_.setOutlineThickness(1.f);
 
   selector_rect_.setSize(
-      sf::Vector2f(state_data_->grid_size_, state_data_->grid_size_));
+      _::FPC2(state_data_->grid_size_, state_data_->grid_size_));
 
-  selector_rect_.setFillColor(sf::Color(255, 255, 255, 150));
+  selector_rect_.setFillColor(IUN(255, 255, 255, 150));
   selector_rect_.setOutlineThickness(1.f);
-  selector_rect_.setOutlineColor(sf::Color::Green);
+  selector_rect_.setOutlineColor(IUN::Green);
 }
 
 // Constructors/Destructors
@@ -47,14 +48,14 @@ ModeEditorEnemy::~ModeEditorEnemy() {}
 void ModeEditorEnemy::UpdateInput(const float& dt) {
   if (sf::Mouse::IsButtonPressed(sf::Mouse::Left) && KeyTime()) {
     if (!sidebar_.GlobalBounds().contains(
-            sf::Vector2f(*editor_state_data_->mouse_pos_window))) {
+            _::FPC2(*editor_state_data_->mouse_pos_window))) {
       tiles_->AddTile(editor_state_data_->mouse_pos_grid->x,
                       editor_state_data_->mouse_pos_grid->y, 0, texture_rect_,
                       type_, amount_, time_to_spawn_, distance_max_);
     }
   } else if (sf::Mouse::IsButtonPressed(sf::Mouse::Right) && KeyTime()) {
     if (!sidebar_.GlobalBounds().contains(
-            sf::Vector2f(*editor_state_data_->mouse_pos_window))) {
+            _::FPC2(*editor_state_data_->mouse_pos_window))) {
       tiles_->RemoveTile(editor_state_data_->mouse_pos_grid->x,
                          editor_state_data_->mouse_pos_grid->y, 0,
                          TileTypes::kSpawnerEnemy);

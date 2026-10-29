@@ -136,22 +136,22 @@ function GIBBS-ASK(X, e, bn,N) returns an estimate of P(X|e)
 
 
 /* Binary domains only (documented scope): every variable takes value 0 or 1.
- * Variables must be supplied in topological order (0..var_count-1): each
- * variable's parents are lower-indexed variables.
- *
- * TBayesNet layout (all tables RAMFactory-owned by the net's destructor):
- *   per var: parent list (parent ids, ascending) and a PPT of 2^pc rows;
- *   row r (bit j of r = parent j's value) holds P(var=1 | that assignment);
- *   P(var=0 | ...) = 1 - p. */
-struct TBayesNet {
+Variables must be supplied in topological order (0..var_count-1): each
+variable's parents are lower-indexed variables.
+
+BaysNet layout (all tables RAMFactory-owned by the net's destructor):
+  per var: parent list (parent ids, ascending) and a PPT of 2^pc rows;
+  row r (bit j of r = parent j's value) holds P(var=1 | that assignment);
+  P(var=0 | ...) = 1 - p. */
+struct BaysNet {
   Autoject mem_;
   ISC var_count_;
   ISC parent_cap_;
   ISC ppt_cap_;
   ISC parent_count_;
   ISC ppt_count_;
-  TBayesNet();
-  ~TBayesNet();
+  BaysNet();
+  ~BaysNet();
   BOL Init(ISC var_count, ISC parent_cap, ISC ppt_cap);
   BOL TellVar(ISC var, const ISC* parents, ISC parent_count, const FPC* ppt);
   /* P(var=value | parent_values) — parent_values indexed by parent order. */
@@ -159,55 +159,54 @@ struct TBayesNet {
 };
 
 /* Evidence item (Fig 14.9 'e'). */
-struct TBayesEv {
+struct BaysEv {
   ISC var;
   IUC value;
 };
 
 /* All inference answers are P(query_var = 1 | evidence). */
 
-/* Fig 14.9 ENUMERATION-ASK: exact, recursive ENUMERATE-ALL over the
- * variable order. */
-FPC TBayesEnumerate(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+/* Fig 14.9 ENUMERATION-ASK: exact, recursive ENUMERATE-ALL over the variable order. */
+FPC BaysEnumerate(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                     ISC ev_n);
 
 /* Fig 14.11 ELIMINATION-ASK: variable elimination with join and sum-out
- * over RAMFactory-owned factors. Factor layout: a scope bit mask plus a
- * values array indexed by rank — bit i of the rank is scope bit bits[i] of
- * the assignment, so a scope of k variables spans 2^k cells regardless of
- * var_count. Variables are processed in reverse topological order (children
- * before parents) so each var may be summed out only after every factor that
- * still references it has been joined. Each factor (make/join/sum-out) takes
- * a fresh non-aliasing cell block from the pool; old factors stay live until
- * the destructor. */
-struct TBayesInfer {
+over RAMFactory-owned factors. Factor layout: a scope bit mask plus a
+values array indexed by rank — bit i of the rank is scope bit bits[i] of
+the assignment, so a scope of k variables spans 2^k cells regardless of
+var_count. Variables are processed in reverse topological order (children
+before parents) so each var may be summed out only after every factor that
+still references it has been joined. Each factor (make/join/sum-out) takes
+a fresh non-aliasing cell block from the pool; old factors stay live until
+the destructor. */
+struct BayesInfer {
   Autoject scope_mem_;
   Autoject val_mem_;
   IUD cells_used_;
   IUD cells_cap_;
   ISC var_count_;
-  TBayesInfer();
-  ~TBayesInfer();
+  BayesInfer();
+  ~BayesInfer();
   BOL Init(ISC var_count, IUD cells_cap);
-  FPC Ask(const TBayesNet& bn, ISC query_var, const TBayesEv* ev, ISC ev_n);
+  FPC Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev, ISC ev_n);
 };
 
 /* Fig 14.13 PRIOR-SAMPLE: one sample into the caller array. */
-FPC TBayesSample(const TBayesNet& bn, IUD seed, IUC* out_event);
+FPC BaysSample(const BaysNet& bn, IUD seed, IUC* out_event);
 
 /* Fig 14.14 REJECTION-SAMPLING: N samples, fixed seed. */
-FPC TBayesReject(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysReject(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                  ISC ev_n, ISC n_samples, IUD seed);
 
 /* Fig 14.15 LIKELIHOOD-WEIGHTING: N weighted samples, fixed seed. */
-FPC TBayesLw(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
              ISC ev_n, ISC n_samples, IUD seed);
 
 /* Fig 14.16 GIBBS-ASK: N full cycles over the nonevidence variables Z
- * (query included, per the figure), fixed seed. A draw is counted after
- * every single-variable resample (the figure's placement of the N[x]
- * increment), so the estimate averages N * |Z| draws. */
-FPC TBayesGibbs(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+(query included, per the figure), fixed seed. A draw is counted after
+every single-variable resample (the figure's placement of the N[x]
+increment), so the estimate averages N * |Z| draws. */
+FPC BaysGibbs(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                 ISC ev_n, ISC n_cycles, IUD seed);
 
 } //< namespace iGeek

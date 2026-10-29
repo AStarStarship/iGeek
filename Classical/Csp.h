@@ -110,8 +110,8 @@ function TREE-CSP-SOLVER(csp) returns a solution, or failure
 
 
 /* Binary constraint: a value x for var_a and a value y for var_b satisfy
- * the constraint iff Compatible(x, y) is true. A value pair that fails
- * the callback violates the constraint. */
+the constraint iff Compatible(x, y) is true. A value pair that fails
+the callback violates the constraint. */
 struct CspConstraint {
   ISC var_a;
   ISC var_b;
@@ -119,18 +119,17 @@ struct CspConstraint {
 };
 
 /* Uniform-domain binary CSP: every variable takes a value 0..domain_count-1.
- * initial_domains is a var_count array of IUC bitmasks (bit v set = value v
- * available); 0..domain_count-1 bits are meaningful, the rest are ignored.
- * The problem description is const — the solvers work on their own
- * RAMFactory copies of the domains and never mutate the problem.
- *
- * Solvers (implemented in Csp.hxx, following the relocated AIMA figures):
- *   CspAc3         — Fig 6.3  arc consistency
- *   CspBacktrack   — Fig 6.5  backtracking search with the MRV heuristic
- *   CspMinConflicts— Fig 6.8  min-conflicts local search
- *   CspTree        — Fig 6.11 tree-structured CSP solver
- * All succeed-failure functions return true with out[var] = value on
- * success, false on failure (out untouched). */
+initial_domains is a var_count array of IUC bitmasks (bit v set = value v
+available); 0..domain_count-1 bits are meaningful, the rest are ignored.
+the problem description is const — the solvers work on their own RAMFactory copies of the domains and never mutate the problem.
+
+Solvers (implemented in Csp.hxx, following the relocated AIMA figures):
+  CspAc3         — Fig 6.3  arc consistency
+  CspBacktrack   — Fig 6.5  backtracking search with the MRV heuristic
+  CspMinConflicts— Fig 6.8  min-conflicts local search
+  CspTree        — Fig 6.11 tree-structured CSP solver
+All succeed-failure functions return true with out[var] = value on
+success, false on failure (out untouched). */
 struct CSP {
   ISC var_count;
   ISC domain_count;
@@ -140,29 +139,29 @@ struct CSP {
 };
 
 /* Fig 6.3: enforce arc consistency on the (caller-owned) domain copy
- * `domains`. Returns true when every arc is arc-consistent, false when some
- * domain was wiped (the CSP cannot be solved). The queue holds every arc
- * of every constraint, both directions; REVISE deletes unsupported values. */
+`domains`. Returns true when every arc is arc-consistent, false when some
+domain was wiped (the CSP cannot be solved). The queue holds every arc
+of every constraint, both directions; REVISE deletes unsupported values. */
 BOL CspAc3(CSP* csp, IUC* domains);
 
 /* Fig 6.5: backtracking search with MRV variable selection
- * (SELECT-UNASSIGNED-VARIABLE = fewest remaining values, ties by index;
- * ORDER-DOMAIN-VALUES = ascending; INFERENCE = forward domain filtering,
- * undoable via the trail). Works from the given initial `domains`. */
+(SELECT-UNASSIGNED-VARIABLE = fewest remaining values, ties by index;
+ORDER-DOMAIN-VALUES = ascending; INFERENCE = forward domain filtering,
+undoable via the trail). Works from the given initial `domains`. */
 BOL CspBacktrack(CSP* csp, const IUC* domains, IUC* out);
 
 /* Fig 6.8: min-conflicts local search. Greedy initial assignment (each
- * variable gets the value with fewest conflicts against already-assigned
- * earlier variables), then up to max_steps steps: pick a random conflicted
- * variable (seeded LCG) and assign it the value with the fewest conflicts.
- * Returns true with `out` set when the current assignment is conflict-free. */
+variable gets the value with fewest conflicts against already-assigned
+earlier variables), then up to max_steps steps: pick a random conflicted
+variable (seeded LCG) and assign it the value with the fewest conflicts.
+Returns true with `out` set when the current assignment is conflict-free. */
 BOL CspMinConflicts(CSP* csp, const IUC* domains, IUC* out, ISC max_steps,
                     IUD seed);
 
 /* Fig 6.11: tree-structured CSP solver. The constraint graph must be a tree
- * (a back edge is reported as failure). Topological order from root 0,
- * MAKE-ARC-CONSISTENT parent-to-leaf, then forward assignment of any
- * consistent value. Linear time when a solution exists. */
+(a back edge is reported as failure). Topological order from root 0,
+MAKE-ARC-CONSISTENT parent-to-leaf, then forward assignment of any
+consistent value. Linear time when a solution exists. */
 BOL CspTree(CSP* csp, const IUC* domains, IUC* out);
 
 } //< namespace iGeek

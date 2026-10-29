@@ -6,10 +6,10 @@
 namespace iGeek {
 
 /* Chapter 17 — a Markov decision process over indexed states (0..
- * state_count-1). R(s,a) is the reward earned by taking action a from
- * state s (the book's Figure 17.4 form uses a state-only reward; an
- * action-dependent reward subsumes it). States with IsTerminal true have
- * no transitions and zero value. */
+state_count-1). R(s,a) is the reward earned by taking action a from
+state s (the book's Figure 17.4 form uses a state-only reward; an
+action-dependent reward subsumes it). States with IsTerminal true have
+no transitions and zero value. */
 struct MDP {
   ISC state_count;
   ISC action_count;
@@ -20,19 +20,19 @@ struct MDP {
   /* Reward earned taking action from state. */
   FPC (*Reward)(ISC state, IUC action);
   /* Transition model: writes the successors of (state, action) into
-   * out_states with probabilities out_probs (count <= cap, summing to
-   * 1); returns the count. */
+  out_states with probabilities out_probs (count <= cap, summing to
+  1); returns the count. */
   ISC (*Transitions)(ISC state, IUC action, ISC* out_states, ISC cap,
                      FPC* out_probs, ISC prob_cap);
 };
 
 /* Figure 17.4 value iteration (full max backup) and Figure 17.7 policy
- * iteration. V and policy are state_count words owned by the caller;
- * V is overwritten in place (its initial values are ignored) and policy
- * is filled greedily with respect to the final V. The termination test
- * is Equation (17.8): delta < eps * (1-gamma) / (1+gamma).
- * Returns the number of outer iterations run (max_iters when the
- * bound was exhausted without convergence). */
+iteration. V and policy are state_count words owned by the caller;
+V is overwritten in place (its initial values are ignored) and policy
+is filled greedily with respect to the final V. The termination test
+is Equation (17.8): delta < eps * (1-gamma) / (1+gamma).
+Returns the number of outer iterations run (max_iters when the
+bound was exhausted without convergence). */
 ISC ValueIteration(const MDP* mdp, FPC* V, FPC* policy, ISC max_iters);
 ISC PolicyIteration(const MDP* mdp, FPC* V, FPC* policy, ISC max_iters);
 

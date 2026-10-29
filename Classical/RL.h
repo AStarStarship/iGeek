@@ -77,28 +77,28 @@ zero s, a, r , the previous state, action, and reward, initially null
 
 
 /* Tabular reinforcement-learning agents over discrete states
- * (ISC indices 0..state_count-1) and actions (IUC, 0..action_count-1).
- * A percept is (s_next, r): the state entered and the reward received.
- * Each agent's Percept() applies the book's update for the previous
- * (s, a, r) triple and returns the action to take in s_next; when s_next
- * is terminal it returns the sentinel action_count (the book's null
- * action — no action is taken in a terminal state).
- *
- * All tables are RAMFactory-owned (ObjectFactoryHeap), allocated by Init
- * and returned by the destructor. The step size is a constant alpha
- * (the book's alpha(n) is any schedule satisfying the convergence
- * conditions; constant is standard).
- *
- * The three agents (implemented in RL.hxx, following the relocated AIMA
- * figures):
- *   TPassiveTDAgent  — Fig 21.4  fixed policy, utility table, TD update
- *   TQAgent          — Fig 21.8  active learner, Q table, eps-greedy
- *   TPassiveADPAgent — Fig 21.2  learns the transition model, then runs
- *                             POLICY-EVALUATION over it every step */
+(ISC indices 0..state_count-1) and actions (IUC, 0..action_count-1).
+A percept is (s_next, r): the state entered and the reward received.
+Each agent's Percept() applies the book's update for the previous
+(s, a, r) triple and returns the action to take in s_next; when s_next
+is terminal it returns the sentinel action_count (the book's null
+action — no action is taken in a terminal state).
+
+All tables are RAMFactory-owned (ObjectFactoryHeap), allocated by Init
+and returned by the destructor. The step size is a constant alpha
+(the book's alpha(n) is any schedule satisfying the convergence
+conditions; constant is standard).
+
+The three agents (implemented in RL.hxx, following the relocated AIMA
+figures):
+  PassiveTDAgent  — Fig 21.4  fixed policy, utility table, TD update
+  QAgent          — Fig 21.8  active learner, Q table, eps-greedy
+   PassiveADPAgent — Fig 21.2  learns the transition model, then runs
+                             POLICY-EVALUATION over it every step */
 
 /* Fig 21.4: passive learner with a fixed policy. Persistent state: U
- * (utilities), Ns (state visit counts), and the previous s, a, r triple. */
-struct TPassiveTDAgent {
+ (utilities), Ns (state visit counts), and the previous s, a, r triple. */
+struct PassiveTDAgent {
   Autoject u_mem_;
   Autoject n_mem_;
   ISC state_count_;
@@ -110,8 +110,8 @@ struct TPassiveTDAgent {
   ISC s_prev_;
   IUC a_prev_;
   FPC r_prev_;
-  TPassiveTDAgent();
-  ~TPassiveTDAgent();
+  PassiveTDAgent();
+  ~PassiveTDAgent();
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
            BOL (*IsTerminal)(ISC state), IUC (*Policy)(ISC state));
   IUC Percept(ISC s_next, FPC r);
@@ -120,14 +120,14 @@ struct TPassiveTDAgent {
 };
 
 /* Fig 21.8: exploratory Q-learning agent. Q is indexed [state][action];
- * Nsa counts state-action visits. Exploration is eps-greedy (seeded LCG):
- * with probability eps a uniform random action, otherwise the first
- * the book's exploration function f (Fig 21.10) is not in
- * Agent.h; eps-greedy is the standard stand-in. Like the TD agent, the
- * update uses r_prev_ (the reward received for the previous action); when
- * s_next is terminal it bootstraps with 0 (target = r_prev_, no gamma
- * term). */
-struct TQAgent {
+  Nsa counts state-action visits. Exploration is eps-greedy (seeded LCG):
+  with probability eps a uniform random action, otherwise the first
+  the book's exploration function f (Fig 21.10) is not in
+  Agent.h; eps-greedy is the standard stand-in. Like the TD agent, the
+  update uses r_prev_ (the reward received for the previous action); when
+  s_next is terminal it bootstraps with 0 (target = r_prev_, no gamma
+  term). */
+struct QAgent {
   Autoject q_mem_;
   Autoject n_mem_;
   ISC state_count_;
@@ -140,8 +140,8 @@ struct TQAgent {
   ISC s_prev_;
   IUC a_prev_;
   FPC r_prev_;
-  TQAgent();
-  ~TQAgent();
+  QAgent();
+  ~QAgent();
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha, FPC eps,
            BOL (*IsTerminal)(ISC state), IUD seed);
   IUC Percept(ISC s_next, FPC r);
@@ -150,12 +150,12 @@ struct TQAgent {
 };
 
 /* Fig 21.2: passive adaptive-dynamic-programming agent. Persistent state:
- * U (utilities), R (state rewards — the book's per-(a,s,s') R is condensed
- * to a per-state sample mean, updated on every departure from the state),
- * the fixed policy, Nsa (state-action counts), Ns'|sa (outcome counts), and
- * the learned model P(t | s, a). Every step re-derives P from the counts and
- * re-solves the fixed-policy Bellman equations (POLICY-EVALUATION) to tol. */
-struct TPassiveADPAgent {
+U (utilities), R (state rewards — the book's per-(a,s,s') R is condensed
+to a per-state sample mean, updated on every departure from the state),
+the fixed policy, Nsa (state-action counts), Ns'|sa (outcome counts), and
+the learned model P(t | s, a). Every step re-derives P from the counts and
+re-solves the fixed-policy Bellman equations (POLICY-EVALUATION) to tol. */
+struct PassiveADPAgent {
   Autoject u_mem_;
   Autoject r_mem_;
   Autoject nsa_mem_;
@@ -171,8 +171,8 @@ struct TPassiveADPAgent {
   ISC s_prev_;
   IUC a_prev_;
   FPC r_prev_;
-  TPassiveADPAgent();
-  ~TPassiveADPAgent();
+  PassiveADPAgent();
+  ~PassiveADPAgent();
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC tol,
            BOL (*IsTerminal)(ISC state), IUC (*Policy)(ISC state));
   IUC Percept(ISC s_next, FPC r);

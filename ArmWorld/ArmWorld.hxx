@@ -11,7 +11,7 @@ const CHA* TArmStatusName(ISC status) {
   const CHA* names[] = {"running", "reach", "timeout", "invalid"};
   return status >= ArmRunning && status <= ArmInvalid ? names[status] : "?";
 }
-/** Deterministic splitmix64-style hash for target drawing. */
+/* Deterministic splitmix64-style hash for target drawing. */
 static IUD TArmHash(IUD x) {
   x ^= x >> 12; x = x * 0x9E3779B97F4A7C15ull; x ^= x >> 25;
   x = x * 0xC2B2AE3D27D4EB4Full; x ^= x >> 27;

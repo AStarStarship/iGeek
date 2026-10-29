@@ -138,37 +138,36 @@ function LRTA*-COST(s, a, s′,H) returns a cost estimate
 */
 
 /* Chapter 4 — Beyond classical search: stochastic local search
- * (simulated annealing, genetic algorithms), AND–OR graph search for
- * nondeterministic environments, and online search agents (depth-first
- * exploration, LRTA*). All RAM is RAMFactory-owned; the online agents keep
- * their per-state tables in a hash table that grows x2 as states are seen.
- * States are state_words IUC words, state_words <= 8. */
+(simulated annealing, genetic algorithms), AND–OR graph search for
+nondeterministic environments, and online search agents (depth-first
+exploration, LRTA*). All RAM is RAMFactory-owned; the online agents keep
+their per-state tables in a hash table that grows x2 as states are seen.
+States are state_words IUC words, state_words <= 8. */
 
 /* Sentinel action: the agent is done (the book's "stop"). */
 static const IUC kStochasticStop = 0xFFFFFFFF;
 
 /* Fig 4.5 SIMULATED-ANNEALING. The schedule is internal: T(t) = T0 *
- * (1 - (t-1)/iters) (linear cool); t past iters returns the incumbent.
- * VALUE convention: higher is better (the book's ΔE > 0 acceptance).
- * The value function and a LCG seed are caller-supplied; the successor is
- * picked uniformly from problem.ACTIONS. Returns false on pool exhaustion.
- * out_state receives the final (best) state (state_words words). */
+(1 - (t-1)/iters) (linear cool); t past iters returns the incumbent.
+VALUE convention: higher is better (the book's ΔE > 0 acceptance).
+The value function and a LCG seed are caller-supplied; the successor is
+picked uniformly from problem.ACTIONS. Returns false on pool exhaustion.
+out_state receives the final (best) state (state_words words). */
 BOL SearchSA(const Problem* problem, ISC iters, FPC T0, IUD seed,
              FPC (*Value)(const IUC* state, ISC state_words),
              IUC* out_state);
 
 /* Fig 4.8 GENETIC-ALGORITHM. `population` is pop_size initial states
- * (state_words words each, world-owned). Fitness: higher is better.
- * REPRODUCE is one-point crossover over the word stream; MUTATE flips one
- * bit of one random word. RANDOM-SELECTION is a 2-way fitness tournament.
- * out_state receives the fittest individual after `generations` rounds. */
+(state_words words each, world-owned). Fitness: higher is better.
+REPRODUCE is one-point crossover over the word stream; MUTATE flips one
+bit of one random word. RANDOM-SELECTION is a 2-way fitness tournament.
+out_state receives the fittest individual after `generations` rounds. */
 BOL SearchGA(const Problem* problem, const IUC* population, ISC pop_size,
              ISC generations, FPC p_crossover, FPC p_mutate, IUD seed,
              FPC (*Fitness)(const IUC* state, ISC state_words),
              IUC* out_state);
 
-/* Fig 4.11 — a nondeterministic search problem: actions may have several
- * outcomes. */
+/* Fig 4.11 — a nondeterministic search problem: actions may have several outcomes. */
 struct NondetProblem {
   const IUC* initial;  //< Initial state (state_words words).
   ISC state_words;     //< State width in IUC words (<= 8).
@@ -182,10 +181,10 @@ struct NondetProblem {
 };
 
 /* Conditional plan pool (Fig 4.11). Plan ids: kPlanEmpty = 0 (the book's
- * empty plan), kPlanFail on failure. A plan node is an OR choice: its action
- * plus one child plan per outcome (child[i] = the plan to follow when the
- * outcome is outcome_id[i]). out_count outcomes are stored; a child of
- * kPlanEmpty means "goal reached, do nothing". */
+empty plan), kPlanFail on failure. A plan node is an OR choice: its action
+plus one child plan per outcome (child[i] = the plan to follow when the
+outcome is outcome_id[i]). out_count outcomes are stored; a child of
+PlanEmpty means "goal reached, do nothing". */
 static const IUD kPlanEmpty = 0;
 static const IUD kPlanFail = ~IUD(0);
 static const ISC kAndOrMaxOutcomes = 4;
@@ -209,18 +208,18 @@ struct SearchAndOrPlan {
 };
 
 /* OR-SEARCH from the initial state with cycle detection along the current
- * path and max_depth as a guard (the book has no depth bound). Returns the
- * root plan id via out_root; false on failure or pool exhaustion. */
+path and max_depth as a guard (the book has no depth bound). Returns the
+root plan id via out_root; false on failure or pool exhaustion. */
 BOL SearchAndOrGraph(const NondetProblem* problem, ISC max_depth,
                      SearchAndOrPlan* plan, IUD* out_root);
 /* The outcome state stored in a plan node (state_words words). */
 const IUC* SearchAndOrState(const SearchAndOrPlan* plan, IUD state_id);
 
 /* Fig 4.21 ONLINE-DFS-AGENT over a single-outcome Problem. Applicable only
- * where every action can be undone (backtracked). Persistent tables:
- * untried actions, unbacktracked states, and the result map per state.
- * Percept(s_next) applies the book's update for the previous (s, a) and
- * returns the action to take in s_next; kStochasticStop when done. */
+where every action can be undone (backtracked). Persistent tables:
+untried actions, unbacktracked states, and the result map per state.
+Percept(s_next) applies the book's update for the previous (s, a) and
+returns the action to take in s_next; kStochasticStop when done. */
 struct OnlineDfsAgent {
   Autoject table_mem_;  //< hash entries (state words + hash + used)
   Autoject data_mem_;   //< per-state stacks (untried, unbacktracked, result)
@@ -238,8 +237,8 @@ struct OnlineDfsAgent {
 };
 
 /* Fig 4.24 LRTA*-AGENT over a single-outcome Problem. H[s] is the cost
- * estimate (h when s is new); result[s, a] the successor observed. The step
- * cost is problem.StepCost (NILP => unit cost). */
+estimate (h when s is new); result[s, a] the successor observed. The step
+cost is problem.StepCost (NILP => unit cost). */
 struct LrtaStarAgent {
   Autoject table_mem_;
   Autoject data_mem_;

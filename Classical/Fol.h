@@ -6,9 +6,6 @@
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
 
-// --- AIMA reference pseudocode (relocated from Agent.h, 2026-10-28) --------
-// The implementations below follow these figures.
-
 /* Figure 8.3 The syntax of first-order logic with equality, specified in
 Backus–Naur form (see page 1060 if you are not familiar with this notation).
 Operator precedences are specified, from highest to lowest. The precedence of
@@ -134,16 +131,15 @@ continuation)
 */
 
 
-/* Fig 8.3 is the syntax of the logic; this module operates on already-parsed
- * term trees. Term encoding (documented choice):
- *   kind 0 — atom:  value = a small ground-atom id (caller-assigned, < 2^40)
- *   kind 1 — var:   value = variable id, 0..var_count-1
- *   kind 2 — pair:  left = head node id, right = tail node id (lists)
- *   kind 3 — nil:   empty list
- * Nodes live in a caller-owned pool of TFolTerm; a node id is a pool index.
- * Compound expressions (the book's OP/ARGS branch) are out of scope: the
- * caller flattens them to lists. Atoms are ids, not trees. */
-struct TFolTerm {
+/* Fig 8.3 is the syntax of the logic; this module operates on already-parsed term trees. Term encoding (documented choice):
+  kind 0 — atom:  value = a small ground-atom id (caller-assigned, < 2^40)
+  kind 1 — var:   value = variable id, 0..var_count-1
+  kind 2 — pair:  left = head node id, right = tail node id (lists)
+  kind 3 — nil:   empty list
+Nodes live in a caller-owned pool of FolTerm; a node id is a pool index.
+Compound expressions (the book's OP/ARGS branch) are out of scope: the
+caller flattens them to lists. Atoms are ids, not trees. */
+struct FolTerm {
   IUD value;
   IUD left;
   IUD right;
@@ -151,26 +147,26 @@ struct TFolTerm {
 };
 
 /* Substitution entry: var id -> node (any pool node: atom, var, or pair).
- * The book's add {var/x} to θ. */
-struct TFolSubst {
+The book's add {var/x} to θ. */
+struct FolSubst {
   ISC var;
   IUD node;
 };
 
 /* Fig 9.1 UNIFY(x, y, θ) with occurs check. x and y are node ids into the
- * caller pool. theta_in/out are caller arrays of TFolSubst; out_n is the
- * resulting size. out_cap must fit at most (x_n + y_n) new bindings. */
-BOL FolUnify(const TFolTerm* pool, IUD x, IUD y,
-             const TFolSubst* theta, ISC theta_n, ISC var_count,
-             TFolSubst* out_theta, ISC out_cap, ISC* out_n);
+caller pool. theta_in/out are caller arrays of FolSubst; out_n is the
+resulting size. out_cap must fit at most (x_n + y_n) new bindings. */
+BOL FolUnify(const FolTerm* pool, IUD x, IUD y,
+             const FolSubst* theta, ISC theta_n, ISC var_count,
+             FolSubst* out_theta, ISC out_cap, ISC* out_n);
 
 /* Fig 9.6 backward chaining over definite clauses.
- * A clause is a list of premise nodes (vars act as existential wildcards —
- * documented deviation from full θ-carrying: premise variables bind to
- * anything) plus one ground-atom conclusion. Ask runs goal-directed
- * backward chaining with a per-path visited mask (at most 64 atom ids) and
- * a max_depth bound, both per the loop-avoidance intent of the figure. */
-struct TFolKb {
+A clause is a list of premise nodes (vars act as existential wildcards —
+documented deviation from full θ-carrying: premise variables bind to
+anything) plus one ground-atom conclusion. Ask runs goal-directed
+backward chaining with a per-path visited mask (at most 64 atom ids) and
+a max_depth bound, both per the loop-avoidance intent of the figure. */
+struct FolKb {
   Autoject tab_;
   Autoject pool_;
   ISC var_count_;
@@ -178,25 +174,25 @@ struct TFolKb {
   ISC clause_count_;
   ISC pool_count_;
   BOL Init(ISC clause_cap, ISC var_count);
-  BOL Tell(const TFolTerm* premises, ISC premise_count, IUD conclusion_atom);
+  BOL Tell(const FolTerm* premises, ISC premise_count, IUD conclusion_atom);
   BOL Ask(IUD goal_atom, ISC max_depth) const;
-  TFolKb();
-  ~TFolKb();
+  FolKb();
+  ~FolKb();
   /* Fig 9.3 NAIVE-ENTAILS: ground every clause over the domain of
-   * domain_size constants, then for each grounding of the goal (a var goal
-   * grounds to every constant) check with SatDpll that
-   * groundKB ∪ {¬g} is unsatisfiable. Exponential in the grounding count —
-   * the point of the figure. Atom ids must be < 64; returns false when the
-   * grounding count exceeds 4096 (documented bound). */
-  BOL NaiveEntails(const TFolTerm* goal, const IUD* constants,
+  domain_size constants, then for each grounding of the goal (a var goal
+  grounds to every constant) check with SatDpll that
+  groundKB ∪ {¬g} is unsatisfiable. Exponential in the grounding count —
+  the point of the figure. Atom ids must be < 64; returns false when the
+  grounding count exceeds 4096 (documented bound). */
+  BOL NaiveEntails(const FolTerm* goal, const IUD* constants,
                    ISC domain_size) const;
 };
 
 /* Fig 9.8 compiled Append: APPEND(ax, y, az, continuation). The compiled
- * scheme's trail/continuation is the bounded-depth list walk; here it is
- * the direct length+prefix check (same semantics, iteration replaces
- * recursion). ax/y/az are flat atom-id arrays; [] is the empty array.
- * az is the output: on success az_n = ax_n + y_n and az = ax ++ y. */
+scheme's trail/continuation is the bounded-depth list walk; here it is
+the direct length+prefix check (same semantics, iteration replaces
+recursion). ax/y/az are flat atom-id arrays; [] is the empty array.
+az is the output: on success az_n = ax_n + y_n and az = ax ++ y. */
 BOL FolAppend(const IUD* ax, ISC ax_n, const IUD* y, ISC y_n,
               IUD* az, ISC az_cap, ISC* az_n);
 

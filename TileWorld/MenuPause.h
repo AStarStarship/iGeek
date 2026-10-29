@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_PAUSEMENU_H #pragma once
@@ -16,7 +17,7 @@ class PauseMenu {
   _::ADic<_::AString, gui::Button*> buttons;
 
  public:
-  PauseMenu(sf::VideoMode& vm, sf::Font& font);
+  PauseMenu(_::TVideoMode& vm, sf::Font& font);
   virtual ~PauseMenu();
 
   _::ADic<_::AString, gui::Button*>& getButtons();
@@ -25,7 +26,7 @@ class PauseMenu {
   void AddButton(const _::AString key, const FPC y, const FPC width,
                  const FPC height, const unsigned char_size,
                  const _::AString text);
-  void Update(const sf::Vector2i& mouse_pos_window);
+  void Update(const _::ISC2& mouse_pos_window);
   void Render(sf::RenderTarget& target);
 };
 

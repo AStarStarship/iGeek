@@ -1,0 +1,6 @@
+// Copyright AStarship <https://astarship.net>.
+
+#define KABUKI_AUTOPILOT 123
+#define KABUKI_AUTOPILOT_0 KABUKI_AUTOPILOT_0 + 1
+#define KABUKI_AUTOPILOT_1 KABUKI_AUTOPILOT_0 + 2
+#define KABUKI_AUTOPILOT_N KABUKI_AUTOPILOT_0 + 2
