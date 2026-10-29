@@ -15,7 +15,7 @@
 #include "LinearPolicy.hxx"
 #include <math.h>
 
-namespace _ {
+namespace iGeek {
 
 TPPO::TPPO(Gym& gym, TPolicy& policy, ISC horizon, ISC epochs)
     : gym_(gym), policy_(policy), horizon_(horizon), epochs_(epochs),
@@ -202,4 +202,4 @@ TPPOStats TPPO::TrainStep() {
   return stats;
 }
 
-}  // namespace _
+} //< namespace iGeek

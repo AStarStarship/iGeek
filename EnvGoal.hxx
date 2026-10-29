@@ -1,8 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
 #include "EnvGoal.h"
-namespace _ {
+namespace iGeek {
 
-EnvGoal::EnvGoal() : observation(), desired_goal(), achieved_goal() {}
-
-}  //< namespace _
+} //< namespace iGeek

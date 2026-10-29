@@ -5,7 +5,7 @@
 #include "CarConfig.h"
 #include "../BikeWorld/BikePhysics.h"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 enum { CarFrontLeft, CarFrontRight, CarRearLeft, CarRearRight, CarWheelCount };
 /** SI units. Planar rigid body; four independent tire forces, static axle loads. */
 struct TCarParams
@@ -38,6 +38,6 @@ struct alignas(ACPUCacheLineSize) TCarState
  */
 BOL TCarStep(TCarState& car, const TCarParams& params,
              const TCarControl& control, const TCarContacts& contacts, FPD dt);
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

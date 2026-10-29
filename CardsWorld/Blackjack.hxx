@@ -2,7 +2,7 @@
 
 #include "Blackjack.h"
 #if SEAM >= IGEEK_BLACKJACK
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 Blackjack::Blackjack(Player* player)
@@ -164,5 +164,5 @@ ISC Blackjack::SettleRound() {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

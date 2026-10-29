@@ -5,7 +5,7 @@
 #include "../ASCIICrabs/_Config.h"
 #include "AgentState.h"
 
-namespace _ {
+namespace iGeek {
 
 /* Metrics — the qualia measurement protocol primitives
  * (iGeek AGENT_PLAN.md section 3.4, the "actual research contribution").
@@ -132,5 +132,5 @@ class LinearProbe {
   FPC inv_scale_;  // 1 / max-abs-word at train time; applied in Predict too.
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

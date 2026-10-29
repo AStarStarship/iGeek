@@ -1,8 +1,0 @@
-// Copyright AStarship <https://astarship.net>.
-
-// This file replaces the Script2-era _impl.inl, which included
-// <_config.h> and was the entry point for the original module build
-// (2014-2019, kabuki-toolkit, UTF-16LE, Windows/MSVC).
-//
-// The current world uses _Config.h and compiles _Main.cpp and
-// MazeWorld.hxx directly.

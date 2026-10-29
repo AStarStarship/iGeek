@@ -1,8 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
 #include "EnvReward.h"
-namespace _ {
+namespace iGeek {
 
-EnvGoal::EnvGoal() : reward_() {}
-
-}  //< namespace _
+} //< namespace iGeek

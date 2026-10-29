@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #include "SchoolCourse.h
 #if SEAM >= IGEEK_CORE
-namespace _ {
+namespace iGeek {
 
 SchoolCourse::Course() {
 

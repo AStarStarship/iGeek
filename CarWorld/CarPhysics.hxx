@@ -5,7 +5,7 @@
 #include "CarPhysics.h"
 #include "../BikeWorld/VehicleMap.hxx"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 inline void TCarPack(const TCarState& s, FPD* v) {
   v[0] = s.x; v[1] = s.y; v[2] = s.heading; v[3] = s.forward;
   v[4] = s.lateral; v[5] = s.yaw_rate; v[6] = s.steer;
@@ -117,6 +117,6 @@ BOL TCarStep(TCarState& car, const TCarParams& p,
   car = next;
   return true;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

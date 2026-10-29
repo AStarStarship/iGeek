@@ -4,7 +4,7 @@
 #define CRABS_CARWORLD_2D_H
 #include "CarPilot.h"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 enum { CarRunning, CarGoal, CarCollision, CarTimeout, CarInvalid, CarBlocked, CarStopped };
 enum { CarCruise, CarSlow, CarFast, CarStop, CarCrawl, CarActionCount };
 const CHA* TCarStatusName(ISC status);
@@ -49,6 +49,6 @@ class ACarEnv
   ISC status_ = CarRunning;
   void Peaks();
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

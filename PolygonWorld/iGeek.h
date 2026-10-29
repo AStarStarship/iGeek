@@ -5,7 +5,7 @@ namespace iGeek {
 class iGeek : public App {
   iGeek();
 
-  static void main(AString[] args);
+  static void Main(AString[] args);
 };
 
 }  //< namespace iGeek

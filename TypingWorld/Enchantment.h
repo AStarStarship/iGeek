@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_ENCHANTMENT_DECL
-#define TYPECRAFT_ENCHANTMENT_DECL
+#ifndef TYPINGWORLD_ENCHANTMENT_DECL
+#define TYPINGWORLD_ENCHANTMENT_DECL
 #include "ItemGroup.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 /* # Summary of enchantments
 | Name                  | Summary                             | JEID | PEID | ML  | W  |
@@ -75,5 +75,5 @@ struct Enchantment {
   _::AArray<ItemGroup*> items_;  //< An array of Inventory Items.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

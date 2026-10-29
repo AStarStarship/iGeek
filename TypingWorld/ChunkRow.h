@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_CHUNKROW_DECL
-#define TYPECRAFT_CHUNKROW_DECL
+#ifndef TYPINGWORLD_CHUNKROW_DECL
+#define TYPINGWORLD_CHUNKROW_DECL
 #include "Chunk.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 /* A row of Chunk(s) that can grow on the positive and negative directions.
 Chunks are designed to grow in the Cartesian quadrants 1 and 2, or 3 and 4.
@@ -36,5 +36,5 @@ class ChunkRow {
   _::ArX<Chunk*> cunks_[4];  //< A stack of Chunks.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

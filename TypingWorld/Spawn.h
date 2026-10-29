@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_SPAWN_DECL
-#define TYPECRAFT_SPAWN_DECL
+#ifndef TYPINGWORLD_SPAWN_DECL
+#define TYPINGWORLD_SPAWN_DECL
 #include "Item.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 class Spawn : public Item {
  public:
@@ -25,5 +25,5 @@ class Spawn : public Item {
   ISC type_;  //< What type of Spawn it is.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

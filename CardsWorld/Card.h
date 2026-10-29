@@ -5,7 +5,7 @@
 #define IGEEK_CARDSCARD_DECL
 #include <_Config.h>
 #if SEAM >= IGEEK_CARD
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* An enumerated list of the different playing card suits (French). */
@@ -73,6 +73,6 @@ struct Card {
 };
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

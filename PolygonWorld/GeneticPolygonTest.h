@@ -3,7 +3,7 @@
 #pragma once
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 class GeneticPolygonTest : public JApplet {
   GeneticPolygonTest();
@@ -11,5 +11,5 @@ class GeneticPolygonTest : public JApplet {
   static void main(Loom<> args);
 };
 
-}  //< namespace _
+} //< namespace iGeek
 }

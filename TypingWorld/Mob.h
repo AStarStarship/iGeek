@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_MOB_DECL
-#define TYPECRAFT_MOB_DECL
+#ifndef TYPINGWORLD_MOB_DECL
+#define TYPINGWORLD_MOB_DECL
 #include "Entity.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 class Mob : public Entity {
  public:
@@ -379,5 +379,5 @@ class Parrot {
   Parrot();
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

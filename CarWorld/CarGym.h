@@ -5,7 +5,7 @@
 #include "CarWorld2D.h"
 #include "../Gym.h"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 enum { CarDriverActions, CarActuatorActions, CarRawActionCount = 9 };
 /** Real native Gym buffers. Default five actions select classical-driver speed.
  * Optional nine raw actions bypass the driver: three steer targets crossed
@@ -37,6 +37,6 @@ class ACarGym : public Gym
   const ISC Mode;
   void CopyObservation(ISC i);
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

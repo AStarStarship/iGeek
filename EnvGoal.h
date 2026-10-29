@@ -3,9 +3,9 @@
 #ifndef IGEEK_ENVGOAL_DECL
 #define IGEEK_ENVGOAL_DECL
 #include "../ASCIICrabs/Operand.h"
-namespace _ {
+namespace iGeek {
 
-/* A Script2 data node holding the three goals relevant to one env step:
+/* An ASCIICrabs Operand data node holding the three goals relevant to one env step:
    the raw observation, the achieved goal, and the desired goal.
 Migrated 2026-10-07:
   - `Star(CHN, ...)` -> `Star(CHC, ...)`: the Operand virtual is
@@ -23,7 +23,7 @@ class EnvGoal : public Operand {
   EnvGoal() : observation_(NILP), desired_goal_(NILP), achieved_goal_(NILP) {}
   ~EnvGoal() {}
 
-  /* Script2 operation. */
+  /* ASCIICrabs Operand operation. */
   const Op* Star(CHC index, Crabs* crabs) override;
 
   /* Accessors (vectorized-batch: the policy reads observation, the reward
@@ -46,9 +46,9 @@ class EnvGoal : public Operand {
 };
 
 template <typename Printer>
-Printer& PrintTo(Printer& p, const _::EnvGoal& env_goal) {
+Printer& PrintTo(Printer& p, const EnvGoal& env_goal) {
   return p << "\nEnvGoal";
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

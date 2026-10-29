@@ -5,7 +5,7 @@
 #include "BikePhysics.h"
 #include <math.h>
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 constexpr FPD BikeGravity = 9.80665;
 constexpr FPD BikePi = 3.14159265358979323846;
 inline FPD TBikeClamp(FPD value, FPD low, FPD high) {
@@ -126,6 +126,6 @@ BOL TBikeStep(TBikeState& bike, const TBikeParams& p,
   bike.fallen = fabs(bike.roll) >= p.fall_angle;
   return true;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

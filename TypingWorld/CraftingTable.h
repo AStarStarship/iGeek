@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_CRAFTINGTABLE_DECL
-#define TYPECRAFT_CRAFTINGTABLE_DECL
+#ifndef TYPINGWORLD_CRAFTINGTABLE_DECL
+#define TYPINGWORLD_CRAFTINGTABLE_DECL
 #include "Item.h"
-namespace Typecraft {
+namespace TypingWorld {
 /* Crafting Table. */
 class CraftingTable : public Item {
  public:
@@ -25,5 +25,5 @@ class CraftingTable : public Item {
   Item* blocks_[3][3];
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

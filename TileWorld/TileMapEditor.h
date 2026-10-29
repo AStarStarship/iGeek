@@ -1935,10 +1935,10 @@ static ISN stbte__slider(ISN x0, ISN w, ISN y, ISN range, ISN *value, ISN id) {
 }
 
 #if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
-#define stbte__sprintf sprintf_s
+#define stbte__sD_COUT sD_COUT_s
 #define stbte__sizeof(s) , sizeof(s)
 #else
-#define stbte__sprintf sprintf
+#define stbte__sD_COUT sD_COUT
 #define stbte__sizeof(s)
 #endif
 
@@ -1950,7 +1950,7 @@ static ISN stbte__float_control(ISN x0, ISN y0, ISN w, FPC minv, FPC maxv,
   switch (stbte__ui.event) {
     case STBTE__paint: {
       char text[32];
-      stbte__sprintf(text stbte__sizeof(text), fmt ? fmt : "%6.2f", *value);
+      stbte__sD_COUT(text stbte__sizeof(text), fmt ? fmt : , *value);
       stbte__draw_textbox(x0, y0, x1, y1, text, 1, 2, colormode,
                           STBTE__INDEX_FOR_ID(id, 0, 0));
       break;
@@ -3318,7 +3318,7 @@ static ISN stbte__info_value(const char *label, ISN x, ISN y, ISN val,
   if (stbte__ui.event == STBTE__paint) {
     ISN off = 9 - stbte__get_char_width(label[0]);
     char text[16];
-    stbte__sprintf(text stbte__sizeof(text), label, digits, val);
+    stbte__sD_COUT(text stbte__sizeof(text), label, digits, val);
     stbte__draw_text_core(x + off, y, text, 999,
                           STBTE__TEXTCOLOR(STBTE__cpanel), 1);
   }
@@ -3406,7 +3406,7 @@ static void stbte__layers(stbte_TileMap *tm, ISN x0, ISN y0, ISN w, ISN h) {
     ISN disabled = (tm->solo_layer >= 0 && tm->solo_layer != i);
     if (i - tm->layer_scroll >= 0 && i - tm->layer_scroll < num_rows) {
       if (str == NULL)
-        stbte__sprintf(str = text stbte__sizeof(text), "%2d", i + 1);
+        stbte__sD_COUT(str = text stbte__sizeof(text), , i + 1);
       if (stbte__button(STBTE__clayer_button, str, x0, y, (i + 1 < 10) * 2,
                         xoff - 2, STBTE__ID(STBTE__layer, i),
                         tm->cur_layer == i, 0))
@@ -3639,26 +3639,25 @@ static ISN stbte__cp_mode, stbte__cp_aspect, stbte__cp_state, stbte__cp_index,
 #ifdef STBTE__COLORPICKER
 static void stbte__dump_colorstate(void) {
   ISN i, j, k;
-  printf(
-      "static ISN "
+  D_COUT(
       "stbte__color_table[STBTE__num_color_modes][STBTE__num_color_aspects]["
       "STBTE__num_color_states] =\n");
-  printf("{\n");
-  printf("   {\n");
+  D_COUT();
+  D_COUT();
   for (k = 0; k < STBTE__num_color_modes; ++k) {
     for (j = 0; j < STBTE__num_color_aspects; ++j) {
-      printf("      { ");
+      D_COUT();
       for (i = 0; i < STBTE__num_color_states; ++i) {
-        printf("0x%06x, ", stbte__color_table[k][j][i]);
+        D_COUT();
       }
-      printf("},\n");
+      D_COUT();
     }
     if (k + 1 < STBTE__num_color_modes)
-      printf("   }, {\n");
+      D_COUT();
     else
-      printf("   },\n");
+      D_COUT();
   }
-  printf("};\n");
+  D_COUT();
 }
 
 static void stbte__colorpicker(ISN x0, ISN y0, ISN w, ISN h) {

@@ -2,11 +2,11 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_ITEM_DECL
-#define TYPECRAFT_ITEM_DECL
-namespace Typecraft {
+#ifndef TYPINGWORLD_ITEM_DECL
+#define TYPINGWORLD_ITEM_DECL
+namespace TypingWorld {
 enum {
-  cTypecraftNumBlocks = 452,
+  cTypingWorldNumBlocks = 452,
 };
 
 class Item {
@@ -520,5 +520,5 @@ class Item {
 /* Gets an Item name. */
 Item* Items(ISC item_number);
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

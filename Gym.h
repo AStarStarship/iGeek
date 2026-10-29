@@ -4,7 +4,7 @@
 #define IGEEK_GYM_DECL
 #include "Env.h"
 #include "EnvGoal.h"
-namespace _ {
+namespace iGeek {
 
 /* Max parallel envs in one Gym batch. Fixed-size (no std vector).
    8 is a sane console default; raise for larger vectorization. */
@@ -78,5 +78,5 @@ class Gym {
   Env* envs_[GymEnvMax];
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

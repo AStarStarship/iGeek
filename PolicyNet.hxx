@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-// PolicyNet.hxx — TTransformer forward (MUSE-style compact transformer policy).
+// PolicyNet.hxx — TTransformer forward (compact transformer policy).
 //
 // Architecture (forward; backward is M4):
 //   obs [B, obs_len]
@@ -17,7 +17,7 @@
 #include "Tensor.hxx"
 #include <math.h>
 
-namespace _ {
+namespace iGeek {
 
 namespace {
 // Tiny deterministic LCG for weight init (seeded, reproducible).
@@ -50,7 +50,7 @@ void MhsaForward(const TTensor& X, const TBlock& blk, TTensor& Y) {
   TTensorMatMul(V, blk.W_o, Y); TTensorAddBiasInPlace(Y, blk.b_o);
   TTensorFree(Q); TTensorFree(K); TTensorFree(V);
 }
-}  // namespace
+}  //< namespace
 
 TTransformer::TTransformer(ISC obs_len, ISC action_count, ISC dim, ISC layers)
     : obs_len_(obs_len), action_count_(action_count),
@@ -244,4 +244,4 @@ FPC TValueLoss(const TTensor& values, const TTensor& returns) {
   return total;
 }
 
-}  // namespace _
+} //< namespace iGeek

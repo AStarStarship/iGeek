@@ -4,7 +4,7 @@
 #define IGEEK_MULTIVERSE_DECL
 #include "EnvGoal.h"
 #include "Gym.h"
-namespace _ {
+namespace iGeek {
 
 /* A container environment that holds many Envs (or many Gyms).
 Migrated 2026-10-07:
@@ -33,5 +33,5 @@ class Multiverse {
   const CHA* name_;
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

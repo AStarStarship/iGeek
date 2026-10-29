@@ -6,7 +6,7 @@
 #ifndef IGEEK_COURSE_CODE
 #define IGEEK_COURSE_CODE
 #include "../ASCIICrabs/Operand.h"
-namespace _ {
+namespace iGeek {
 
 class School : public Operand {
 
@@ -24,6 +24,6 @@ class School : public Operand {
   ISC class_count_;   //< The number of 
       
 };
-}  // namespace _
+} //< namespace iGeek
 #endif
 #endif

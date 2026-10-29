@@ -7,7 +7,7 @@
 #if SEAM >= IGEEK_DECK
 #include "Card.h"
 #include "CardStack.h"
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* A Deck of Cards.
@@ -72,6 +72,6 @@ class Deck {
 };
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

@@ -169,5 +169,5 @@ void VirusPopulation::BoxTwoViruses(Graphics& g, Virus& a, Virus& b) {
   b.drawCircle(g, Color.green);
 }
 
-}  //< namespace _
+} //< namespace iGeek
 }

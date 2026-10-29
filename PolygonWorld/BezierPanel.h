@@ -3,7 +3,7 @@
 #pragma once
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 /* This class draws a BezierCurve drawn on a JPanel. */
 class BezierCurvePanel {

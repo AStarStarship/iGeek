@@ -1,6 +1,6 @@
 # iGeekTypingWorld
 
-Typecraft — a typing tutor where you mine blocks by doing typing lessons.
+TypingWorld — a typing tutor where you mine blocks by doing typing lessons.
 
 ## Kanban board
 
@@ -28,7 +28,7 @@ identifiers and filenames fleet-wide.
 | Local variables | lower_snake_case (always) | `bytes_data`, `read_cursor` |
 | Macros / #define | UPPER_SNAKE_CASE | `CRABS_RUN_TESTS`, `CPU_X64` |
 | Private/protected members | trailing underscore | `aobj_`, `array_` |
-| Namespaces | `namespace _ { ... }` | single shared underscore namespace |
+| Namespaces | `namespace iGeek { ... }` | single shared underscore namespace |
 | DB names / tables / columns | lower_snake_case (mutable) | `user_sessions`, `order_items` |
 | Client-facing API / headers | CamelCase (immutable contract) | `OrderService`, `PaymentGateway` |
 | Filenames (client contract) | CamelCase | `OrderService.h` |

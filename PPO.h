@@ -5,7 +5,7 @@
 #include "Gym.h"
 #include "Policy.h"
 #include "Tensor.h"
-namespace _ {
+namespace iGeek {
 
 /* PPO training loop over a vectorized Gym + a TPolicy.
    vectorized-batch: mirrors the structure of the local reference PPO implementation's
@@ -82,5 +82,5 @@ class TPPO {
   FPC vf_coef_;
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

@@ -2,7 +2,7 @@
 
 #include "BlackjackEnv.h"
 #if SEAM >= IGEEK_BLACKJACKENV
-namespace _ {
+namespace iGeek {
 
 /* A simple baseline policy: hit until the hand value is >= 17.
 The percept format is "P:<val> D:<dealer_up> H:<hidden?>\n<cards>".
@@ -189,5 +189,5 @@ ISC BlackjackEnv::RunPolicy(ISC (*policy)(const CHA*), ISC rounds) {
   return total;
 }
 
-}  //< namespace _
+} //< namespace iGeek
 #endif

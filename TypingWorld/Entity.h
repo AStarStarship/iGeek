@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_PLAYER_DECL
-#define TYPECRAFT_PLAYER_DECL
+#ifndef TYPINGWORLD_PLAYER_DECL
+#define TYPINGWORLD_PLAYER_DECL
 #include "Inventory.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 class Entity {
  public:
@@ -94,5 +94,5 @@ class Entity {
   Inventory inventory_;  //< An Entity's Inventory.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

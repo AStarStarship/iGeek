@@ -4,7 +4,7 @@
 
 #include "bezier.h"
 
-namespace _ {
+namespace iGeek {
 
 BezierCurve::BezierCurve(FPD x_points[], FPD y_points[], ISC point_count) {
   DASSERT(y_points != null) : "Error creating BezierCurve. xPoings is null.";
@@ -137,5 +137,5 @@ AString BezierCurve::ToString() {
 
   return returnString;
 }
-}  //< namespace _
+} //< namespace iGeek
 }  //< namespace kabuki

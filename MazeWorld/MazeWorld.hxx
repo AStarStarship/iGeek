@@ -6,7 +6,7 @@
 #include "MazeWorld.h"
 #include "../../ASCIICrabs/COut.h"
 #if SEAM >= IGEEK_MAZEWORLD
-namespace _ {
+namespace iGeek {
 
 const ISC MazeWorld::Dx[DirCount] = {0, 0, -1, 1};
 const ISC MazeWorld::Dy[DirCount] = {-1, 1, 0, 0};
@@ -21,13 +21,15 @@ IUD MazeWorld::NextRand() {
 
 MazeWorld::MazeWorld(ISC cols, ISC rows, IUD seed)
     : cols_(0), rows_(0), rng_(seed) {
-  ClearGrid();
   if (cols < 7) cols = 7;
   if (rows < 7) rows = 7;
   if (cols > MazeMaxCols) cols = MazeMaxCols;
   if (rows > MazeMaxRows) rows = MazeMaxRows;
   if ((cols & 1) == 0) cols--;
   if ((rows & 1) == 0) rows--;
+  cols_ = cols;
+  rows_ = rows;
+  ClearGrid();
   Generate(seed);
 }
 
@@ -194,5 +196,5 @@ void MazeWorld::Print(ISC player_x, ISC player_y) const {
   o.NL();
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

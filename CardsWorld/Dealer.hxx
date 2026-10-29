@@ -2,7 +2,7 @@
 
 #include "Dealer.h"
 #if SEAM >= IGEEK_DEALER
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 Dealer::Dealer(ISC ante, ISC min_bet, ISC min_cards, ISC max_cards)
@@ -62,5 +62,5 @@ ISC Dealer::NextPlayer() {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

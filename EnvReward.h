@@ -3,9 +3,9 @@
 #ifndef IGEEK_ENVREWARD_DECL
 #define IGEEK_ENVREWARD_DECL
 #include "../ASCIICrabs/Operand.h"
-namespace _ {
+namespace iGeek {
 
-/* Wraps the scalar reward for one env step as a Script2 data node.
+/* Wraps the scalar reward for one env step as an ASCIICrabs Operand data node.
 Migrated 2026-10-07:
   - Fixed the copy-pasted include guard (was IGEEK_ENVGOAL_DECL).
   - `Star(CHN, ...)` -> `Star(CHC, ...)`.
@@ -19,7 +19,7 @@ class EnvReward : public Operand {
   EnvReward() : reward_(0.0f), crabs_(NILP) {}
   ~EnvReward() {}
 
-  /* Script2 operation. */
+  /* ASCIICrabs Operand operation. */
   const Op* Star(CHC index, Crabs* crabs) override;
 
   /* Set / get the scalar reward for this step. */
@@ -41,5 +41,5 @@ Printer& PrintTo(Printer& p, const EnvReward& env_reward) {
   return p << "\nEnvReward";
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

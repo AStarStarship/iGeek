@@ -5,7 +5,7 @@
 #include "CarWorld2D.h"
 #include "CarPilot.hxx"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 const CHA* TCarStatusName(ISC status) {
   const CHA* names[] = {"running", "goal", "collision", "timeout", "invalid", "blocked", "stopped"};
   return status >= CarRunning && status <= CarStopped ? names[status] : "?";
@@ -124,6 +124,6 @@ void ACarEnv::Observe() {
   }
   obs_[21] = FPC(FPD(metrics_.frames) / FPD(MaxFrames));
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

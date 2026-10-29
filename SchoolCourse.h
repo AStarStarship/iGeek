@@ -5,7 +5,7 @@
 #define IGEEK_SCHOOLCOURSE
 #include "SchoolCourse.h"
 #if SEAM >= IGEEK_CORE
-namespace _ {
+namespace iGeek {
 
 class SchoolCourse: public _::Operand {
 

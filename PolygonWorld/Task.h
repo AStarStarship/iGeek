@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 
-namespace _ {
+namespace iGeek {
 
 /* A AI Task.
 # Model Layer
@@ -16,4 +16,4 @@ class AITask {
   // AITaskInput in;
   // AITaskOutput out;
 };
-}  //< namespace _
+} //< namespace iGeek

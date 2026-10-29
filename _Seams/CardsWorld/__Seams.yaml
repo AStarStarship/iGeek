@@ -1,0 +1,13 @@
+# __Seams.yaml — CardsWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py __Seams.yaml
+engine: ["../../CardsWorld/Card.hxx", "../../CardsWorld/CardStack.hxx", "../../CardsWorld/Deck.hxx", "../../CardsWorld/Hand.hxx", "../../CardsWorld/Player.hxx", "../../CardsWorld/Dealer.hxx", "../../CardsWorld/Blackjack.hxx", "../../CardsWorld/BlackjackGym.hxx", "../../CardsWorld/BlackjackEnv.hxx"]
+seams:
+  - name: IGEEK_CARDSWORLD_CORE
+    depends: [IGEEK_CORE]
+    file: 01.Core.hxx
+    label: "Testing CardsWorld core..."
+  - name: IGEEK_CARDSWORLD_RELEASE
+    depends: [IGEEK_CARDSWORLD_CORE]
+    file: 07.Release.hxx
+    label: "Testing CardsWorld release..."

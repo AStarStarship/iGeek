@@ -1,4 +1,4 @@
-# Typecraft
+# TypingWorld
 
 A typing tutor where you mine blocks by doing typing lessons.
 

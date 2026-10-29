@@ -2,7 +2,7 @@
 
 #include "Player.h"
 #if SEAM >= IGEEK_PLAYER
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* Copies up to (dest_size-1) chars from src to dest, nil-terminating. */
@@ -35,5 +35,5 @@ ISC Player::PointsAdd(ISC num_points) {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

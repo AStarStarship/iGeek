@@ -21,7 +21,7 @@ You can watch the iGeek Cookbook videos and find extra content on YouTube at:
 1. [CarWorld](./CarWorld/)
 
 Worlds with a complete build (verified, exit 0): BikeWorld, CarWorld,
-CardsWorld, HBM. PacWorld is in quarantine (legacy SFML build); the other
+CardsWorld, Models/HRM. PacWorld is in quarantine (legacy SFML build); the other
 worlds are source-only (see each world's README).
 
 ## License

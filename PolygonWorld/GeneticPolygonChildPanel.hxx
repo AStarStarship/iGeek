@@ -4,7 +4,7 @@
 
 #include "GeneticPolygonChildPanel.h"
 
-namespace _ {
+namespace iGeek {
 
 GeneticPolygonChildPanel::GeneticPolygonChildPanel(GeneticPolygon fitShape,
                                                    GeneticPolygon initChild,
@@ -74,4 +74,4 @@ void GeneticPolygonChildPanel::setChild(GeneticPolygon newChild) {
   infoLabel.setText(infoString);
 }
 
-}  //< namespace _
+} //< namespace iGeek

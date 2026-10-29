@@ -1,9 +1,0 @@
-// Copyright AStarship <https://astarship.net>.
-
-// This file replaces the Script2-era _seams.inl, which defined the
-// KABUKI_AUTOPILOT seam numbers used by the original module build
-// (2014-2019, kabuki-toolkit, UTF-16LE, Windows/MSVC).
-//
-// All seam numbering is now in ASCIICrabs/_Seams/_Seams.h (CRABS_*
-// constants) and the world's own _Config.h
-// (IGEEK_MAZEWORLD = 23, SEAM = IGEEK_MAZEWORLD).

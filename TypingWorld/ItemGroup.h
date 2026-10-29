@@ -2,11 +2,11 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_ITEMGROUP_DECL
-#define TYPECRAFT_ITEMGROUP_DECL
+#ifndef TYPINGWORLD_ITEMGROUP_DECL
+#define TYPINGWORLD_ITEMGROUP_DECL
 //
 #include "Item.h"
-namespace Typecraft {
+namespace TypingWorld {
 class ItemGroup {
  public:
   /* Constructs an ItemGroup with the given max_size. */
@@ -41,5 +41,5 @@ class ItemGroup {
   _::ArX<Item*> items;  //< An array of Inventory Items.
 };
 
-}  //< namespace Typecraft
-#endif  //< TYPECRAFT_ITEMGROUP_H
+}  //< namespace TypingWorld
+#endif  //< TYPINGWORLD_ITEMGROUP_H

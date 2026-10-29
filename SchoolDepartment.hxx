@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #include "SchoolDepartment.h"
 #if SEAM >= IGEEK_CORE
-namespace _ {
+namespace iGeek {
 
 SchoolDepartment::SchoolDepartment() {
 
@@ -38,5 +38,5 @@ const Op* SchoolDepartment::Star(CHC index, Crabs* crabs) {
   return nullptr;
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

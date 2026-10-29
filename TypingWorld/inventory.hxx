@@ -2,7 +2,7 @@
 
 #include "Inventory.h"
 
-namespace Typecraft {
+namespace TypingWorld {
 
 Inventory::Inventory(ISC max_size) {}
 
@@ -16,4 +16,4 @@ void Inventory::DeleteAll() {}
 
 void Inventory::Print() {}
 
-}  // namespace Typecraft
+}  //< namespace TypingWorld

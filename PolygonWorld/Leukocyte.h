@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 
-namespace _ {
+namespace iGeek {
 
 class Leukocyte {
   Leukocyte();
 };
 
-}  //< namespace _
+} //< namespace iGeek

@@ -5,7 +5,7 @@
 #include "CarPhysics.h"
 #include "../BikeWorld/VehicleRoute.h"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 /** Classical reference driver. Ideal state/map, no neural policy or state edits. */
 class ACarPilot
 {
@@ -18,6 +18,6 @@ class ACarPilot
   FPD target_speed_ = 0;
   TVehicleGuide guide_;
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

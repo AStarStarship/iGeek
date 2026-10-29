@@ -28,7 +28,7 @@ root and its siblings:
 cmake -S . -B build_core -DCMAKE_BUILD_TYPE=Release
 cmake --build build_core -j
 
-# a world (any of: BikeWorld, CarWorld, CardsWorld, HBM, SudokuWorld)
+# a world (any of: BikeWorld, CarWorld, CardsWorld, Models/HRM, SudokuWorld)
 cmake -S BikeWorld -B BikeWorld/build -DCMAKE_BUILD_TYPE=Release
 cmake --build BikeWorld/build -j
 ```

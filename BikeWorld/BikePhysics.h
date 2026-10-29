@@ -4,7 +4,7 @@
 #define CRABS_BIKEWORLD_PHYSICS_H
 #include "_Config.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 /** Local contact material. Slopes are dz/dx and dz/dy, not angles. */
 struct TVehicleSurface
 {
@@ -43,6 +43,6 @@ struct alignas(ACPUCacheLineSize) TBikeState
 BOL TBikeStep(TBikeState& bike, const TBikeParams& params,
               const TBikeControl& control, const TVehicleSurface& front,
               const TVehicleSurface& rear, FPD dt);
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

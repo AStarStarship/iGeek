@@ -4,7 +4,7 @@
 
 #include "geneticpolygonpanel.h"
 
-namespace _ {
+namespace iGeek {
 
 GeneticPolygonPanel::GeneticPolygonPanel(GeneticPolygon thisShape,
                                          AString thisShapeLabel, ISC width,
@@ -47,4 +47,4 @@ void GeneticPolygonPanel::setGeneticPolygon(GeneticPolygon newPoly) {
   gPoly = newPoly;
 }
 
-}  //< namespace _
+} //< namespace iGeek

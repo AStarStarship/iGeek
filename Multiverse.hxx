@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #include "Env.h"
-namespace _ {
+namespace iGeek {
 
 Env::Env() {}
 
-}  //< namespace _
+} //< namespace iGeek

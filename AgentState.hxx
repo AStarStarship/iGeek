@@ -3,7 +3,7 @@
 #include "../ASCIICrabs/Autoject.hxx"
 #ifndef IGEEK_AGENTSTATE_IMPL
 #define IGEEK_AGENTSTATE_IMPL 1
-namespace _ {
+namespace iGeek {
 
 AgentState::AgentState(ISC slot_count)
     : autoject_{NILP, &ObjectFactoryHeap},
@@ -70,5 +70,5 @@ IUD AgentState::ByteSize() const {
   return IUD(slot_count_) * IUD(sizeof(IUW));
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

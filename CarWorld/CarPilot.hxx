@@ -6,7 +6,7 @@
 #include "CarPhysics.hxx"
 #include "../BikeWorld/VehicleRoute.hxx"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 inline TCarContacts TCarSampleContacts(const TileMap& map,
     const TCarState& car, const TCarParams& p) {
   TCarContacts contacts;
@@ -108,6 +108,6 @@ TCarControl ACarPilot::Control(const TileMap& map, const TVehicleRoute& route,
   }
   return control;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

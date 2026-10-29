@@ -4,7 +4,7 @@
 #define IGEEK_MAZEWORLD_DECL
 #include <_Config.h>
 #include "../../ASCIICrabs/Random.h"
-namespace _ {
+namespace iGeek {
 
 /* Randomized ASCII terminal maze: perfect (recursive-backtracker) maze on a
    grid where odd rows are passages and even rows are wall rows; even columns
@@ -88,5 +88,5 @@ struct MazeWorld {
   void ClearGrid();
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

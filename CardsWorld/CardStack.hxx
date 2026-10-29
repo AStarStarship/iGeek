@@ -2,7 +2,7 @@
 
 #include "CardStack.h"
 #if SEAM >= IGEEK_CARDSTACK
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 CardStack::CardStack()
@@ -130,5 +130,5 @@ Card* CardStack::TakeRandomCard() {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

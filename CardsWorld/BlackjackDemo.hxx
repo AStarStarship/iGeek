@@ -15,7 +15,7 @@
 #include "../Gym.hxx"
 #include "../PPO.hxx"
 #if SEAM >= CARDSWORLD_CORE
-namespace _ {
+namespace iGeek {
 /** Headless one-decision Blackjack adapter; owns flat batch buffers. */
 class TBlackjackDemoGym : public Gym {
  public:
@@ -121,6 +121,6 @@ inline TBlackjackDemoScore TBlackjackDemoEval(TLinearPolicy& policy,
 inline void TBlackjackDemoTrain(TPPO& trainer, ISC updates) {
   for (ISC i = 0; i < updates; ++i) trainer.TrainStep();
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

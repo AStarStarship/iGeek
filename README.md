@@ -27,7 +27,7 @@ internal agent state changes under learning.
 - **`TileWorld/`** — 2D tile ECS (headless spine: entities, components,
   tile map, occlusion/visibility, enemies).
 - **`MazeWorld/`**, **`PolygonWorld/`**, **`TypingWorld/`**,
-  **`PrisonerWorld/`**, **`SudokuWorld/`**, **`HBM/`**, **`Ulator/`**,
+  **`PrisonerWorld/`**, **`SudokuWorld/`**, **`Ulator/`**,
   **`WikiWorld/`** — additional worlds in various states of completion
   (see each world's README).
 - **`Cookbook/`** — worked examples and getting-started notes.
