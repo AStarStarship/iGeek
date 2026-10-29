@@ -19,6 +19,24 @@ AArmGym::AArmGym(const TArmParams& params, ISC count, IUD seed)
     arms_[i] = new AArmEnv(params, seed_ + IUD(i) * 0x9E37u);
     envs_[i] = NILP;
   }
+  CopyStr(manifest_.name, ManifestNameLen, "armworld");
+  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  manifest_.kind = ManifestKindEnv;
+  manifest_.domain = ManifestDomainRobotics;
+  CopyStr(manifest_.description, ManifestDescriptionLen,
+          "2-link arm reacher with joint torque control");
+  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  manifest_.reward_low = FPC(-1.0);
+  manifest_.reward_high = FPC(1.0);
+  manifest_.reward_higher_is_better = true;
+  manifest_.determinism = ManifestDeterminismSeeded;
+  manifest_.obs_count = obs_len_;
+  manifest_.action_count = action_count_;
+  manifest_.max_episode_steps = AArmEnv::MaxFrames;
+  manifest_.env_count_max = GymEnvMax;
+  CopyStr(manifest_.world_name, ManifestWorldLen, "ArmWorld");
+  manifest_.seam_number = IGEEK_ARMWORLD_CORE;
+  manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
 AArmGym::~AArmGym() {

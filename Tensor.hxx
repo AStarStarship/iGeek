@@ -1,10 +1,4 @@
 // Copyright AStarship <https://astarship.net>.
-// Tensor.hxx — implementations of the TTensor ops declared in Tensor.h.
-//
-// NO C++ standard library. Math (exp/sqrt/log) comes from the C library
-// <math.h> (C, not C++ std) — the same pragmatic choice as the rest of the
-// single-TU g++ build. Allocation uses new[]/delete[] (compiler builtins,
-// no <new> header required).
 #pragma once
 #include "Tensor.h"
 #include <math.h>

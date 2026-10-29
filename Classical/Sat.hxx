@@ -38,14 +38,14 @@ static inline IUD SatSeedNC(IUD seed) {
 static const FPC kSatUnit = FPC(2.3283064365386963e-10f);  // 1/2^32
 
 /* A clause holds in the partial model (t, f) iff some literal is true:
- * a positive literal s is true when s in t; a negative one when s in f. */
+a positive literal s is true when s in t; a negative one when s in f. */
 static inline BOL SatClauseTrueNC(const SatClause* c, IUD t, IUD f) {
   return (c->positive & t) != 0 || (c->negative & f) != 0;
 }
 
 /* A clause is falsified iff every literal is assigned and false:
- * a positive literal is false when its symbol is in f; a negative one
- * when its symbol is in t. (The empty clause is falsified by any model.) */
+a positive literal is false when its symbol is in f; a negative one
+when its symbol is in t. (The empty clause is falsified by any model.) */
 static inline BOL SatClauseFalseNC(const SatClause* c, IUD t, IUD f) {
   return (c->positive & ~f) == 0 && (c->negative & ~t) == 0;
 }
@@ -162,8 +162,8 @@ BOL SatFcEntails(const SatDefinite* kb, ISC kb_count, IUD known, ISC q) {
 // --- Fig 7.12 SatResolution --------------------------------------------------
 
 /* Growing clause set with linear duplicate check (reference driver).
- * Add returns 1 when the clause is newly added, 0 when it is already
- * present, -1 on allocation failure. */
+Add returns 1 when the clause is newly added, 0 when it is already
+present, -1 on allocation failure. */
 struct SatClauseSet {
   IUW* mem;
   ISC count;
@@ -199,8 +199,8 @@ struct SatClauseSet {
 };
 
 /* PL-RESOLVE(Ci, Cj): one positive literal of Ci against one negative
- * literal of Cj (and vice versa); returns the resolvent clauses written
- * into out (up to out_cap). Empty clause => *out_empty true. */
+literal of Cj (and vice versa); returns the resolvent clauses written
+into out (up to out_cap). Empty clause => *out_empty true. */
 static ISC SatResolveNC(const SatClause* ci, const SatClause* cj,
                         SatClause* out, ISC out_cap, BOL* out_empty) {
   *out_empty = false;
@@ -478,16 +478,16 @@ BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
   return false;
 }
 
-// --- Fig 7.1 TKBAgent ---------------------------------------------------------
+// --- Fig 7.1 KBAgent ---------------------------------------------------------
 
-TKBAgent::TKBAgent() : kb_mem_(NILP, &ObjectFactoryHeap), kb_count_(0),
+KBAgent::KBAgent() : kb_mem_(NILP, &ObjectFactoryHeap), kb_count_(0),
                        kb_cap_(0) {}
 
-TKBAgent::~TKBAgent() {
+KBAgent::~KBAgent() {
   kb_mem_.origin = SatFree(kb_mem_.origin);
 }
 
-BOL TKBAgent::Init(ISC kb_cap) {
+BOL KBAgent::Init(ISC kb_cap) {
   if (kb_cap < 1) {
     return false;
   }
@@ -504,11 +504,11 @@ BOL TKBAgent::Init(ISC kb_cap) {
   return true;
 }
 
-const SatClause* TKBAgent::Clauses() const {
+const SatClause* KBAgent::Clauses() const {
   return TPtr<SatClause>(kb_mem_.origin);
 }
 
-BOL TKBAgent::Tell(const SatClause* clauses, ISC count) {
+BOL KBAgent::Tell(const SatClause* clauses, ISC count) {
   if (clauses == NILP || count < 0) {
     return false;
   }
@@ -533,7 +533,7 @@ BOL TKBAgent::Tell(const SatClause* clauses, ISC count) {
   return true;
 }
 
-BOL TKBAgent::Ask(const SatClause* query_neg, ISC count, IUD universe) const {
+BOL KBAgent::Ask(const SatClause* query_neg, ISC count, IUD universe) const {
   // KB entails the query iff KB ∧ ¬query is unsatisfiable (DPLL).
   ISC total = kb_count_ + count;
   if (total < 1) {
@@ -724,7 +724,7 @@ BOL SatPlan(const SatPlanProblem* problem, ISC t_max, IUD* model_out,
   return false;  // failure: no plan up to T max
 }
 
-// --- Fig 7.20 THybridWumpusAgent (2x2 grid) ----------------------------------
+// --- Fig 7.20 HybridWumpusAgent (2x2 grid) ----------------------------------
 //
 // Symbol universe (t = 0..5, 56 symbols, all IUD masks):
 //   OK(x,y)      bit y*2+x            0..3
@@ -872,7 +872,7 @@ static void WmpResultNC(const IUC* state, ISC state_words, IUC action,
   *out = h * 4 + sq;
 }
 
-THybridWumpusAgent::THybridWumpusAgent()
+HybridWumpusAgent::HybridWumpusAgent()
     : kb_mem_(NILP, &ObjectFactoryHeap),
       kb_count_(0),
       kb_cap_(0),
@@ -887,11 +887,11 @@ THybridWumpusAgent::THybridWumpusAgent()
       done_(false),
       plan_count_(0) {}
 
-THybridWumpusAgent::~THybridWumpusAgent() {
+HybridWumpusAgent::~HybridWumpusAgent() {
   kb_mem_.origin = SatFree(kb_mem_.origin);
 }
 
-BOL THybridWumpusAgent::Init(ISC kb_cap) {
+BOL HybridWumpusAgent::Init(ISC kb_cap) {
   if (kb_cap < 96) {  // 84 atemporal clauses (+ headroom)
     return false;
   }
@@ -976,8 +976,7 @@ BOL THybridWumpusAgent::Init(ISC kb_cap) {
   return true;
 }
 
-/* Assert a symbol true (or false) if not already known; returns whether
- * it was new. */
+/* Assert a symbol true (or false) if not already known; returns whether it was new. */
 static inline BOL WmpAssert(IUD* known_true, IUD* known_false, IUD sym,
                             BOL is_true) {
   if (is_true) {
@@ -995,7 +994,7 @@ static inline BOL WmpAssert(IUD* known_true, IUD* known_false, IUD sym,
 }
 
 /* TELL the t_-th percept: the raw facts, then the fixpoint chain. */
-void THybridWumpusAgent::TellPercept(const WumpusPercept* p, BOL moved,
+void HybridWumpusAgent::TellPercept(const WumpusPercept* p, BOL moved,
                                      IUC x, IUC y) {
   IUD* kt = &known_true_;
   IUD* kf = &known_false_;
@@ -1039,18 +1038,16 @@ void THybridWumpusAgent::TellPercept(const WumpusPercept* p, BOL moved,
   }
 }
 
-BOL THybridWumpusAgent::Safe(IUC x, IUC y) const {
+BOL HybridWumpusAgent::Safe(IUC x, IUC y) const {
   return (known_true_ & WmpOK(x, y)) != 0;
 }
 
-BOL THybridWumpusAgent::NotWumpus(IUC x, IUC y) const {
+BOL HybridWumpusAgent::NotWumpus(IUC x, IUC y) const {
   return (known_false_ & WmpW(x, y)) != 0;
 }
 
-/* PLAN-ROUTE: append the relative actions (Forward/Left/Right) that move the
- * agent from `from` to one of `goals` through `allowed | goals` squares
- * (SearchBFS over the packed (heading, square) state). */
-BOL THybridWumpusAgent::Route(IUC from, IUD goals, IUD allowed) {
+/* PLAN-ROUTE: append the relative actions (Forward/Left/Right) that move the  agent from `from` to one of `goals` through `allowed | goals` squares (SearchBFS over the packed (heading, square) state). */
+BOL HybridWumpusAgent::Route(IUC from, IUD goals, IUD allowed) {
   IUC init = heading_ * 4 + from;
   Problem prob;
   prob.initial = &init;
@@ -1086,9 +1083,8 @@ static inline IUC WmpShootDir(ISC dx, ISC dy) {
   return kWmpShootW;
 }
 
-/* PLAN-SHOT: append the actions to shoot a possible wumpus square: shoot it
- * directly when adjacent, or route to an adjacent safe square and shoot. */
-BOL THybridWumpusAgent::PlanShot(IUC current, IUD possible, IUD safe) {
+/* PLAN-SHOT: append the actions to shoot a possible wumpus square: shoot it directly when adjacent, or route to an adjacent safe square and shoot. */
+BOL HybridWumpusAgent::PlanShot(IUC current, IUD possible, IUD safe) {
   while (possible != 0) {
     IUD pick = possible & -possible;
     possible &= possible - 1;
@@ -1128,7 +1124,7 @@ BOL THybridWumpusAgent::PlanShot(IUC current, IUD possible, IUD safe) {
   return false;
 }
 
-IUC THybridWumpusAgent::Percept(const WumpusPercept* p, BOL moved, IUC x,
+IUC HybridWumpusAgent::Percept(const WumpusPercept* p, BOL moved, IUC x,
                                 IUC y) {
   if (p == NILP || done_) {
     return kWmpClimb;

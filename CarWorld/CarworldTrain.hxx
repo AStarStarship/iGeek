@@ -85,7 +85,7 @@ ISC main(ISC argc, CHA** argv) {
   for (ISC i = 1; i < argc; ++i) {
     const CHA* flag = argv[i];
     if (strcmp(flag, "--help") == 0) { Help(); return 0; }
-    if (i + 1 >= argc) { fD_COUT(stderr,  << flag << ); return 2; }
+    if (i + 1 >= argc) { fD_COUT(stderr,  << flag << '\n'); return 2; }
     const CHA* value = argv[++i];
     if (strcmp(flag, "--scenario") == 0) {
       scenario = -1;
@@ -119,7 +119,7 @@ ISC main(ISC argc, CHA** argv) {
     delete planner; return 1;
   }
   delete planner;
-  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) <<  << updates <<  << horizon <<  << envs <<  << epochs <<  << mode == CarActuatorActions ?  :  <<  << (unsigned long)seed <<);
+  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) << " " << updates << " " << horizon << " " << envs << " " << epochs << " " << mode == CarActuatorActions ?  :  << " " << (unsigned long)seed << '\n');
   ACarGym gym(map, route, initial, envs, seed, mode);
   TLinearPolicy policy(ACarEnv::ObsLength, gym.ActionCount(), seed);
   policy.SetLearnRate(lr);
@@ -127,7 +127,7 @@ ISC main(ISC argc, CHA** argv) {
   // Baseline evaluation.
   FPC base_reward = 0; IUD base_goals = 0;
   Evaluate(map, route, initial, envs, seed, mode, policy, 4, base_reward, base_goals);
-  D_COUT("base_reward=" << (double)base_reward <<  << (int)base_goals <<);
+  D_COUT("base_reward=" << (double)base_reward << " " << (int)base_goals << '\n');
   FPD started = Seconds();
   TPPOStats stats = {};
   FPC best_reward = base_reward;
@@ -154,7 +154,7 @@ ISC main(ISC argc, CHA** argv) {
   FPC final_reward = 0; IUD final_goals = 0;
   Evaluate(map, route, initial, envs, seed + IUD(updates) * 7919, mode, policy, 8,
       final_reward, final_goals);
-  D_COUT("final_reward=" << (double)final_reward <<  << (int)final_goals <<  << (int)(8 * envs) <<);
-  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) <<  << final_goals > 0 ? 1 : 0 <<);
+  D_COUT("final_reward=" << (double)final_reward << " " << (int)final_goals << " " << (int)(8 * envs) << '\n');
+  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) << " " << final_goals > 0 ? 1 : 0 << '\n');
   return 0;
 }

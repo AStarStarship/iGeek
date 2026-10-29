@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_RAT
@@ -17,10 +18,10 @@ class Rat : public Enemy {
   virtual ~Rat();
 
   void UpdateAnimation(const FPC& dt);
-  void Update(const FPC& dt, sf::Vector2f& mouse_pos_view);
+  void Update(const FPC& dt, _::FPC2& mouse_pos_view);
 
   void Render(sf::RenderTarget& target, sf::Shader* shader,
-              const sf::Vector2f light_position, const bool show_hitbox);
+              const _::FPC2 light_position, const bool show_hitbox);
 };
 
 #endif

@@ -8,8 +8,8 @@
 //     sf::Sprite& into the components; now the components read/update a
 //     _::TVec2F& (the entity's pos_). This is the one consistent
 //     position-ownership model used across the spine.
-//   - sf::Vector2f -> _::TVec2F, sf::Vector2i -> _::TVec2I, sf::FloatRect ->
-//     _::TFloatRect, sf::IntRect -> _::TIntRect (ASCIICrabs/TVec.h).
+//   - _::FPC2 -> _::TVec2F, _::ISC2 -> _::TVec2I, _::FPC4 ->
+//     _::TFloatRect, _::ISC4 -> _::TIntRect (ASCIICrabs/TVec.h).
 //   - Render() is DELETED (headless). A future SDL3/CrabsTK renderer reads
 //     pos_ + texture_id + the occlusion map; it is not this layer's concern.
 //   - 'Sprite' as a concept is DATA ONLY here: texture_id (which atlas cell a

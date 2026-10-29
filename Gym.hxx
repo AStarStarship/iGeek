@@ -25,8 +25,9 @@ void Gym::AddEnv(Env* env) {
   envs_[env_count_++] = env;
 }
 
-void Gym::LoadDLL(const CHA* library) {
-  (void)library;  // DLL loading is a later milestone.
+BOL Gym::LoadDLL(const CHA* library) {
+  (void)library;  // DLL loading is not implemented.
+  return false;
 }
 
 } //< namespace iGeek

@@ -1,4 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
+#pragma once
+#ifndef IGEEK_PACWORLD_HXX
+#define IGEEK_PACWORLD_HXX
 // PacWorld.hxx — headless Pac-Man env + vectorized Gym implementations.
 // No C++ stdlib. Math from <math.h> (C). Deterministic per seed.
 #include "PacWorld.h"
@@ -334,6 +337,24 @@ PacWorldGym::PacWorldGym(ISC envs, ISC cols, ISC rows, IUD seed)
     for (ISC j = 0; j < action_count_; ++j)
       action_mask_[i * action_count_ + j] = 1.0f;
   }
+  CopyStr(manifest_.name, ManifestNameLen, "pacworld");
+  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  manifest_.kind = ManifestKindEnv;
+  manifest_.domain = ManifestDomainGame;
+  CopyStr(manifest_.description, ManifestDescriptionLen,
+          "Pac-Man maze navigation");
+  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  manifest_.reward_low = FPC(-1.0);
+  manifest_.reward_high = FPC(1.0);
+  manifest_.reward_higher_is_better = true;
+  manifest_.determinism = ManifestDeterminismSeeded;
+  manifest_.obs_count = obs_len_;
+  manifest_.action_count = action_count_;
+  manifest_.max_episode_steps = PacWorldEnv::MaxSteps;
+  manifest_.env_count_max = GymEnvMax;
+  CopyStr(manifest_.world_name, ManifestWorldLen, "PacWorld");
+  manifest_.seam_number = IGEEK_PACWORLD_CORE;
+  manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
 
@@ -384,3 +405,5 @@ void PacWorldGym::StepBatch() {
 }
 
 } //< namespace iGeek
+
+#endif  // IGEEK_PACWORLD_HXX

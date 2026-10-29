@@ -1,5 +1,10 @@
 # iGeekMazeWorld
 
+Status: **simulation-only** — single-TU ASCII maze solver, headless
+builds on Linux g++. Not a Gym subclass; no PPO loop. A* solver is
+correct (unique shortest path in a perfect maze) but has no learned
+component.
+
 ASCII terminal maze-solver environment. A seeded recursive-backtracker generates
 a perfect (tree) maze; an A* solver finds the unique shortest path from start
 `S` to exit `E`. Headless (no Windows console I/O, no `GetAsyncKeyState`) so it

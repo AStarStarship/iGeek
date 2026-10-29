@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_MELEEWEAPON_H
@@ -21,8 +22,8 @@ class MeleeWeapon : public Item {
   MeleeWeapon();
   virtual ~MeleeWeapon();
 
-  virtual void Update(const sf::Vector2f& mouse_pos_view,
-                      const sf::Vector2f center) = 0;
+  virtual void Update(const _::FPC2& mouse_pos_view,
+                      const _::FPC2 center) = 0;
 
   virtual void Render(sf::RenderTarget& target, sf::Shader* shader) = 0;
 };

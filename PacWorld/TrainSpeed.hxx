@@ -1,4 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
+#pragma once
+#ifndef IGEEK_TRAINSPEED_HXX
+#define IGEEK_TRAINSPEED_HXX
 // Headless training-speed probe: N real TPPO::TrainStep() on PacWorldGym @ -O2.
 // Reports elapsed + steps/sec. The "fast RL" number.
 #include "_probe_pacworld.hxx"
@@ -106,3 +109,5 @@ int main(int argc, char** argv) {
   write(1, line, (unsigned long)n);
   return 0;
 }
+
+#endif  // IGEEK_TRAINSPEED_HXX

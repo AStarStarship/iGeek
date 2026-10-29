@@ -1,5 +1,10 @@
 # iGeekPacWorld — Headless RL Env
 
+Status: **tested headless** — grid-based discrete Pac-Man, deterministic
+step, vectorized Gym (PacWorldGym inherits iGeek's `Gym`). Not validated
+as a learned policy yet; the environment is ready for PPO but no trained
+agent has been demonstrated.
+
 A headless, no-stdlib Pac-Man environment for the iGeek RL framework
 (ASCIICrabs C++23). The original SFML arcade game is preserved as the
 reference for game *rules*; this is a grid-based, discrete re-implementation

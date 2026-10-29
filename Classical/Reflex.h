@@ -70,9 +70,9 @@ return action
 
 
 /* Vacuum-cleaner world (Fig 2.2): two locations A/B, each Clean or Dirty.
- * Actions: Suck, move A<->B. The book's table-driven agent (Fig 2.7)
- * retains the complete percept sequence and looks up the action; the
- * reflex agent (Fig 2.8) reads only the current [location, status]. */
+Actions: Suck, move A<->B. The book's table-driven agent (Fig 2.7)
+retains the complete percept sequence and looks up the action; the
+reflex agent (Fig 2.8) reads only the current [location, status]. */
 
 /* Action codes for the vacuum world. */
 static const IUC kVacSuck = 0;
@@ -84,28 +84,28 @@ static const IUC kVacLocA = 0;
 static const IUC kVacLocB = 1;
 
 /* Fig 2.8 REFLEX-VACUUM-AGENT([location, status]) — pure function, no state.
- * location: kVacLocA/kVacLocB, dirty: current square's dirt flag. */
+location: kVacLocA/kVacLocB, dirty: current square's dirt flag. */
 IUC ReflexVacuumAction(IUC location, BOL dirty);
 
 /* Fig 2.7 TABLE-DRIVEN-AGENT over the vacuum world. The book's table maps
- * each percept sequence to an action; for the vacuum environment the action
- * depends only on the latest percept, so the table is a lookup over packed
- * percept histories of length history_len (percept = (dirty, location),
- * 2 bits each; history_len <= 31). Unpinned entries default to the reflex
- * action of the latest percept (the book's tabulated values). */
-struct TTableVacuumAgent {
+each percept sequence to an action; for the vacuum environment the action
+depends only on the latest percept, so the table is a lookup over packed
+percept histories of length history_len (percept = (dirty, location),
+2 bits each; history_len <= 31). Unpinned entries default to the reflex
+action of the latest percept (the book's tabulated values). */
+struct TableVacuumAgent {
   Autoject table_mem_;
   ISC history_len_;
   ISC hist_count_;
   IUC* history_;
-  TTableVacuumAgent();
-  ~TTableVacuumAgent();
+  TableVacuumAgent();
+  ~TableVacuumAgent();
   BOL Init(ISC history_len);
   /* Append a percept to the sequence; pin an explicit table entry if the
-   * world overrides the book's defaults. */
+  world overrides the book's defaults. */
   void Percept(IUC location, BOL dirty);
   /* LOOKUP percepts in the table; returns the book's action for the
-   * sequence (falls back to the reflex action of the last percept). */
+  sequence (falls back to the reflex action of the last percept). */
   IUC Action();
   /* Override one table entry (packed history) with a fixed action. */
   void PinEntry(IUC packed_history, IUC action);
@@ -113,19 +113,19 @@ struct TTableVacuumAgent {
 };
 
 /* Fig 2.12 SIMPLE-REFLEX-AGENT: state <- INTERPRET-INPUT(percept);
- * rule <- RULE-MATCH(state, rules); return rule.ACTION. `state` is a flat
- * IUC word computed by the world's INTERPRET-INPUT (the world provides it
- * as the percept itself when identity is the right interpretation). Rules
- * are exact word-equal condition->action pairs, first match wins. */
-struct TSimpleReflexAgent {
+rule <- RULE-MATCH(state, rules); return rule.ACTION. `state` is a flat
+IUC word computed by the world's INTERPRET-INPUT (the world provides it
+as the percept itself when identity is the right interpretation). Rules
+are exact word-equal condition->action pairs, first match wins. */
+struct SimpleReflexAgent {
   Autoject rules_mem_;
   Autoject state_mem_;
   ISC state_words_;
   ISC rule_count_;
   ISC rule_cap_;
   BOL seen_;
-  TSimpleReflexAgent();
-  ~TSimpleReflexAgent();
+  SimpleReflexAgent();
+  ~SimpleReflexAgent();
   BOL Init(ISC state_words, ISC rule_cap);
   /* condition: state_words IUC words (the INTERPRET-INPUT output). */
   BOL AddRule(const IUC* condition, IUC action);

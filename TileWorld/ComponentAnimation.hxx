@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "stdafx.h"
 //
@@ -117,9 +118,9 @@ AnimationComponent::Animation::Animation(sf::Sprite& sprite,
       width(width),
       height(height) {
   start_rect =
-      sf::IntRect(start_frame_x * width, start_frame_y * height, width, height);
+      _::ISC4(start_frame_x * width, start_frame_y * height, width, height);
   current_rect = start_rect;
-  endRect = sf::IntRect(frames_x * width, frames_y * height, width, height);
+  endRect = _::ISC4(frames_x * width, frames_y * height, width, height);
 
   sprite.setTexture(textureSheet, true);
   sprite.setTextureRect(start_rect);

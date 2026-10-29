@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #ifndef TILEWORLD_ANIMATIONCOMPONENT_DECL
 #define TILEWORLD_ANIMATIONCOMPONENT_DECL
 #include <_Config.h>
@@ -21,10 +22,10 @@ class AnimationComponent {
           done(false),
           width(width),
           height(height) {
-      start_rect = sf::IntRect(start_frame_x * width, start_frame_y * height,
+      start_rect = _::ISC4(start_frame_x * width, start_frame_y * height,
                                width, height);
       current_rect = start_rect;
-      endRect = sf::IntRect(frames_x * width, frames_y * height, width, height);
+      endRect = _::ISC4(frames_x * width, frames_y * height, width, height);
 
       sprite.setTexture(textureSheet, true);
       sprite.setTextureRect(start_rect);
@@ -46,7 +47,7 @@ class AnimationComponent {
     bool done_;
     ISN width_;
     ISN height_;
-    sf::IntRect start_rect_, current_rect_, end_rect_;
+    _::ISC4 start_rect_, current_rect_, end_rect_;
   };
 
   sf::Sprite& sprite_;

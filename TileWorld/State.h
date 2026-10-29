@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_STATE
@@ -29,10 +30,10 @@ class State {
   bool quit_, paused_;
   FPC keytime_, key_press_time_max_, size_grid_;
 
-  sf::Vector2i mouse_pos_screen_;
-  sf::Vector2i mouse_pos_window_;
-  sf::Vector2f mouse_pos_view_;
-  sf::Vector2i mouse_pos_grid_;
+  _::ISC2 mouse_pos_screen_;
+  _::ISC2 mouse_pos_window_;
+  _::FPC2 mouse_pos_view_;
+  _::ISC2 mouse_pos_grid_;
 
   _::ADic<_::AString, sf::Texture> textures_;
 

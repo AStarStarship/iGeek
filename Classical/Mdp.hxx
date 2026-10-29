@@ -36,7 +36,7 @@ static FPC MdpBackupNC(const MDP* mdp, ISC state, IUC action, FPC* V,
 }
 
 /* Runtime-sized (state_count) successor/probability scratch, both buffers
- * RAMFactory-owned; the destructor returns them to the factory. */
+RAMFactory-owned; the destructor returns them to the factory. */
 struct MdpScratch {
   Autoject succ_;
   Autoject prob_;

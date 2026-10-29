@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "state_menu_main.h"
 
@@ -25,10 +26,10 @@ void StateMenuMain::InitKeybinds() {
 }
 
 void StateMenuMain::InitGUI() {
-  const sf::VideoMode& vm = state_data_->gfx_settings->resolution;
+  const _::TVideoMode& vm = state_data_->gfx_settings->resolution;
 
   // Background
-  background_.setSize(sf::Vector2f(static_cast<float>(vm.width),
+  background_.setSize(_::FPC2(static_cast<float>(vm.width),
                                    static_cast<float>(vm.height)));
 
   if (!background_texture_.LoadFromFile(
@@ -38,39 +39,39 @@ void StateMenuMain::InitGUI() {
 
   background_.setTexture(&background_texture_);
 
-  bttn_background_.setSize(sf::Vector2f(static_cast<float>(vm.width / 5),
+  bttn_background_.setSize(_::FPC2(static_cast<float>(vm.width / 5),
                                         static_cast<float>(vm.height)));
 
   bttn_background_.PositionSet(gui::p2pX(11.5f, vm), 0.f);
-  bttn_background_.setFillColor(sf::Color(10, 10, 10, 220));
+  bttn_background_.setFillColor(IUN(10, 10, 10, 220));
 
   buttons_["GAME_STATE"] = new gui::Button(
       gui::p2pX(15.6f, vm), gui::p2pY(30.f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "New Game", gui::CalcCharSize(vm),
-      sf::Color(200, 200, 200, 200), sf::Color(255, 255, 255, 255),
-      sf::Color(20, 20, 20, 50), sf::Color(70, 70, 70, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(200, 200, 200, 200), IUN(255, 255, 255, 255),
+      IUN(20, 20, 20, 50), IUN(70, 70, 70, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 
   buttons_["SETTINGS_STATE"] = new gui::Button(
       gui::p2pX(15.6f, vm), gui::p2pY(40.f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "Settings", gui::CalcCharSize(vm),
-      sf::Color(200, 200, 200, 200), sf::Color(255, 255, 255, 255),
-      sf::Color(20, 20, 20, 50), sf::Color(70, 70, 70, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(200, 200, 200, 200), IUN(255, 255, 255, 255),
+      IUN(20, 20, 20, 50), IUN(70, 70, 70, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 
   buttons_["EDITOR_STATE"] = new gui::Button(
       gui::p2pX(15.6f, vm), gui::p2pY(50.f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "Editor", gui::CalcCharSize(vm),
-      sf::Color(200, 200, 200, 200), sf::Color(255, 255, 255, 255),
-      sf::Color(20, 20, 20, 50), sf::Color(70, 70, 70, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(200, 200, 200, 200), IUN(255, 255, 255, 255),
+      IUN(20, 20, 20, 50), IUN(70, 70, 70, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 
   buttons_["EXIT_STATE"] = new gui::Button(
       gui::p2pX(15.6f, vm), gui::p2pY(65.f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "Quit", gui::CalcCharSize(vm),
-      sf::Color(200, 200, 200, 200), sf::Color(255, 255, 255, 255),
-      sf::Color(20, 20, 20, 50), sf::Color(100, 100, 100, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(200, 200, 200, 200), IUN(255, 255, 255, 255),
+      IUN(20, 20, 20, 50), IUN(100, 100, 100, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 }
 
 void StateMenuMain::ResetGUI() {

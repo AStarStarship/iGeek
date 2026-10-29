@@ -10,3 +10,15 @@ seams:
     depends: [IGEEK_CLASSICAL_CORE]
     file: 02.Release.hxx
     label: "Testing Classical release..."
+  - name: IGEEK_CLASSICAL_SEARCH
+    depends: [IGEEK_CLASSICAL_RELEASE]
+    file: 03.Search.hxx
+    label: "Testing Classical Search..."
+  - name: IGEEK_CLASSICAL_CSP
+    depends: [IGEEK_CLASSICAL_SEARCH]
+    file: 04.Csp.hxx
+    label: "Testing Classical Csp..."
+  - name: IGEEK_CLASSICAL_MDP
+    depends: [IGEEK_CLASSICAL_CSP]
+    file: 05.Mdp.hxx
+    label: "Testing Classical Mdp..."

@@ -1,3 +1,4 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "player_gui.h"
 
@@ -9,8 +10,8 @@ void PlayerGUI::InitLevelBar() {
   float x = gui::p2pX(1.f, vm);
   float y = gui::p2pY(1.9f, vm);
 
-  levelBarBack.setSize(sf::Vector2f(width, height));
-  levelBarBack.setFillColor(sf::Color(50, 50, 50, 200));
+  levelBarBack.setSize(_::FPC2(width, height));
+  levelBarBack.setFillColor(IUN(50, 50, 50, 200));
   levelBarBack.PositionSet(x, y);
 
   levelBarText.setFont(font);
@@ -22,16 +23,16 @@ void PlayerGUI::InitLevelBar() {
 void PlayerGUI::InitExpBar() {
   expBar = new gui::ProgressBar(1.f, 5.6f, 10.4f, 1.9f,
                                 player->GetAttributeComponent()->next_exp,
-                                sf::Color::Blue, 220, vm, &font);
+                                IUN::Blue, 220, vm, &font);
 }
 
 void PlayerGUI::InitHPBar() {
   hpBar = new gui::ProgressBar(1.f, 8.3f, 10.4f, 2.8f,
                                player->GetAttributeComponent()->hp_max,
-                               sf::Color::Red, 180, vm, &font);
+                               IUN::Red, 180, vm, &font);
 }
 
-PlayerGUI::PlayerGUI(Player* player, sf::VideoMode& vm) : vm(vm) {
+PlayerGUI::PlayerGUI(Player* player, _::TVideoMode& vm) : vm(vm) {
   player = player;
 
   InitFont();

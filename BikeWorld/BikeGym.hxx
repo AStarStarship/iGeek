@@ -19,6 +19,24 @@ ABikeGym::ABikeGym(const TileMap& map, const TVehicleRoute& route,
     bikes_[i] = new ABikeEnv(map, route, initial, seed_ + IUD(i) * 0x9E37u);
     envs_[i] = NILP;
   }
+  CopyStr(manifest_.name, ManifestNameLen, "bikeworld");
+  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  manifest_.kind = ManifestKindEnv;
+  manifest_.domain = ManifestDomainRobotics;
+  CopyStr(manifest_.description, ManifestDescriptionLen,
+          "Bicycle riding with speed command control");
+  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  manifest_.reward_low = FPC(-1.0);
+  manifest_.reward_high = FPC(1.0);
+  manifest_.reward_higher_is_better = true;
+  manifest_.determinism = ManifestDeterminismSeeded;
+  manifest_.obs_count = obs_len_;
+  manifest_.action_count = action_count_;
+  manifest_.max_episode_steps = ABikeEnv::MaxFrames;
+  manifest_.env_count_max = GymEnvMax;
+  CopyStr(manifest_.world_name, ManifestWorldLen, "BikeWorld");
+  manifest_.seam_number = IGEEK_BIKEWORLD_CORE;
+  manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
 ABikeGym::~ABikeGym() {

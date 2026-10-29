@@ -7,20 +7,19 @@
 #include <math.h>
 #if SEAM >= CRABS_ARMWORLD
 namespace iGeek {
-/** Arm dynamics row-major layout (2 x 2 inertia, 2-vector force). */
+/* Arm dynamics row-major layout (2 x 2 inertia, 2-vector force). */
 enum { ArmMatSize = 2, ArmVecSize = 2 };
-/** Closed-form two-link forward kinematics from absolute joint angles. */
+/* Closed-form two-link forward kinematics from absolute joint angles. */
 void TArmFK(const TArmParams& params, FPD j1, FPD j2,
            FPD& tip_x, FPD& tip_y) {
   FPD c1 = cos(j1), s1 = sin(j1), c2 = cos(j2), s2 = sin(j2);
   tip_x = params.length_1 * c1 + params.length_2 * c2;
   tip_y = params.length_1 * s1 + params.length_2 * s2;
 }
-/** Point masses on uniform links (mass at 0.5 l), gravity in +y.
- * I11 is constant; I12 = I12_base + (m2/4) l1 l2 (cos j1 + cos j2);
- * Coriolis c12 = -(m2/2) l1 l2 sin(j1 - j2).
- * @return false when inputs are invalid; forces are untouched.
- */
+/* Point masses on uniform links (mass at 0.5 l), gravity in +y.
+I11 is constant; I12 = I12_base + (m2/4) l1 l2 (cos j1 + cos j2);
+Coriolis c12 = -(m2/2) l1 l2 sin(j1 - j2).
+@return false when inputs are invalid; forces are untouched. */
 BOL TArmForces(const TArmParams& params, const TArmState& state,
               TArmDynamicsTerms& forces) {
   if (!TArmParamsValid(params) || !TArmStateValid(state)) return false;
@@ -40,10 +39,9 @@ BOL TArmForces(const TArmParams& params, const TArmState& state,
   forces.grav_2 = -(params.mass_2 * lc2) * g * s2;
   return true;
 }
-/** One dynamics evaluation: solve I(w) a = tau + C(w) w + g for a.
- * Uses Math::GemmRR/GemvR (2 x 2) + explicit 2 x 2 inverse.
- * @return false for invalid inputs; acc is untouched.
- */
+/* One dynamics evaluation: solve I(w) a = tau + C(w) w + g for a.
+Uses Math::GemmRR/GemvR (2 x 2) + explicit 2 x 2 inverse.
+@return false for invalid inputs; acc is untouched. */
 BOL TArmDynamics(const TArmParams& params, FPD j1, FPD j2, FPD w1, FPD w2,
                 FPD tau_1, FPD tau_2, FPD* acc) {
   if (!TArmParamsValid(params)) return false;
@@ -92,10 +90,9 @@ BOL TArmStateValid(const TArmState& state) {
       state.j1 >= -1e-9 && state.j1 <= jmax + 1e-9 &&
       state.j2 >= -1e-9 && state.j2 <= jmax + 1e-9;
 }
-/** One 0.02 s frame = four 0.01 s RK4 substeps of the torque model.
- * Joint angles are clamped to [0, pi/2]; velocity zeros at the bound.
- * @return false for invalid inputs; state is untouched.
- */
+/* One 0.02 s frame = four 0.01 s RK4 substeps of the torque model.
+Joint angles are clamped to [0, pi/2]; velocity zeros at the bound.
+@return false for invalid inputs; state is untouched. */
 BOL TArmStep(TArmState& state, const TArmParams& params,
             const TArmControl& control) {
   if (!TArmParamsValid(params) || !TArmStateValid(state) ||

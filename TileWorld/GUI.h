@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #ifndef TILEWORLD_GUI
 #define TILEWORLD_GUI
 #include <_Config.h>
@@ -10,9 +11,9 @@ enum button_states {
 };
 
 namespace gui {
-const FPC p2pX(const FPC perc, const sf::VideoMode& vm);
-const FPC p2pY(const FPC perc, const sf::VideoMode& vm);
-const unsigned CalcCharSize(const sf::VideoMode& vm,
+const FPC p2pX(const FPC perc, const _::TVideoMode& vm);
+const FPC p2pY(const FPC perc, const _::TVideoMode& vm);
+const unsigned CalcCharSize(const _::TVideoMode& vm,
                             const unsigned modifier = 60);
 
 class Button {
@@ -24,26 +25,26 @@ class Button {
   sf::Font* font;
   sf::Text text;
 
-  sf::Color textIdleColor;
-  sf::Color textHoverColor;
-  sf::Color textActiveColor;
+  IUN textIdleColor;
+  IUN textHoverColor;
+  IUN textActiveColor;
 
-  sf::Color idleColor;
-  sf::Color hoverColor;
-  sf::Color activeColor;
+  IUN idleColor;
+  IUN hoverColor;
+  IUN activeColor;
 
-  sf::Color outlineIdleColor;
-  sf::Color outlineHoverColor;
-  sf::Color outlineActiveColor;
+  IUN outlineIdleColor;
+  IUN outlineHoverColor;
+  IUN outlineActiveColor;
 
  public:
   Button(FPC x, FPC y, FPC width, FPC height, sf::Font* font,
-         _::AString text, unsigned character_size, sf::Color text_idle_color,
-         sf::Color text_hover_color, sf::Color text_active_color,
-         sf::Color idle_color, sf::Color hover_color, sf::Color active_color,
-         sf::Color outline_idle_color = sf::Color::Transparent,
-         sf::Color outline_hover_color = sf::Color::Transparent,
-         sf::Color outline_active_color = sf::Color::Transparent,
+         _::AString text, unsigned character_size, IUN text_idle_color,
+         IUN text_hover_color, IUN text_active_color,
+         IUN idle_color, IUN hover_color, IUN active_color,
+         IUN outline_idle_color = IUN::Transparent,
+         IUN outline_hover_color = IUN::Transparent,
+         IUN outline_active_color = IUN::Transparent,
          short unsigned id = 0);
   ~Button();
 
@@ -55,7 +56,7 @@ class Button {
   void setText(const _::AString text);
   void setId(const short unsigned id);
 
-  void Update(const sf::Vector2i& mouse_pos_window);
+  void Update(const _::ISC2& mouse_pos_window);
   void Render(sf::RenderTarget& target);
 };
 
@@ -80,7 +81,7 @@ class DropDownList {
   const bool KeyTime();
 
   void UpdateKeyTime(const FPC& dt);
-  void Update(const sf::Vector2i& mouse_pos_window, const FPC& dt);
+  void Update(const _::ISC2& mouse_pos_window, const FPC& dt);
   void Render(sf::RenderTarget& target);
 };
 
@@ -94,8 +95,8 @@ class TextureSelector {
   sf::RectangleShape bounds_;
   sf::Sprite sheet_;
   sf::RectangleShape selector_;
-  sf::Vector2u mouse_pos_grid_;
-  sf::IntRect texture_rect_;
+  _::ISC2 mouse_pos_grid_;
+  _::ISC4 texture_rect_;
 
  public:
   TextureSelector(FPC x, FPC y, FPC width, FPC height, FPC grid_size,
@@ -104,11 +105,11 @@ class TextureSelector {
   ~TextureSelector();
 
   const bool& getActive() const;
-  const sf::IntRect& getTextureRect() const;
+  const _::ISC4& getTextureRect() const;
 
   const bool KeyTime();
   void UpdateKeyTime(const FPC& dt);
-  void Update(const sf::Vector2i& mouse_pos_window, const FPC& dt);
+  void Update(const _::ISC2& mouse_pos_window, const FPC& dt);
   void Render(sf::RenderTarget& target);
 };
 
@@ -123,7 +124,7 @@ class ProgressBar {
 
  public:
   ProgressBar(FPC x, FPC y, FPC width, FPC height, ISN max_value,
-              sf::Color inner_color, unsigned character_size, sf::VideoMode& vm,
+              IUN inner_color, unsigned character_size, _::TVideoMode& vm,
               sf::Font* font = nullptr);
   ~ProgressBar();
 

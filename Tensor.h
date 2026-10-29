@@ -8,21 +8,21 @@
 namespace iGeek {
 
 /* Minimal row-major float tensor for RL policy math.
-   NO standard library. This is the primitive the vectorized-batch policy
-   (TTransformer) and PPO loop (TPPO) are built on.
+NO standard library. This is the primitive the vectorized-batch policy
+(TTransformer) and PPO loop (TPPO) are built on.
 
-   vectorized-batch: the whole RL data model is tensor-valued
-   (obs_t*, float* actions/rewards, logits, grad_logits, grad_values_pred,
-   action_mask). We need a flat float buffer with shape + the handful of
-   elementwise/linear ops a policy forward/backward uses.
+vectorized-batch: the whole RL data model is tensor-valued
+(obs_t*, float* actions/rewards, logits, grad_logits, grad_values_pred,
+action_mask). We need a flat float buffer with shape + the handful of
+elementwise/linear ops a policy forward/backward uses.
 
-   IMPORTANT GAP: ASCIICrabs has no tensor/linear-algebra primitive. The
-   heavy kernels (MatMul, Softmax, LayerNorm, backprop) are logged to
-   ../ASCIICrabs/AGENT_PLAN.md — until then, these ops are implemented
-   here in iGeek as plain FPC* loops over a flat buffer.
+IMPORTANT GAP: ASCIICrabs has no tensor/linear-algebra primitive. The
+heavy kernels (MatMul, Softmax, LayerNorm, backprop) are logged to
+../ASCIICrabs/AGENT_PLAN.md — until then, these ops are implemented
+here in iGeek as plain FPC* loops over a flat buffer.
 
-   Chimera+: T prefix = POD struct, CamelCase type, lower_snake_case
-   mutable members, free functions T-prefixed.
+Chimera+: T prefix = POD struct, CamelCase type, lower_snake_case
+mutable members, free functions T-prefixed.
 */
 struct TTensor {
   FPC* data_;     //< Flat row-major float storage (rows_ * cols_).
@@ -44,7 +44,7 @@ struct TTensor {
 /* --- Allocation (preallocate-at-init pattern: preallocate at init, free at close) --- */
 
 /* Allocate a rows x cols FPC tensor, zero-initialized. Returns a TTensor
-   whose data_ is heap-owned (free with TTensorFree). */
+whose data_ is heap-owned (free with TTensorFree). */
 TTensor TTensorAlloc(ISC rows, ISC cols);
 
 /* Free the tensor storage. Sets *t.data_ = NILP so a double-free is safe. */
@@ -65,13 +65,13 @@ void TTensorLayerNormInPlace(TTensor& X);
 void TTensorReluInPlace(TTensor& X);
 
 /* C = A + B (elementwise). A and B MUST have the same shape [r, c].
-   For a bias column [K, 1] added to a [B, K] tensor, use TTensorAddBias. */
+For a bias column [K, 1] added to a [B, K] tensor, use TTensorAddBias. */
 void TTensorAdd(const TTensor& A, const TTensor& B, TTensor& C);
 
 /* In-place bias broadcast: X is [B, K], bias is [K, 1]. Adds bias[j] to
-   every row's column j: X[i, j] += bias[j, 0]. This is the correct way to
-   add a learned bias (a [K, 1] column) to a batched [B, K] activation —
-   TTensorAdd would overflow because it assumes matching shapes. */
+every row's column j: X[i, j] += bias[j, 0]. This is the correct way to
+add a learned bias (a [K, 1] column) to a batched [B, K] activation —
+TTensorAdd would overflow because it assumes matching shapes. */
 void TTensorAddBiasInPlace(TTensor& X, const TTensor& bias);
 
 /* C = A * s (scalar broadcast). */

@@ -6,9 +6,6 @@
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
 
-// --- AIMA reference pseudocode (relocated from Agent.h, 2026-10-28) --------
-// Decision theory (Figures 13.1, 16.9). Reference only: no C++ implementation yet.
-
 /* Figure 13.1 A decision-theoretic agent that selects rational actions.
 
 @code

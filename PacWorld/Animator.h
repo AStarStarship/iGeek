@@ -1,28 +1,50 @@
 // Copyright AStarship <https://astarship.net>.
-
-#pragma once 
+#pragma once
 #ifndef IGEEK_PACMOD_ANIMATOR_DECL
 #define IGEEK_PACMOD_ANIMATOR_DECL
-#include <Crabs/_Config.h>
+
+#include "Maze.h"  // brings in _Config.h (ISC/FPC/BOL) + TVec.h (ISC4)
+
 namespace PacWorld {
 
+/* A headless frame animator. Holds a fixed array of texture sub-rects
+   (ISC4) and advances through them on a timer (FPC seconds). The actual
+   sprite update is a display concern (CImage later) — Animate() is a no-op.
+   No SFML, no stdlib. */
 class Animator {
-  AArray<sf::IntRect> frames_;
-  int current_frame_;
-  bool is_playing_;
-  sf::Time duration_;
-  bool loop_;
+  static const ISC FramesMax = 16;
+
+  ISC4 frames_[FramesMax];  // texture sub-rects (left, top, w, h).
+  ISC frame_count_;
+  ISC current_frame_;
+  BOL is_playing_;
+  FPC duration_;  // total animation duration in seconds.
+  FPC time_buffer_;  // accumulated time since last frame advance.
+  BOL loop_;
 
  public:
   Animator();
 
-  void AddFrame(sf::IntRect frame);
+  /* Add a frame (texture sub-rect). */
+  void AddFrame(ISC4 frame);
 
-  void Play(TMS duration, bool loop);
-  bool IsPlaying() const;
+  /* Start playing. `duration` is the total seconds for the full cycle. */
+  void Play(FPC duration, BOL loop);
 
-  void Update(TMS delta);
-  void Animate(sf::Sprite& sprite);
+  BOL IsPlaying() const;
+
+  /* Advance the animation by `delta` seconds. */
+  void Update(FPC delta);
+
+  /* The current frame index. */
+  ISC CurrentFrame() const { return current_frame_; }
+
+  /* The current frame's texture sub-rect. */
+  ISC4 CurrentRect() const { return frames_[current_frame_]; }
+
+  /* No-op for headless — the sprite update is a display concern. */
+  void Animate() {}
 };
-}  //< namespace PacWorld
+
+}  // namespace PacWorld
 #endif

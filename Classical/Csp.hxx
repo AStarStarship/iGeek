@@ -50,8 +50,8 @@ static BOL CspPairOK(const CspConstraint* c, ISC i, ISC j, IUC vi, IUC vj) {
   return c->Compatible(vj, vi);
 }
 
-/* Fig 6.3 REVISE: delete values of variable i with no support in j. Returns
- * true when the domain of i changed. */
+/* Fig 6.3 REVISE: delete values of variable i with no support in j. 
+Returns true when the domain of i changed. */
 static BOL CspReviseNC(const CSP* csp, ISC i, ISC j, IUC* d) {
   BOL revised = false;
   IUC di = d[i];
@@ -145,8 +145,8 @@ struct CspArcQueue {
   }
 };
 
-/* Fig 6.3 AC-3: queue every arc of every constraint (both directions) and
- * REVISE until the queue drains. Returns false when a domain is wiped. */
+/* Fig 6.3 AC-3: queue every arc of every constraint (both directions) and REVISE until the queue drains.
+Returns false when a domain is wiped. */
 BOL CspAc3(CSP* csp, IUC* d) {
   CspArcQueue q;
   if (!q.Init(csp->constraint_count * 2)) {
@@ -187,8 +187,7 @@ BOL CspAc3(CSP* csp, IUC* d) {
   return true;
 }
 
-/* Undo log for the backtracker: every domain write is logged (variable,
- * previous mask). PopTo restores all entries above save_top. */
+/* Undo log for the backtracker: every domain write is logged (variable, previous mask). PopTo restores all entries above save_top. */
 struct CspTrail {
   struct Entry {
     ISC var;
@@ -296,9 +295,7 @@ static ISC CspConflictsNC(const CSP* csp, const IUC* asg, ISC var, IUC x) {
   return n;
 }
 
-/* Fig 6.5 BACKTRACK: MRV variable selection (fewest remaining values, ties
- * by index), ascending value order, forward domain filtering as INFERENCE.
- * Every domain write goes to the trail; on failure the trail restores. */
+/* Fig 6.5 BACKTRACK: MRV variable selection (fewest remaining values, ties by index), ascending value order, forward domain filtering as INFERENCE. Every domain write goes to the trail; on failure the trail restores. */
 static BOL CspBacktrackRec(const CSP* csp, IUC* d, IUC* asg, CspTrail* trail,
                            IUC* out) {
   ISC best = -1;
@@ -483,8 +480,8 @@ BOL CspMinConflicts(CSP* csp, const IUC* domains, IUC* out, ISC max_steps,
 }
 
 /* DFS over the adjacency bitmasks: preorder into order[], parent[] set.
- * Returns false on a cycle (back edge) — the constraint graph is not a tree.
- * Depth is bounded by var_count <= 32. */
+Returns false on a cycle (back edge) — the constraint graph is not a tree.
+Depth is bounded by var_count <= 32. */
 static BOL CspTreeDfsNC(const IUC* adj, IUC* parent, IUC* order, ISC* order_n,
                         ISC var) {
   order[(*order_n)++] = IUC(var);

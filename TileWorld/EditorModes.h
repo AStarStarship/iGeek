@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #ifndef TILEWORLD_EDITORMODE_DECL
 #define TILEWORLD_EDITORMODE_DECL
 #include <_Config.h>
@@ -22,7 +23,7 @@ class EditorStateData {
 
   _::ADic<_::AString, ISN>* keybinds;
 
-  sf::Vector2i *mouse_pos_screen,  //<
+  _::ISC2 *mouse_pos_screen,  //<
       *mouse_pos_window,           //<
       *mouse_pos_view,             //<
       *mouse_pos_grid;             //<

@@ -17,7 +17,7 @@
 using namespace _;
 static ISC cw_failures = 0;
 #define CHECK(condition) do { if (!(condition)) { \
-  D_COUT("FAIL " << __FILE__ <<  << __LINE__ <<  << #condition <<); \
+  D_COUT("FAIL " << __FILE__ << " " << __LINE__ << " " << #condition << '\n'); \
   ++cw_failures; } } while (false)
 
 static void FreeCoast() {
@@ -126,7 +126,7 @@ static void RouteFollower() {
   CHECK(env.State().x == first.x && env.State().y == first.y);
   CHECK(env.State().time == first.time && env.State().heading == first.heading);
   for (ISC i = 0; i < ACarEnv::ObsLength; ++i) CHECK(isfinite(env.Obs()[i]));
-  D_COUT("TCarStatusName=" << TCarStatusName(env.Status()) <<);
+  D_COUT("TCarStatusName=" << TCarStatusName(env.Status()) << '\n');
 #else
   CHECK(false && "native car route follower missing");
 #endif
@@ -143,7 +143,7 @@ static void CarScenarioRoutes() {
     CHECK(env.Status() == CarGoal);
     CHECK(env.GoalDistance() < 1.2 && env.State().forward < 0.1);
     CHECK(env.Metrics().max_cross_track < 4);
-    D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) <<  << TCarStatusName(env.Status()) <<);
+    D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) << " " << TCarStatusName(env.Status()) << '\n');
   }
   delete planner;
 #else
@@ -161,7 +161,7 @@ static void SpeedStops() {
     while (!env.Done()) env.Step(action);
     CHECK(env.Status() == CarGoal);
     CHECK(env.GoalDistance() < 1.2 && env.State().forward < 0.1);
-    D_COUT("action=" << action <<  << TCarStatusName(env.Status()) <<);
+    D_COUT("action=" << action << " " << TCarStatusName(env.Status()) << '\n');
   }
 }
 static void CarFailurePaths() {
@@ -185,7 +185,7 @@ static void CarFailurePaths() {
   FPD gap = 45 - emergency.Params().body_radius - emergency.State().x;
   CHECK(emergency.Status() == CarBlocked);
   CHECK(emergency.State().forward < 0.1 && gap > 0.25);
-  D_COUT("TCarStatusName=" << TCarStatusName(emergency.Status()) <<);
+  D_COUT("TCarStatusName=" << TCarStatusName(emergency.Status()) << '\n');
   initial.forward = 300;
   ACarEnv crash(map, route, initial, 7);
   while (!crash.Done()) crash.StepControl(TCarControl());

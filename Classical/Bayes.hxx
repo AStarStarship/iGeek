@@ -35,43 +35,42 @@ static inline FPC BayesRoll(IUD* rnd) {
   return FPC(*rnd >> 32) * FPC(2.3283064365386963e-10f);  // /2^32
 }
 
-// --- TBayesNet -------------------------------------------------------------
+// --- BaysNet -------------------------------------------------------------
 
-/* Per-var record: parent slice start/count into the parent pool, PPT slice
- * start into the ppt pool. 16 bytes per var (word-aligned tail padding). */
-struct TBayesVarRec {
+/* Per-var record: parent slice start/count into the parent pool, PPT slice start into the ppt pool. 16 bytes per var (word-aligned tail padding). */
+struct BaysVarRec {
   ISC parent_start;
   ISC parent_count;
   ISC ppt_start;
 };
 
-static char* BayesRecEndNC(const TBayesNet* bn) {
+static char* BayesRecEndNC(const BaysNet* bn) {
   return TPtr<char>(bn->mem_.origin) +
-         IUD(bn->var_count_) * IUD(sizeof(TBayesVarRec));
+         IUD(bn->var_count_) * IUD(sizeof(BaysVarRec));
 }
 
-static ISC* BayesParentsNC(const TBayesNet* bn) {
+static ISC* BayesParentsNC(const BaysNet* bn) {
   return TPtr<ISC>(BayesRecEndNC(bn));
 }
 
-static FPC* BayesPptsNC(const TBayesNet* bn) {
+static FPC* BayesPptsNC(const BaysNet* bn) {
   return TPtr<FPC>(
       BayesRecEndNC(bn) + IUD(bn->parent_cap_) * IUD(sizeof(ISC)));
 }
 
-TBayesNet::TBayesNet()
+BaysNet::BaysNet()
     : mem_(NILP, &ObjectFactoryHeap), var_count_(0), parent_cap_(0),
       ppt_cap_(0), parent_count_(0), ppt_count_(0) {}
 
-TBayesNet::~TBayesNet() {
+BaysNet::~BaysNet() {
   mem_.origin = BayesFree(mem_.origin);
 }
 
-BOL TBayesNet::Init(ISC var_count, ISC parent_cap, ISC ppt_cap) {
+BOL BaysNet::Init(ISC var_count, ISC parent_cap, ISC ppt_cap) {
   if (var_count < 1 || var_count > 16 || parent_cap < 0 || ppt_cap < 0) {
     return false;
   }
-  IUD bytes = IUD(var_count) * IUD(sizeof(TBayesVarRec)) +
+  IUD bytes = IUD(var_count) * IUD(sizeof(BaysVarRec)) +
               IUD(parent_cap) * IUD(sizeof(ISC)) + IUD(ppt_cap) * IUD(sizeof(FPC));
   mem_.origin = ObjectFactoryHeap(NILP, bytes);
   if (IsError(mem_.origin)) {
@@ -86,7 +85,7 @@ BOL TBayesNet::Init(ISC var_count, ISC parent_cap, ISC ppt_cap) {
   return true;
 }
 
-BOL TBayesNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
+BOL BaysNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
                        const FPC* ppt) {
   if (var < 0 || var >= var_count_ || ppt == NILP || parent_count < 0 ||
       parent_count > 8 || (parents == NILP && parent_count > 0)) {
@@ -97,7 +96,7 @@ BOL TBayesNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
       ppt_count_ + rows > IUD(ppt_cap_)) {
     return false;
   }
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(mem_.origin);
+  BaysVarRec* recs = TPtr<BaysVarRec>(mem_.origin);
   ISC* parents_pool = BayesParentsNC(this);
   FPC* ppt_pool = BayesPptsNC(this);
   recs[var].parent_start = parent_count_;
@@ -117,9 +116,9 @@ BOL TBayesNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
   return true;
 }
 
-FPC TBayesNet::P(ISC var, IUC value, const IUC* parent_values) const {
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(mem_.origin);
-  const TBayesVarRec* r = &recs[var];
+FPC BaysNet::P(ISC var, IUC value, const IUC* parent_values) const {
+  BaysVarRec* recs = TPtr<BaysVarRec>(mem_.origin);
+  const BaysVarRec* r = &recs[var];
   FPC* ppt = BayesPptsNC(this);
   IUD row = 0;
   for (ISC i = 0; i < r->parent_count; ++i) {
@@ -132,7 +131,7 @@ FPC TBayesNet::P(ISC var, IUC value, const IUC* parent_values) const {
 // --- evidence helpers ------------------------------------------------------
 
 /* ev_map[var] = 0 unseen, 1 evidence value 0, 2 evidence value 1. */
-static BOL BayesEvMapNC(const TBayesNet& bn, const TBayesEv* ev, ISC ev_n,
+static BOL BayesEvMapNC(const BaysNet& bn, const BaysEv* ev, ISC ev_n,
                         IUC* ev_map, ISC ev_map_cap) {
   for (ISC i = 0; i < ev_map_cap; ++i) {
     ev_map[i] = 0;
@@ -184,12 +183,12 @@ static IUD BayesExpandNC(const ISC* bits, ISC n, IUD r) {
 
 // --- Fig 14.9 ENUMERATION-ASK ----------------------------------------------
 
-static FPC BayesEnumerateAllNC(const TBayesNet& bn, ISC idx, IUC* ev_map) {
+static FPC BayesEnumerateAllNC(const BaysNet& bn, ISC idx, IUC* ev_map) {
   if (idx == bn.var_count_) {
     return FPC(1.0f);
   }
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(bn.mem_.origin);
-  const TBayesVarRec* r = &recs[idx];
+  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+  const BaysVarRec* r = &recs[idx];
   const ISC* parents = BayesParentsNC(&bn) + r->parent_start;
   IUC pv[8];
   for (ISC i = 0; i < r->parent_count; ++i) {
@@ -213,7 +212,7 @@ static FPC BayesEnumerateAllNC(const TBayesNet& bn, ISC idx, IUC* ev_map) {
   return acc;
 }
 
-FPC TBayesEnumerate(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysEnumerate(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                     ISC ev_n) {
   if (query_var < 0 || query_var >= bn.var_count_) {
     return FPC(0.0f);
@@ -234,16 +233,16 @@ FPC TBayesEnumerate(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
 
 // --- Fig 14.11 ELIMINATION-ASK ---------------------------------------------
 
-TBayesInfer::TBayesInfer()
+BayesInfer::BayesInfer()
     : scope_mem_(NILP, &ObjectFactoryHeap), val_mem_(NILP, &ObjectFactoryHeap),
       cells_used_(0), cells_cap_(0), var_count_(0) {}
 
-TBayesInfer::~TBayesInfer() {
+BayesInfer::~BayesInfer() {
   scope_mem_.origin = BayesFree(scope_mem_.origin);
   val_mem_.origin = BayesFree(val_mem_.origin);
 }
 
-BOL TBayesInfer::Init(ISC var_count, IUD cells_cap) {
+BOL BayesInfer::Init(ISC var_count, IUD cells_cap) {
   if (var_count < 1 || var_count > 16 || cells_cap < 1) {
     return false;
   }
@@ -259,7 +258,7 @@ BOL TBayesInfer::Init(ISC var_count, IUD cells_cap) {
   return true;
 }
 
-FPC TBayesInfer::Ask(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BayesInfer::Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                      ISC ev_n) {
   if (query_var < 0 || query_var >= var_count_) {
     return FPC(0.0f);
@@ -268,7 +267,7 @@ FPC TBayesInfer::Ask(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
   if (!BayesEvMapNC(bn, ev, ev_n, ev_map, 16)) {
     return FPC(0.0f);
   }
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   const FPC* ppt_pool = BayesPptsNC(&bn);
 
@@ -291,7 +290,7 @@ FPC TBayesInfer::Ask(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
   // {v} + parents(v) scope.
   for (ISC v = var_count_ - 1; v >= 0; --v) {
     // MAKE-FACTOR(v, e): scope {v} + parents(v).
-    const TBayesVarRec* r = &recs[v];
+    const BaysVarRec* r = &recs[v];
     IUD m_scope = IUD(1) << IUD(v);
     for (ISC i = 0; i < r->parent_count; ++i) {
       m_scope |= IUD(1) << IUD(parents_pool[r->parent_start + i]);
@@ -384,11 +383,11 @@ FPC TBayesInfer::Ask(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
 
 // --- Fig 14.13 PRIOR-SAMPLE ------------------------------------------------
 
-static BOL BayesSampleNC(const TBayesNet& bn, IUD* rnd, IUC* x) {
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(bn.mem_.origin);
+static BOL BayesSampleNC(const BaysNet& bn, IUD* rnd, IUC* x) {
+  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   for (ISC i = 0; i < bn.var_count_; ++i) {
-    const TBayesVarRec* r = &recs[i];
+    const BaysVarRec* r = &recs[i];
     IUD row = 0;
     for (ISC j = 0; j < r->parent_count; ++j) {
       row |= IUD(x[parents_pool[r->parent_start + j]] & 1) << IUD(j);
@@ -399,7 +398,7 @@ static BOL BayesSampleNC(const TBayesNet& bn, IUD* rnd, IUC* x) {
   return true;
 }
 
-FPC TBayesSample(const TBayesNet& bn, IUD seed, IUC* out_event) {
+FPC BaysSample(const BaysNet& bn, IUD seed, IUC* out_event) {
   if (out_event == NILP || seed == 0) {
     return FPC(0.0f);
   }
@@ -408,7 +407,7 @@ FPC TBayesSample(const TBayesNet& bn, IUD seed, IUC* out_event) {
   return FPC(1.0f);  // a sample is not a number; 1.0 signals success
 }
 
-static BOL BayesConsistentNC(const IUC* x, const TBayesEv* ev, ISC ev_n) {
+static BOL BayesConsistentNC(const IUC* x, const BaysEv* ev, ISC ev_n) {
   for (ISC i = 0; i < ev_n; ++i) {
     if (x[ev[i].var] != ev[i].value) {
       return false;
@@ -419,7 +418,7 @@ static BOL BayesConsistentNC(const IUC* x, const TBayesEv* ev, ISC ev_n) {
 
 // --- Fig 14.14 REJECTION-SAMPLING ------------------------------------------
 
-FPC TBayesReject(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysReject(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                  ISC ev_n, ISC n_samples, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_samples < 1 ||
       seed == 0) {
@@ -444,7 +443,7 @@ FPC TBayesReject(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
 
 // --- Fig 14.15 LIKELIHOOD-WEIGHTING ----------------------------------------
 
-FPC TBayesLw(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
              ISC ev_n, ISC n_samples, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_samples < 1 ||
       seed == 0) {
@@ -457,12 +456,12 @@ FPC TBayesLw(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
   FPC w0 = FPC(0.0f), w1 = FPC(0.0f);
   IUC x[16];
   IUD rnd = seed;
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   for (ISC j = 0; j < n_samples; ++j) {
     FPC w = FPC(1.0f);
     for (ISC i = 0; i < bn.var_count_; ++i) {
-      const TBayesVarRec* r = &recs[i];
+      const BaysVarRec* r = &recs[i];
       IUC code = ev_map[i];
       if (code != 0) {
         // Evidence variable: weight by its likelihood, keep its value.
@@ -501,12 +500,12 @@ FPC TBayesLw(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
  * the product of the children's likelihoods at their current values.
  * Children are found by scanning the parent lists (fine for the documented
  * small-net scope). */
-static FPC BayesGibbsCondNC(const TBayesNet& bn, ISC z, IUC value,
+static FPC BayesGibbsCondNC(const BaysNet& bn, ISC z, IUC value,
                             const IUC* x) {
-  TBayesVarRec* recs = TPtr<TBayesVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   const FPC* ppt_pool = BayesPptsNC(&bn);
-  const TBayesVarRec* rz = &recs[z];
+  const BaysVarRec* rz = &recs[z];
   IUD row = 0;
   for (ISC k = 0; k < rz->parent_count; ++k) {
     row |= IUD(x[parents_pool[rz->parent_start + k]] & 1) << IUD(k);
@@ -514,7 +513,7 @@ static FPC BayesGibbsCondNC(const TBayesNet& bn, ISC z, IUC value,
   FPC p = ppt_pool[rz->ppt_start + ISC(row)];
   FPC acc = value ? p : FPC(1.0f) - p;
   for (ISC c = z + 1; c < bn.var_count_; ++c) {
-    const TBayesVarRec* rc = &recs[c];
+    const BaysVarRec* rc = &recs[c];
     BOL is_child = false;
     for (ISC k = 0; k < rc->parent_count; ++k) {
       if (parents_pool[rc->parent_start + k] == z) {
@@ -540,7 +539,7 @@ static FPC BayesGibbsCondNC(const TBayesNet& bn, ISC z, IUC value,
   return acc;
 }
 
-FPC TBayesGibbs(const TBayesNet& bn, ISC query_var, const TBayesEv* ev,
+FPC BaysGibbs(const BaysNet& bn, ISC query_var, const BaysEv* ev,
                 ISC ev_n, ISC n_cycles, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_cycles < 1 ||
       seed == 0) {

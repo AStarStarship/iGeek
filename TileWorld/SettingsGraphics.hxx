@@ -1,14 +1,15 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "settings_graphics.h"
 
 GraphicsSettings::GraphicsSettings() {
   title = "kDefault";
-  resolution = sf::VideoMode::getDesktopMode();
+  resolution = _::TVideoMode::getDesktopMode();
   fullscreen = false;
   vertical_sync = false;
   frame_rate_limit = 120;
   context_settings.antialiasingLevel = 0;
-  video_modes = sf::VideoMode::getFullscreenModes();
+  video_modes = _::TVideoMode::getFullscreenModes();
 }
 
 void GraphicsSettings::SaveToFile(const _::AString path) {

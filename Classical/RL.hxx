@@ -33,20 +33,20 @@ static inline IUD RlLcgStep(IUD s) {
   return s * 6364136223846793005ULL + 1442695040888963407ULL;
 }
 
-// --- TPassiveTDAgent (Fig 21.4) --------------------------------------------
+// --- PassiveTDAgent (Fig 21.4) --------------------------------------------
 
-TPassiveTDAgent::TPassiveTDAgent()
+PassiveTDAgent::PassiveTDAgent()
     : u_mem_(NILP, &ObjectFactoryHeap),
       n_mem_(NILP, &ObjectFactoryHeap), state_count_(0), action_count_(0),
       gamma_(FPC(0.0f)), alpha_(FPC(0.0f)), IsTerminal_(NILP),
       Policy_(NILP), s_prev_(-1), a_prev_(0), r_prev_(FPC(0.0f)) {}
 
-TPassiveTDAgent::~TPassiveTDAgent() {
+PassiveTDAgent::~PassiveTDAgent() {
   u_mem_.origin = RlFree(u_mem_.origin);
   n_mem_.origin = RlFree(n_mem_.origin);
 }
 
-BOL TPassiveTDAgent::Init(ISC state_count, ISC action_count, FPC gamma,
+BOL PassiveTDAgent::Init(ISC state_count, ISC action_count, FPC gamma,
                           FPC alpha, BOL (*IsTerminal)(ISC state),
                           IUC (*Policy)(ISC state)) {
   if (state_count < 1 || action_count < 1 || IsTerminal == NILP ||
@@ -74,11 +74,11 @@ BOL TPassiveTDAgent::Init(ISC state_count, ISC action_count, FPC gamma,
   return true;
 }
 
-FPC TPassiveTDAgent::Utility(ISC state) const {
+FPC PassiveTDAgent::Utility(ISC state) const {
   return TPtr<FPC>(u_mem_.origin)[state];
 }
 
-IUC TPassiveTDAgent::Percept(ISC s_next, FPC r) {
+IUC PassiveTDAgent::Percept(ISC s_next, FPC r) {
   FPC* u = TPtr<FPC>(u_mem_.origin);
   IUD* n = TPtr<IUD>(n_mem_.origin);
   if (n[s_next] == 0) {
@@ -99,7 +99,7 @@ IUC TPassiveTDAgent::Percept(ISC s_next, FPC r) {
   return a_prev_;
 }
 
-void TPassiveTDAgent::Reset() {
+void PassiveTDAgent::Reset() {
   RlWipe(u_mem_.origin, IUD(state_count_) * IUD(sizeof(FPC)));
   RlWipe(n_mem_.origin, IUD(state_count_) * IUD(sizeof(IUD)));
   s_prev_ = -1;
@@ -107,21 +107,21 @@ void TPassiveTDAgent::Reset() {
   r_prev_ = FPC(0.0f);
 }
 
-// --- TQAgent (Fig 21.8) -----------------------------------------------------
+// --- QAgent (Fig 21.8) -----------------------------------------------------
 
-TQAgent::TQAgent()
+QAgent::QAgent()
     : q_mem_(NILP, &ObjectFactoryHeap), n_mem_(NILP, &ObjectFactoryHeap),
       state_count_(0), action_count_(0), gamma_(FPC(0.0f)),
       alpha_(FPC(0.0f)), eps_(FPC(0.0f)), IsTerminal_(NILP),
       rnd_state_(1442695040888963407ULL), s_prev_(-1), a_prev_(0),
       r_prev_(FPC(0.0f)) {}
 
-TQAgent::~TQAgent() {
+QAgent::~QAgent() {
   q_mem_.origin = RlFree(q_mem_.origin);
   n_mem_.origin = RlFree(n_mem_.origin);
 }
 
-BOL TQAgent::Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
+BOL QAgent::Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
                   FPC eps, BOL (*IsTerminal)(ISC state), IUD seed) {
   if (state_count < 1 || action_count < 1 || IsTerminal == NILP) {
     return false;
@@ -149,11 +149,11 @@ BOL TQAgent::Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
   return true;
 }
 
-FPC TQAgent::Q(ISC state, IUC action) const {
+FPC QAgent::Q(ISC state, IUC action) const {
   return TPtr<FPC>(q_mem_.origin)[IUD(state) * IUD(action_count_) + action];
 }
 
-IUC TQAgent::Percept(ISC s_next, FPC r) {
+IUC QAgent::Percept(ISC s_next, FPC r) {
   FPC* q = TPtr<FPC>(q_mem_.origin);
   IUD* n = TPtr<IUD>(n_mem_.origin);
   if (s_prev_ != -1) {
@@ -214,7 +214,7 @@ IUC TQAgent::Percept(ISC s_next, FPC r) {
   return action;
 }
 
-void TQAgent::Reset() {
+void QAgent::Reset() {
   IUD cells = IUD(state_count_) * IUD(action_count_);
   RlWipe(q_mem_.origin, cells * IUD(sizeof(FPC)));
   RlWipe(n_mem_.origin, cells * IUD(sizeof(IUD)));
@@ -223,9 +223,9 @@ void TQAgent::Reset() {
   r_prev_ = FPC(0.0f);
 }
 
-// --- TPassiveADPAgent (Fig 21.2) --------------------------------------------
+// --- PassiveADPAgent (Fig 21.2) --------------------------------------------
 
-TPassiveADPAgent::TPassiveADPAgent()
+PassiveADPAgent::PassiveADPAgent()
     : u_mem_(NILP, &ObjectFactoryHeap), r_mem_(NILP, &ObjectFactoryHeap),
       nsa_mem_(NILP, &ObjectFactoryHeap), np_mem_(NILP, &ObjectFactoryHeap),
       p_mem_(NILP, &ObjectFactoryHeap), u_work_(NILP, &ObjectFactoryHeap),
@@ -233,7 +233,7 @@ TPassiveADPAgent::TPassiveADPAgent()
       tol_(FPC(0.0f)), IsTerminal_(NILP), Policy_(NILP), s_prev_(-1),
       a_prev_(0), r_prev_(FPC(0.0f)) {}
 
-TPassiveADPAgent::~TPassiveADPAgent() {
+PassiveADPAgent::~PassiveADPAgent() {
   u_mem_.origin = RlFree(u_mem_.origin);
   r_mem_.origin = RlFree(r_mem_.origin);
   nsa_mem_.origin = RlFree(nsa_mem_.origin);
@@ -242,7 +242,7 @@ TPassiveADPAgent::~TPassiveADPAgent() {
   u_work_.origin = RlFree(u_work_.origin);
 }
 
-BOL TPassiveADPAgent::Init(ISC state_count, ISC action_count, FPC gamma,
+BOL PassiveADPAgent::Init(ISC state_count, ISC action_count, FPC gamma,
                            FPC tol, BOL (*IsTerminal)(ISC state),
                            IUC (*Policy)(ISC state)) {
   if (state_count < 1 || action_count < 1 || IsTerminal == NILP ||
@@ -288,14 +288,14 @@ BOL TPassiveADPAgent::Init(ISC state_count, ISC action_count, FPC gamma,
   return true;
 }
 
-FPC TPassiveADPAgent::Utility(ISC state) const {
+FPC PassiveADPAgent::Utility(ISC state) const {
   return TPtr<FPC>(u_mem_.origin)[state];
 }
 
 /* POLICY-EVALUATION(π, U, mdp): sweep the fixed-policy Bellman equations
- * U(s) = R(s) + γ Σ_t P(t | s, π(s)) U(t) until the maximum change over a
- * sweep drops below tol (terminals keep R). */
-static void RlPolicyEvalNC(const TPassiveADPAgent* agent, FPC* u) {
+U(s) = R(s) + γ Σ_t P(t | s, π(s)) U(t) until the maximum change over a
+sweep drops below tol (terminals keep R). */
+static void RlPolicyEvalNC(const PassiveADPAgent* agent, FPC* u) {
   FPC* un = TPtr<FPC>(agent->u_work_.origin);
   const FPC* p = TPtr<FPC>(agent->p_mem_.origin);
   const FPC* r = TPtr<FPC>(agent->r_mem_.origin);
@@ -334,7 +334,7 @@ static void RlPolicyEvalNC(const TPassiveADPAgent* agent, FPC* u) {
   }
 }
 
-IUC TPassiveADPAgent::Percept(ISC s_next, FPC r) {
+IUC PassiveADPAgent::Percept(ISC s_next, FPC r) {
   FPC* u = TPtr<FPC>(u_mem_.origin);
   FPC* rr = TPtr<FPC>(r_mem_.origin);
   IUD* nsa = TPtr<IUD>(nsa_mem_.origin);
@@ -381,7 +381,7 @@ IUC TPassiveADPAgent::Percept(ISC s_next, FPC r) {
   return a_prev_;
 }
 
-void TPassiveADPAgent::Reset() {
+void PassiveADPAgent::Reset() {
   IUD cells = IUD(state_count_) * IUD(action_count_);
   IUD tcells = cells * IUD(state_count_);
   RlWipe(u_mem_.origin, IUD(state_count_) * IUD(sizeof(FPC)));

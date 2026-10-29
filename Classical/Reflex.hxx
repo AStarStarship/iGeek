@@ -46,18 +46,18 @@ IUC ReflexVacuumAction(IUC location, BOL dirty) {
   return kVacLeft;
 }
 
-// --- Fig 2.7 TTableVacuumAgent -----------------------------------------------
+// --- Fig 2.7 TableVacuumAgent -----------------------------------------------
 
-TTableVacuumAgent::TTableVacuumAgent()
+TableVacuumAgent::TableVacuumAgent()
     : table_mem_(NILP, &ObjectFactoryHeap), history_len_(0), hist_count_(0),
       history_(NILP) {}
 
-TTableVacuumAgent::~TTableVacuumAgent() {
+TableVacuumAgent::~TableVacuumAgent() {
   table_mem_.origin = RfxFree(table_mem_.origin);
   history_ = NILP;
 }
 
-BOL TTableVacuumAgent::Init(ISC history_len) {
+BOL TableVacuumAgent::Init(ISC history_len) {
   if (history_len < 1 || history_len > 15) {
     return false;
   }
@@ -80,7 +80,7 @@ BOL TTableVacuumAgent::Init(ISC history_len) {
   return true;
 }
 
-void TTableVacuumAgent::Percept(IUC location, BOL dirty) {
+void TableVacuumAgent::Percept(IUC location, BOL dirty) {
   // append percept to the end of percepts (circular: keep the latest
   // history_len)
   IUC packed = RfxPackPercept(location, dirty);
@@ -90,7 +90,7 @@ void TTableVacuumAgent::Percept(IUC location, BOL dirty) {
   }
 }
 
-IUC TTableVacuumAgent::Action() {
+IUC TableVacuumAgent::Action() {
   // action <- LOOKUP (percepts, table)
   if (hist_count_ == 0) {
     return kVacSuck;
@@ -115,29 +115,29 @@ IUC TTableVacuumAgent::Action() {
                            (history_[hist_count_ % IUD(history_len_)] & 2) != 0);
 }
 
-void TTableVacuumAgent::PinEntry(IUC packed_history, IUC action) {
+void TableVacuumAgent::PinEntry(IUC packed_history, IUC action) {
   TPtr<IUC>(table_mem_.origin)[packed_history] = action;
 }
 
-void TTableVacuumAgent::Reset() {
+void TableVacuumAgent::Reset() {
   if (history_ != NILP) {
     RfxWipe(TPtr<IUW>(history_), IUD(history_len_) * IUD(sizeof(IUC)));
   }
   hist_count_ = 0;
 }
 
-// --- Fig 2.12 TSimpleReflexAgent ---------------------------------------------
+// --- Fig 2.12 SimpleReflexAgent ---------------------------------------------
 
-TSimpleReflexAgent::TSimpleReflexAgent()
+SimpleReflexAgent::SimpleReflexAgent()
     : rules_mem_(NILP, &ObjectFactoryHeap), state_mem_(NILP, &ObjectFactoryHeap),
       state_words_(0), rule_count_(0), rule_cap_(0), seen_(false) {}
 
-TSimpleReflexAgent::~TSimpleReflexAgent() {
+SimpleReflexAgent::~SimpleReflexAgent() {
   rules_mem_.origin = RfxFree(rules_mem_.origin);
   state_mem_.origin = RfxFree(state_mem_.origin);
 }
 
-BOL TSimpleReflexAgent::Init(ISC state_words, ISC rule_cap) {
+BOL SimpleReflexAgent::Init(ISC state_words, ISC rule_cap) {
   if (state_words < 1 || rule_cap < 1) {
     return false;
   }
@@ -158,7 +158,7 @@ BOL TSimpleReflexAgent::Init(ISC state_words, ISC rule_cap) {
   return true;
 }
 
-BOL TSimpleReflexAgent::AddRule(const IUC* condition, IUC action) {
+BOL SimpleReflexAgent::AddRule(const IUC* condition, IUC action) {
   if (rule_count_ >= rule_cap_) {
     return false;
   }
@@ -172,7 +172,7 @@ BOL TSimpleReflexAgent::AddRule(const IUC* condition, IUC action) {
   return true;
 }
 
-IUC TSimpleReflexAgent::Percept(const IUC* state) {
+IUC SimpleReflexAgent::Percept(const IUC* state) {
   // state <- INTERPRET-INPUT(percept)
   IUC* s = TPtr<IUC>(state_mem_.origin);
   for (ISC i = 0; i < state_words_; ++i) {
@@ -199,7 +199,7 @@ IUC TSimpleReflexAgent::Percept(const IUC* state) {
   return kVacSuck;
 }
 
-IUC TSimpleReflexAgent::LastAction() {
+IUC SimpleReflexAgent::LastAction() {
   if (!seen_) {
     return kVacSuck;
   }
@@ -208,7 +208,7 @@ IUC TSimpleReflexAgent::LastAction() {
   return Percept(TPtr<IUC>(state_mem_.origin));
 }
 
-void TSimpleReflexAgent::Reset() {
+void SimpleReflexAgent::Reset() {
   if (state_mem_.origin != NILP) {
     RfxWipe(state_mem_.origin, IUD(state_words_) * IUD(sizeof(IUC)));
   }

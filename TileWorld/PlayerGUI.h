@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #ifndef TILEWORLD_PLAYERGUI
 #define TILEWORLD_PLAYERGUI
 #include <_Config.h>
@@ -14,7 +15,7 @@ class PlayerGUI {
  private:
   Player* player_;
 
-  sf::VideoMode& vm_;
+  _::TVideoMode& vm_;
   sf::Font font_;
 
   _::AString level_bar_string_;
@@ -29,7 +30,7 @@ class PlayerGUI {
   void InitHPBar();
 
  public:
-  PlayerGUI(Player* player, sf::VideoMode& vm);
+  PlayerGUI(Player* player, _::TVideoMode& vm);
   virtual ~PlayerGUI();
 
   void UpdateLevelBar();

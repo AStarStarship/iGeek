@@ -25,6 +25,7 @@
 #include "SudokuWorld/_Tests.hxx"
 #include "TileWorld/_Tests.hxx"
 #include "TypingWorld/_Tests.hxx"
+#include "Gym/_Tests.hxx"
 
 
 using namespace ::_;
@@ -44,6 +45,7 @@ inline const CHA* iGeekTests(const CHA* args) {
     SpaceWorldTest::SpaceWorld,
     SudokuWorldTest::SudokuWorld,
     TileWorldTest::TileWorld,
-    TypingWorldTest::TypingWorld>(args);
+    TypingWorldTest::TypingWorld,
+    iGeekGymTest::Gym>(args);
 }
 } //< namespace iGeekTest

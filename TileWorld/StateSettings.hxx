@@ -1,8 +1,9 @@
+#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
 #include "state_settings.h"
 
 void StateSettings::InitVariables() {
-  modes_ = sf::VideoMode::getFullscreenModes();
+  modes_ = _::TVideoMode::getFullscreenModes();
 }
 
 void StateSettings::InitFonts() {
@@ -27,10 +28,10 @@ void StateSettings::InitKeybinds() {
 }
 
 void StateSettings::InitGUI() {
-  const sf::VideoMode& vm = state_data_->gfx_settings->resolution;
+  const _::TVideoMode& vm = state_data_->gfx_settings->resolution;
 
   // Background
-  background_.setSize(sf::Vector2f(static_cast<float>(vm.width),
+  background_.setSize(_::FPC2(static_cast<float>(vm.width),
                                    static_cast<float>(vm.height)));
 
   if (!background_texture_.LoadFromFile(
@@ -43,16 +44,16 @@ void StateSettings::InitGUI() {
   buttons_["BACK"] = new gui::Button(
       gui::p2pX(72.f, vm), gui::p2pY(81.5f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "Back", gui::CalcCharSize(vm),
-      sf::Color(70, 70, 70, 200), sf::Color(250, 250, 250, 250),
-      sf::Color(20, 20, 20, 50), sf::Color(100, 100, 100, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(70, 70, 70, 200), IUN(250, 250, 250, 250),
+      IUN(20, 20, 20, 50), IUN(100, 100, 100, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 
   buttons_["APPLY"] = new gui::Button(
       gui::p2pX(60.f, vm), gui::p2pY(81.5f, vm), gui::p2pX(13.f, vm),
       gui::p2pY(6.f, vm), &font_, "Apply", gui::CalcCharSize(vm),
-      sf::Color(70, 70, 70, 200), sf::Color(250, 250, 250, 250),
-      sf::Color(20, 20, 20, 50), sf::Color(100, 100, 100, 0),
-      sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+      IUN(70, 70, 70, 200), IUN(250, 250, 250, 250),
+      IUN(20, 20, 20, 50), IUN(100, 100, 100, 0),
+      IUN(150, 150, 150, 0), IUN(20, 20, 20, 0));
 
   _::Array<_::AString> modes_str;
   for (auto& i : modes) {
@@ -66,9 +67,9 @@ void StateSettings::InitGUI() {
 
   options_text_.setFont(font_);
   options_text_.PositionSet(
-      sf::Vector2f(gui::p2pX(5.2f, vm), gui::p2pY(41.7f, vm)));
+      _::FPC2(gui::p2pX(5.2f, vm), gui::p2pY(41.7f, vm)));
   options_text_.setCharacterSize(gui::CalcCharSize(vm, 70));
-  options_text_.setFillColor(sf::Color(255, 255, 255, 200));
+  options_text_.setFillColor(IUN(255, 255, 255, 200));
 
   options_text_.setString(
       "Resolution \n\nFullscreen \n\nVsync \n\nAntialiasing \n\n ");

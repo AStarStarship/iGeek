@@ -248,11 +248,12 @@ function SATPLAN(init , transition, goal , T max) returns solution or failure
 @endcode
 */
 
-/* Chapter 7 — propositional-logic reasoning. The proposition-symbol universe
- * is 0..symbol_count-1 with symbol_count <= 64 (clauses are IUD literal
- * masks). A clause is a set of literals; a model is an IUD mask of the
- * symbols assigned true. All solvers are pure over the caller's clause
- * arrays (no mutation) and allocate scratch through the RAMFactory only. */
+/* Chapter 7 — propositional-logic reasoning. 
+The proposition-symbol universe is 0..symbol_count-1 with symbol_count <= 64 
+(clauses are IUD literal masks).
+A clause is a set of literals; a model is an IUD mask of the
+symbols assigned true. All solvers are pure over the caller's clause
+arrays (no mutation) and allocate scratch through the RAMFactory only. */
 
 /* A clause: positive literal mask | negative literal mask (¬symbol). */
 struct SatClause {
@@ -260,64 +261,62 @@ struct SatClause {
   IUD negative;
 };
 
-/* A definite clause (Fig 7.15): all-positive premise set, single-symbol
- * conclusion. */
+/* A definite clause (Fig 7.15): all-positive premise set, single-symbol conclusion. */
 struct SatDefinite {
   IUD premise;
   IUD conclusion;
 };
 
 /* Fig 7.10 TT-ENTAILS?: does the KB clause set entail the query clause set?
- * (For every model: if all KB clauses hold, all query clauses hold.) */
+(For every model: if all KB clauses hold, all query clauses hold.) */
 BOL SatTtEntails(const SatClause* kb, ISC kb_count, const SatClause* query,
                  ISC query_count, IUD universe);
 
-/* Fig 7.15 PL-FC-ENTAILS?: forward chaining over definite clauses. `known`
- * is the mask of facts true in KB (non-clause atoms); q is the query symbol. */
+/* Fig 7.15 PL-FC-ENTAILS?: forward chaining over definite clauses. `known` is the mask of facts true in KB (non-clause atoms); q is the query symbol. */
 BOL SatFcEntails(const SatDefinite* kb, ISC kb_count, IUD known, ISC q);
 
 /* Fig 7.12 PL-RESOLUTION: the caller supplies the CNF clauses of KB ∧ ¬α
- * (the book's `clauses`); iterates until a fixpoint. True when the empty
- * clause is derived (KB entails α); false when the set closes. */
+(the book's `clauses`); iterates until a fixpoint. True when the empty
+clause is derived (KB entails α); false when the set closes. */
 BOL SatResolution(const SatClause* clauses, ISC clause_count, IUD universe);
 
 /* Fig 7.17 DPLL-SATISFIABLE?: pure-symbol and unit-clause propagation plus
- * branch-and-bound. True when some model satisfies all clauses. */
+branch-and-bound. True when some model satisfies all clauses. */
 BOL SatDpll(const SatClause* clauses, ISC clause_count, IUD universe);
 
 /* Fig 7.18 WALKSAT: random walk over models; out_model (IUD mask of true
- * symbols) on success. */
+symbols) on success. */
 BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
                ISC max_flips, IUD seed, IUD* out_model);
 
 /* Fig 7.1 KB-AGENT: a clause-set KB with TELL (add clauses) and Ask
- * (entailment test: KB entails the positive query when KB ∧ ¬query is
- * unsatisfiable — answered with DPLL; the definite-clause fast path is
- * available separately via SatFcEntails). */
-struct TKBAgent {
+(entailment test: KB entails the positive query when KB ∧ ¬query is
+unsatisfiable — answered with DPLL; the definite-clause fast path is
+available separately via SatFcEntails). */
+struct KBAgent {
   Autoject kb_mem_;
   ISC kb_count_;
   ISC kb_cap_;
-  TKBAgent();
-  ~TKBAgent();
+  KBAgent();
+  ~KBAgent();
   BOL Init(ISC kb_cap);
   /* Add clauses to the KB (the book's TELL). */
   BOL Tell(const SatClause* clauses, ISC count);
   /* KB entails the query iff KB ∧ ¬query is unsatisfiable. `query_neg`
-   * is the CNF of the negated query (the caller's MAKE-ACTION-QUERY). */
+  is the CNF of the negated query (the caller's MAKE-ACTION-QUERY). */
   BOL Ask(const SatClause* query_neg, ISC count, IUD universe) const;
   /* Clauses currently in the KB (count = kb_count_). */
   const SatClause* Clauses() const;
 };
 
 /* Fig 7.22 SATPLAN. Time-unindexed predicate atoms 0..atom_count-1
- * (atom_count <= 6); action a has preconditions `pre` and effects `add`
- * (precondition masks of 1-2 bits are the contract — more premises need
- * extra CNF clauses the world must build itself). The horizon is t_max:
- * the goal is asserted at each t = t_max down to 0 until satisfiable
- * (the book runs t upward; equivalent: the first t with a model is the
- * shortest plan). out_plan[t] = the action taken at step t
- * (atom_count actions, plan_cap >= t). */
+(atom_count <= 6); action a has preconditions `pre` and effects `add`
+(precondition masks of 1-2 bits are the contract — more premises need
+extra CNF clauses the world must build itself). The horizon is t_max:
+the goal is asserted at each t = t_max down to 0 until satisfiable
+(the book runs t upward; equivalent: the first t with a model is the
+shortest plan). out_plan[t] = the action taken at step t
+(atom_count actions, plan_cap >= t). */
 struct SatPlanAction {
   IUD pre;
   IUD add;
@@ -334,8 +333,8 @@ BOL SatPlan(const SatPlanProblem* problem, ISC t_max, IUD* model_out,
            IUC* out_plan, ISC plan_cap);
 
 /* Fig 7.20 HYBRID-WUMPUS-AGENT on the 2x2 grid (the book's 4x4 world runs
- * out of the 64-symbol universe once times are indexed; 2x2 keeps the full
- * time-indexed KB at t <= 5). Actions: */
+out of the 64-symbol universe once times are indexed; 2x2 keeps the full
+time-indexed KB at t <= 5). Actions: */
 static const IUC kWmpForward = 0;
 static const IUC kWmpLeft = 1;
 static const IUC kWmpRight = 2;
@@ -355,11 +354,11 @@ struct WumpusPercept {
 };
 
 /* The agent holds the time-indexed definite-clause KB (OK, W, Stench_t,
- * Breeze_t, Glitter_t, HaveArrow_t, At(x,y,t)) and drives the book's action
- * selection: grab-and-climb on glitter, route to an unvisited safe square,
- * shoot possible wumpus squares, or retreat. PLAN-ROUTE is SearchBFS over
- * the grid restricted to `allowed` squares. */
-struct THybridWumpusAgent {
+Breeze_t, Glitter_t, HaveArrow_t, At(x,y,t)) and drives the book's action
+selection: grab-and-climb on glitter, route to an unvisited safe square,
+shoot possible wumpus squares, or retreat. PLAN-ROUTE is SearchBFS over
+the grid restricted to `allowed` squares. */
+struct HybridWumpusAgent {
   Autoject kb_mem_;
   ISC kb_count_;
   ISC kb_cap_;
@@ -374,22 +373,22 @@ struct THybridWumpusAgent {
   BOL done_;
   IUC plan_[32];  //< pending action sequence
   ISC plan_count_;
-  THybridWumpusAgent();
-  ~THybridWumpusAgent();
+  HybridWumpusAgent();
+  ~HybridWumpusAgent();
   BOL Init(ISC kb_cap);
   /* TELL the t_-th percept facts and run the fixpoint chain. */
   void TellPercept(const WumpusPercept* p, BOL moved, IUC x, IUC y);
   /* The book's HYBRID-WUMPUS-AGENT step: TELL the t-th percept, re-plan,
-   * return the action. The world applies the action and hands back the
-   * resulting percept next call (x, y = the new square; moved = the agent
-   * entered a new square). */
+  return the action. The world applies the action and hands back the
+  resulting percept next call (x, y = the new square; moved = the agent
+  entered a new square). */
   IUC Percept(const WumpusPercept* p, BOL moved, IUC x, IUC y);
   /* ASK(KB, OKx,y) — safe to move into (x, y)? */
   BOL Safe(IUC x, IUC y) const;
   /* ASK(KB, ¬Wx,y) — the wumpus is NOT at (x, y)? */
   BOL NotWumpus(IUC x, IUC y) const;
   /* PLAN-ROUTE: append the relative actions moving from `from` to one of
-   * `goals` through `allowed | goals` squares (SearchBFS). */
+  `goals` through `allowed | goals` squares (SearchBFS). */
   BOL Route(IUC from, IUD goals, IUD allowed);
   /* PLAN-SHOT: append the actions to shoot a possible wumpus square. */
   BOL PlanShot(IUC current, IUD possible, IUD safe);

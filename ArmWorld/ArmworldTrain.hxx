@@ -31,7 +31,7 @@ static void Help() {
       "  --report N      Print stats every N updates (default 25)\n"
       "  --help\n");
 }
-/** Evaluate: run the policy greedily (argmax) for K episodes, count reaches. */
+/* Evaluate: run the policy greedily (argmax) for K episodes, count reaches. */
 static void Evaluate(const TArmParams& params, ISC count, IUD seed,
     TLinearPolicy& policy, ISC episodes, FPC& mean_reward, IUD& reaches) {
   AArmGym gym(params, count, seed);
@@ -80,7 +80,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
   for (ISC i = 1; i < argc; ++i) {
     const CHA* flag = argv[i];
     if (strcmp(flag, "--help") == 0) { Help(); return 0; }
-    if (i + 1 >= argc) { fD_COUT(stderr,  << flag << ); return 2; }
+    if (i + 1 >= argc) { fD_COUT(stderr,  << flag << '\n'); return 2; }
     const CHA* value = argv[++i];
     if (strcmp(flag, "--updates") == 0) {
       IUD v; if (!ParseUInt(value, v) || v > 100000) return 2; updates = ISC(v);
@@ -100,7 +100,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
     } else { fD_COUT(stderr, , flag); return 2; }
   }
   TArmParams params;
-  D_COUT("updates=" << updates <<  << horizon <<  << envs <<  << epochs <<  << (unsigned long)seed <<);
+  D_COUT("updates=" << updates << " " << horizon << " " << envs << " " << epochs << " " << (unsigned long)seed << '\n');
   AArmGym gym(params, envs, seed);
   TLinearPolicy policy(AArmEnv::ObsLength, gym.ActionCount(), seed);
   policy.SetLearnRate(lr);
@@ -108,7 +108,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
   // Baseline evaluation.
   FPC base_reward = 0; IUD base_reaches = 0;
   Evaluate(params, envs, seed, policy, 4, base_reward, base_reaches);
-  D_COUT("base_reward=" << (double)base_reward <<  << (int)base_reaches <<);
+  D_COUT("base_reward=" << (double)base_reward << " " << (int)base_reaches << '\n');
   FPD started = Seconds();
   TPPOStats stats = {};
   FPC best_reward = base_reward;
@@ -137,7 +137,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
   FPC final_reward = 0; IUD final_reaches = 0;
   Evaluate(params, envs, seed + IUD(updates) * 7919, policy, 8,
       final_reward, final_reaches);
-  D_COUT("final_reward=" << (double)final_reward <<  << (int)final_reaches <<  << (int)(8 * envs) <<);
-  D_COUT("final_reaches=" << final_reaches > 0 ? 1 : 0 <<);
+  D_COUT("final_reward=" << (double)final_reward << " " << (int)final_reaches << " " << (int)(8 * envs) << '\n');
+  D_COUT("final_reaches=" << final_reaches > 0 ? 1 : 0 << '\n');
   return 0;
 }

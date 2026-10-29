@@ -10,9 +10,6 @@
 //   4. learning: Policy(Net) / Gym / PPO
 //   5. agent tiers + metrics
 //
-// No-stdlib: this rollup is pure headers; the only non-header surface is the
-// C library <math.h> (sin/cos for the toy Gym), matching Tensor.hxx's pragmatic
-// choice. Guarded so an accidental second include is a no-op.
 #pragma once
 #ifndef IGEEK_PACKAGE
 #define IGEEK_PACKAGE 1

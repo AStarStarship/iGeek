@@ -1,5 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#include "TVec.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_ENEMYEDITORMODE
@@ -12,7 +13,7 @@ class ModeEditorEnemy : public ModeEditor {
   sf::Text cursor_text_;        //<
   sf::RectangleShape sidebar_,  //<
       selector_rect_;           //<
-  sf::IntRect texture_rect_;    //<
+  _::ISC4 texture_rect_;    //<
   ISN type_, amount_,           //<
       time_to_spawn_;           //<
   FPC distance_max_;          //<
