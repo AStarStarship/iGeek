@@ -2,7 +2,7 @@
 
 #include "Card.h"
 #if SEAM >= IGEEK_CARD
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* Returns the suit name for the given suit index (1-4) and culture. */
@@ -103,5 +103,5 @@ void Card::SetCulture(SuitCulture culture) {
 void Card::SetSuitName() { suit_name_ = SuitNameFor(suit_value_, culture_); }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

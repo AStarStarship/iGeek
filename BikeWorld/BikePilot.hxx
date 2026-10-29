@@ -5,7 +5,7 @@
 #include "BikePilot.h"
 #include "VehicleRoute.hxx"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 TBikeControl ABikePilot::Control(const TileMap& map,
     const TVehicleRoute& route, const TBikeState& s, const TBikeParams& p,
     FPD cruise_speed, FPD dt) {
@@ -75,6 +75,6 @@ TBikeControl ABikePilot::Control(const TileMap& map,
   }
   return control;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

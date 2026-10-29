@@ -1,10 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
 #include <_Config.h>
-
-#include "c_iGeek.h"
-
-namespace _ {
+#include "iGeek.h"
+namespace iGeek {
 
 Cell_IGA::Cell_IGA() { add(new LeukocyteWar()); }
 
@@ -20,5 +17,4 @@ static void Cell_IGA::main(AString[] args) {
   window.setVisible(true);
 }
 
-}  //< namespace _
-}
+}  //< namespace iGeek

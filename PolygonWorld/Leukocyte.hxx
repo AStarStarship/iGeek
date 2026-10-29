@@ -2,9 +2,9 @@
 
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 Leukocyte::Leukocyte() {}
 
-}  //< namespace _
+} //< namespace iGeek
 }

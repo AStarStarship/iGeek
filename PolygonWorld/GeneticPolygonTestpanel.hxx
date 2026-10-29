@@ -2,7 +2,7 @@
 
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 GeneticPolygonTestPanel::GeneticPolygonTestPanel() {
   setPreferredSize(new Dimension(panelWidth, panelHeight));
@@ -175,5 +175,5 @@ void TimerAction::actionPerformed(ActionEvent e) {
   }
 }
 
-}  //< namespace _
+} //< namespace iGeek
 }

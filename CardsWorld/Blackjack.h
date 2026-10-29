@@ -6,7 +6,7 @@
 #include <_Config.h>
 #if SEAM >= IGEEK_BLACKJACK
 #include "Dealer.h"
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* The player's action in a round of Blackjack. */
@@ -103,6 +103,6 @@ class Blackjack {
 };
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

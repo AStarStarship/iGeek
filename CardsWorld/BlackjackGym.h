@@ -6,7 +6,7 @@
 #if SEAM >= IGEEK_BLACKJACKGYM
 #include "Blackjack.h"
 #include "../Tensor.h"
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* A vectorized Blackjack environment for PPO training.
@@ -69,7 +69,7 @@ class BlackjackGym {
   FPC last_batch_reward_;
 };
 
-}  // namespace CardsWorld
-}  // namespace _
+}  //< namespace CardsWorld
+} //< namespace iGeek
 #endif
 #endif

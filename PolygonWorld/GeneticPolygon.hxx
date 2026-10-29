@@ -4,7 +4,7 @@
 
 #include "geneticpolygon.h"
 
-namespace _ {
+namespace iGeek {
 
 Color GeneticPolygon::getDefaultColor(ISC numPoints) {
   switch (numPoints) {
@@ -684,4 +684,4 @@ ISC GeneticPolygon::randomizeInt(ISC inputValue) {
   return newValue;
 }
 
-}  //< namespace _
+} //< namespace iGeek

@@ -5,7 +5,7 @@
 #include <math.h>
 #ifndef IGEEK_METRICS_IMPL
 #define IGEEK_METRICS_IMPL 1
-namespace _ {
+namespace iGeek {
 
 // --- BehaviorMetrics ------------------------------------------------------
 
@@ -208,5 +208,5 @@ FPC LinearProbe::Weight(ISC i) const {
   return weights_[i];
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

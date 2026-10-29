@@ -3,7 +3,7 @@
 #pragma once
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 class GeneticPolygonTestPanel : public JPanel {
  private:
@@ -63,5 +63,5 @@ class GeneticPolygonTestPanel : public JPanel {
   }
 };
 
-}  //< namespace _
+} //< namespace iGeek
 }

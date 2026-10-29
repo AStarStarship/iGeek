@@ -4,8 +4,11 @@
 // standalone, TToyGym overrides both). These base stubs satisfy the vtable
 // (StepBatch/ResetBatch are virtual) and do nothing — a bare Gym has no envs.
 #include "Gym.h"
+#pragma once
+#ifndef IGEEK_GYM_HXX
+#define IGEEK_GYM_HXX
 
-namespace _ {
+namespace iGeek {
 
 void Gym::StepBatch() {
   // Base does nothing; subclasses override.
@@ -26,4 +29,5 @@ void Gym::LoadDLL(const CHA* library) {
   (void)library;  // DLL loading is a later milestone.
 }
 
-}  // namespace _
+} //< namespace iGeek
+#endif

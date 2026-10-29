@@ -2,7 +2,7 @@
 
 #include "c_geneticpolygontestapp.h"
 
-namespace _ {
+namespace iGeek {
 
 GeneticPolygonTestApp::GeneticPolygonTestApp () {
   add (new GeneticPolygonTestPanel ());

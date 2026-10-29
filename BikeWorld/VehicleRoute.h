@@ -5,7 +5,7 @@
 #include "_Config.h"
 #include "../TileWorld/TileMap.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 enum { VehicleCellMax = 8192, VehicleRouteMax = 256 };
 struct TVehiclePoint
 {
@@ -46,6 +46,6 @@ class AVehiclePlanner
   void HeapRaise(ISC node);
   ISC HeapPop();
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

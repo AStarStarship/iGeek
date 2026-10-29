@@ -6,7 +6,7 @@
 #include "../Env.h"
 #include "../Gym.h"
 #include "../Tensor.h"
-namespace _ {
+namespace iGeek {
 
 /* Headless Pac-Man world for agent training.
    Ported from the SFML iGeekPacWorld game rules to the no-stdlib ASCIICrabs
@@ -151,5 +151,5 @@ class PacWorldGym : public Gym {
   ISC env_count_used_;
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

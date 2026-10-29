@@ -5,7 +5,7 @@
 // NOTE: do NOT include _Package.hxx here — that pulls in the whole ASCIICrabs
 // implementation and double-includes it in the single-TU world build. The POD
 // types (FPC/ISC/BOL/NILP) come from the config headers already on the build.
-namespace _ {
+namespace iGeek {
 
 /* Minimal row-major float tensor for RL policy math.
    NO standard library. This is the primitive the vectorized-batch policy
@@ -80,5 +80,5 @@ void TTensorScale(const TTensor& A, FPC s, TTensor& C);
 /* Row-wise log-sum-exp (stable), into out (rows x 1). */
 void TTensorRowLogSumExp(const TTensor& A, TTensor& out);
 
-}  // namespace _
+} //< namespace iGeek
 #endif

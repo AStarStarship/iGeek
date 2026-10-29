@@ -4,7 +4,7 @@
 
 #include "pathtrail.h"
 
-namespace _ {
+namespace iGeek {
 
 PathTrail::PathTrail() {
   trailColor = DefaultTrailColor;
@@ -98,5 +98,5 @@ AString PathTrail::ToString() {
   return returnString;
 }
 
-}  //< namespace _
+} //< namespace iGeek
 }

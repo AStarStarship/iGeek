@@ -3,7 +3,7 @@
 #ifndef IGEEK_POLICY_DECL
 #define IGEEK_POLICY_DECL
 #include "Tensor.h"
-namespace _ {
+namespace iGeek {
 
 /* A transformer "block": MHSA + FFN, each with residual + layernorm.
    POD of TTensor weights (no logic; the forward logic is in PolicyNet.hxx). */
@@ -87,7 +87,7 @@ class TPolicy {
   FPC lr_;
 };
 
-/* Concrete MUSE-style compact transformer policy (milestone M3/M4). Declared here
+/* Concrete compact transformer policy (milestone M3/M4). Declared here
    so the PPO loop can name it; implemented in PolicyNet.hxx once TTensor
    ops land. Kept out of this header's required surface so the interface
    compiles before the net does. */
@@ -123,5 +123,5 @@ class TTransformer : public TPolicy {
   void Build();                        //< Allocate + seed the weights (idempotent).
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

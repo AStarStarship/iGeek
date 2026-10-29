@@ -1,0 +1,13 @@
+# __Seams.yaml — SudokuWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py __Seams.yaml
+engine: ../../SudokuWorld/SudokuWorld.hxx
+seams:
+  - name: IGEEK_SUDOKUWORLD_CORE
+    depends: [IGEEK_CORE]
+    file: 01.Core.hxx
+    label: "Testing SudokuWorld core..."
+  - name: IGEEK_SUDOKUWORLD_RELEASE
+    depends: [IGEEK_SUDOKUWORLD_CORE]
+    file: 02.Release.hxx
+    label: "Testing SudokuWorld release..."

@@ -2,7 +2,7 @@
 #ifndef IGEEK_AI_AGENT_T
 #define IGEEK_AI_AGENT_T 1
 
-namespace _ {
+namespace iGeek {
 
 // The comments below have code taken from the book Artificial Intelligence
 // (3rd Edition) and we're porting the code into our toolkit for research
@@ -1718,5 +1718,5 @@ return S
 @endcode
 */
 
-}  //< namespace _
+} //< namespace iGeek
 #endif

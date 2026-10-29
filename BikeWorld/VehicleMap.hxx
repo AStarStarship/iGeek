@@ -5,7 +5,7 @@
 #include "BikePhysics.hxx"
 #include "../TileWorld/TileMap.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 /** Tile types are material labels; collision remains Tile's independent flag. */
 enum {
   VehicleAsphalt = 100, VehicleGravel, VehicleIce, VehicleGrass,
@@ -91,6 +91,6 @@ inline FPD TVehicleRange(const TileMap& map, FPD x, FPD y, FPD angle,
                 0, contact);
   return contact * range;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

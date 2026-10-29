@@ -1,17 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-// Agent.hxx — implementations of the three generic iGeek agent tiers
-// (AgentBase contract + TTableAgent / TReflexAgent / TModelAgent).
-//
-// batch/plan-informed (iGeek AGENT_PLAN.md 3.3): these are the world-agnostic
-// Percept->Action + state tiers. No world-specific stimulus knowledge lives
-// here — a world binds percepts/actions to its own tokens.
 #include "Agent.h"
 #include "AgentState.hxx"
 #ifndef IGEEK_AGENT_IMPL
 #define IGEEK_AGENT_IMPL 1
-namespace _ {
-
-// --- TTableAgent ----------------------------------------------------------
+namespace iGeek {
 
 TTableAgent::TTableAgent(ISC action_count, ISC history_len, ISC percept_len)
     : action_count_(action_count < 1 ? 1 : action_count),
@@ -235,5 +227,5 @@ ISC TModelAgent::ActionCount() const {
   return action_count_;
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

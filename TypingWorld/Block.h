@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_BLOCK_DECL
-#define TYPECRAFT_BLOCK_DECL
+#ifndef TYPINGWORLD_BLOCK_DECL
+#define TYPINGWORLD_BLOCK_DECL
 #include "Item.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 /* A MineCraft block that may contain items when it breaks.
 When you break a Block in MineCraft, it may give you zero or more Item(s)
@@ -31,5 +31,5 @@ class Block : public Item {
   Array<Item*>* items_;  //< Items contained in this block.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

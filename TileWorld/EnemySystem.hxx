@@ -1,35 +1,26 @@
 // Copyright AStarship <https://astarship.net>.
-#include "EnemySystem.h"
+#include "stdafx.h"
+//
+#include "enemy_system.h"
 
-TileWorld::EnemySystem::EnemySystem(_::ISC capacity)
-    : capacity_(capacity < 1 ? 1 : capacity), count_(0) {
-  enemies_ = new TileWorld::Enemy*[capacity_](NILP);
-}
+EnemySystem::EnemySystem(_::Array<Enemy*>& active_enemies_,
+                         _::ADic<_::AString, sf::Texture>& textures)
+    : textures(textures), active_enemies_(active_enemies_) {}
 
-TileWorld::EnemySystem::~EnemySystem() {
-  for (_::ISC i = 0; i < capacity_; i++) {
-    if (enemies_[i] != NILP) delete enemies_[i];
-  }
-  delete[] enemies_;
-}
+EnemySystem::~EnemySystem() {}
 
-// PORT-NOTE: the original switched on EnemyTypes::RAT and pushed a new Rat into
-// a shared array; the headless version allocates into its own fixed array.
-// The "unknown type" branch printed an error via std::cout; here it returns -1.
-_::ISC TileWorld::EnemySystem::CreateEnemy(const _::ISM type, const _::FPC xPos,
-                                           const _::FPC yPos) {
+void EnemySystem::CreateEnemy(const short type, const float xPos,
+                              const float yPos) {
   switch (type) {
     case EnemyTypes::RAT:
-      if (count_ >= capacity_) return -1;
-      enemies_[count_] = new TileWorld::Enemy(xPos, yPos);
-      return count_++;
+      active_enemies_.Push(new Rat(xPos, yPos, textures["RAT1_SHEET"]));
+      break;
     default:
-      return -1;
+      std::cout << "\nError: EnemySystem::CreateEnemy Type does not exist!";
+      break;
   }
 }
 
-// PORT-NOTE: the original EnemySystem::Update was empty (each enemy was updated
-// by the game state); kept as-is.
-void TileWorld::EnemySystem::Update(const _::FPC& dt) {
-  (void)dt;
-}
+void EnemySystem::Update(const float& dt) {}
+
+void EnemySystem::Render(sf::RenderTarget* target) {}

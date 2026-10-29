@@ -6,7 +6,7 @@
 #include <_Config.h>
 #if SEAM >= IGEEK_BLACKJACKENV
 #include "Blackjack.h"
-namespace _ {
+namespace iGeek {
 
 /* A Blackjack environment for training agents.
 A BlackjackEnv wraps the CardsWorld::Blackjack game engine and exposes the
@@ -82,6 +82,6 @@ class BlackjackEnv {
   BOL on_;                         //< Whether the env is running.
 };
 
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

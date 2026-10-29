@@ -5,7 +5,7 @@
 #ifndef INCLUDED_KABUKI_AI_MAZEAGENT
 #define INCLUDED_KABUKI_AI_MAZEAGENT 1
 
-namespace _ {
+namespace iGeek {
 
 // Function pointer for getting static mazes and their height.
 typedef const CHA** (*MazeLoader)(ISC& height);
@@ -157,6 +157,6 @@ struct MazeAgent {
 ISC PolicyPilotManual(MazeAgent* agent);
 ISC PolicyPilotDepthFirstRoundRobin(MazeAgent* agent);
 
-}  // namespace _
+} //< namespace iGeek
 
 #endif  //< #ifndef INCLUDED_KABUKI_AI_MAZEAGENT

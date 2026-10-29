@@ -5,7 +5,7 @@
 #include "BikeWorld.h"
 #include "BikePilot.hxx"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 const CHA* TBikeStatusName(ISC status) {
   const CHA* names[] = {"running", "goal", "collision", "fallen", "timeout",
                        "invalid", "blocked", "stopped"};
@@ -139,6 +139,6 @@ void ABikeEnv::Observe() {
   obs_[19] = bike_.supported ? 1 : 0;
   obs_[20] = FPC(FPD(metrics_.frames) / FPD(MaxFrames));
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

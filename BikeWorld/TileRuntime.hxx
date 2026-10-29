@@ -10,7 +10,7 @@
 #include "../TileWorld/Entity.hxx"
 #include "../TileWorld/Tile.hxx"
 #include "../TileWorld/TileRegular.hxx"
-#include "../TileWorld/TileSpawnerEnemy.hxx"
+#include "../TileWorld/TileSpawner.hxx"
 #include "../TileWorld/TileMap.hxx"
 #endif
 #endif

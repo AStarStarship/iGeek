@@ -3,7 +3,7 @@
 #pragma once
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 class GeneticPolygonPanel : public JPanel {
   static const ISC defaultMargin = 30;
@@ -24,5 +24,5 @@ class GeneticPolygonPanel : public JPanel {
   GeneticPolygon gPoly;
 };
 
-}  //< namespace _
+} //< namespace iGeek
 }

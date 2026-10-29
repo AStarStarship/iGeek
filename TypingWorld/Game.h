@@ -2,13 +2,13 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_GAME_DECL
-#define TYPECRAFT_GAME_DECL
+#ifndef TYPINGWORLD_GAME_DECL
+#define TYPINGWORLD_GAME_DECL
 
 #include "Entity.h"
 #include "World.h"
 
-namespace Typecraft {
+namespace TypingWorld {
 
 class Game {
  public:
@@ -24,5 +24,5 @@ class Game {
   World* world_;    //< The current world.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

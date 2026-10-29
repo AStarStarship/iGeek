@@ -29,7 +29,7 @@ void FrameUpdateHandler() { ScanKeyboard(); }
 ISN main() {
   ISN columns, rows;
 
-  cout << "Welcome to Typecraft!";
+  cout << "Welcome to TypingWorld!";
 
   while (1) {
     

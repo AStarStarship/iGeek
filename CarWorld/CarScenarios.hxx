@@ -4,7 +4,7 @@
 #define CRABS_CARWORLD_SCENARIOS_HXX
 #include "CarWorld2D.hxx"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 enum { CarStraight, CarCurves, CarObstacle, CarGravel, CarIce,
        CarUphill, CarDownhill, CarLaunch, CarIceCurves, CarScenarioCount };
 inline const CHA* TCarScenarioName(ISC scenario) {
@@ -46,6 +46,6 @@ inline BOL TCarScenarioBuild(TileMap& map, ISC scenario,
   // Margin for the square body envelope and non-curvature-constrained follower.
   return planner.Plan(map, initial.x, initial.y, 108.5, 32.5, 6.0, route);
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

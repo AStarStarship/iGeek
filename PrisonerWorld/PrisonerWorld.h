@@ -6,7 +6,7 @@
 #include "Env.h"
 #include "EnvGoal.h"
 #if SEAM >= CRABS_PRISONERWORLD
-namespace _ {
+namespace iGeek {
 /* Prisoner's Dilemma repeated-game environment for iGeek.
  * Two agents simultaneously choose Cooperate (0) or Defect (1).
  * Payoffs: T > R > P > S (Temptation > Reward > Punishment > Sucker).
@@ -111,6 +111,6 @@ class PrisonerEnv : public Env {
  */
 extern PrisonerEnv* PrisonerEnvPtr;
 
-}  // namespace _
+} //< namespace iGeek
 #endif  // SEAM >= CRABS_PRISONERWORLD
 #endif  // CRABS_PRISONERWORLD_H

@@ -2,7 +2,7 @@
 #pragma once
 #include "SchoolDegree.h"
 #if SEAM >= IGEEK_CORE
-namespace _ {
+namespace iGeek {
 
 SchoolDegree::SchoolDegree() {
 

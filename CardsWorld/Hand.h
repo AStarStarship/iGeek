@@ -6,7 +6,7 @@
 #include <_Config.h>
 #if SEAM >= IGEEK_HAND
 #include "CardStack.h"
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* A hand of cards in a playing card game.
@@ -28,6 +28,6 @@ class Hand : public CardStack {
 };
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

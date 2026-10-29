@@ -2,12 +2,12 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_WORLD_DECL
-#define TYPECRAFT_WORLD_DECL
+#ifndef TYPINGWORLD_WORLD_DECL
+#define TYPINGWORLD_WORLD_DECL
 #include "Chunk.h"
-namespace Typecraft {
+namespace TypingWorld {
 
-/* A Typecraft World.
+/* A TypingWorld World.
 All world's start out as a N x N Square Matrix. Once a player gets one maximum
 view distance from an unexplored Chunk, a new chunk is added onto the map.
 
@@ -83,5 +83,5 @@ class World {
       quad_[4];  //< The 4 Quadrant Chunks ordered like a Cartesian plane.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

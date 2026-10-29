@@ -1,0 +1,13 @@
+# __Seams.yaml — PrisonerWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py __Seams.yaml
+engine: ../../PrisonerWorld/PrisonerWorld.hxx
+seams:
+  - name: IGEEK_PRISONERWORLD_CORE
+    depends: [IGEEK_CORE]
+    file: 01.Core.hxx
+    label: "Testing PrisonerWorld core..."
+  - name: IGEEK_PRISONERWORLD_RELEASE
+    depends: [IGEEK_PRISONERWORLD_CORE]
+    file: 02.Release.hxx
+    label: "Testing PrisonerWorld release..."

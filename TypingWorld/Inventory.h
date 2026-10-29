@@ -2,11 +2,11 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_INVENTORY_H
-#define TYPECRAFT_INVENTORY_H
+#ifndef TYPINGWORLD_INVENTORY_H
+#define TYPINGWORLD_INVENTORY_H
 //
 #include "ItemGroup.h"
-namespace Typecraft {
+namespace TypingWorld {
 class Inventory {
  public:
   /* Constructs an Inventory with the given max size. */
@@ -34,5 +34,5 @@ class Inventory {
   ArX<ItemGroup*> items_;  //< An array of Inventory Items.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

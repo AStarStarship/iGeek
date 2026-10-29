@@ -4,7 +4,7 @@
 #define CRABS_BIKEWORLD_SCENARIOS_HXX
 #include "BikeWorld.hxx"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 enum {
   BikeStraight, BikeCurves, BikeObstacle, BikeGravel, BikeIce,
   BikeUphill, BikeDownhill, BikeLaunch, BikeScenarioCount
@@ -49,6 +49,6 @@ inline BOL TBikeScenarioBuild(TileMap& map, ISC scenario,
   // Extra planning margin covers the baseline follower's corner cutting.
   return planner.Plan(map, initial.x, initial.y, 108.5, 32.5, 5.0, route);
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

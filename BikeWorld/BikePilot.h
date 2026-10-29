@@ -5,7 +5,7 @@
 #include "BikePhysics.h"
 #include "VehicleRoute.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 /** Classical baseline controller, not a neural or LLM policy. Does not modify
  * vehicle state. Roll stabilization acts only through bounded steering.
  * Global-map routing and ideal contact state are explicit simulator inputs.
@@ -23,6 +23,6 @@ class ABikePilot
   FPD roll_target_ = 0, target_speed_ = 0;
   TVehicleGuide guide_;
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

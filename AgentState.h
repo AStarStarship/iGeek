@@ -4,8 +4,7 @@
 #define IGEEK_AGENTSTATE_DECL 1
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
-
-namespace _ {
+namespace iGeek {
 
 /* AgentState — the internal-state memory model for iGeek agents.
  *
@@ -78,5 +77,5 @@ class AgentState {
   ISC slot_count_;      //< Number of IUC slots (immutable).
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif

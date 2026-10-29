@@ -1,0 +1,12 @@
+# __Seams.yaml — SpaceWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py __Seams.yaml
+seams:
+  - name: IGEEK_SPACEWORLD_CORE
+    depends: [IGEEK_CORE]
+    file: 01.Core.hxx
+    label: "Testing SpaceWorld core..."
+  - name: IGEEK_SPACEWORLD_RELEASE
+    depends: [IGEEK_SPACEWORLD_CORE]
+    file: 02.Release.hxx
+    label: "Testing SpaceWorld release..."

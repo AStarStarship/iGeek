@@ -6,7 +6,7 @@
 #include "CarWorld2D.hxx"
 #include "../Gym.hxx"
 #if SEAM >= CRABS_CARWORLD
-namespace _ {
+namespace iGeek {
 ACarGym::ACarGym(const TileMap& map, const TVehicleRoute& route,
     const TCarState& initial, ISC count, IUD seed, ISC mode)
     : Gym("carworld"), seed_(seed), Mode(mode == CarActuatorActions ? mode : CarDriverActions) {
@@ -62,6 +62,6 @@ void ACarGym::StepBatch() {
     CopyObservation(i);
   }
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

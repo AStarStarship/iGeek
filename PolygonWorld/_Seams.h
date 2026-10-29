@@ -9,7 +9,7 @@
 #include "01_bar.h"
 #endif
 
-namespace _ {
+namespace iGeek {
 
 static const CHA* Test(const CHA* args) {
   return TTestTree<Foo
@@ -19,4 +19,4 @@ static const CHA* Test(const CHA* args) {
 #endif
                    >(seam_log, seam_end, args);
 }
-}  //< namespace _
+} //< namespace iGeek

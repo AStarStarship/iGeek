@@ -4,7 +4,7 @@
 #define CRABS_BIKEWORLD_H
 #include "BikePilot.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 enum {
   BikeRunning, BikeGoal, BikeCollision, BikeFallen, BikeTimeout,
   BikeInvalid, BikeBlocked, BikeStopped
@@ -52,6 +52,6 @@ class ABikeEnv
   IUD seed_;
   ISC status_ = BikeRunning;
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

@@ -9,7 +9,7 @@
 #include "Tensor.h"
 #include <math.h>
 
-namespace _ {
+namespace iGeek {
 
 /* --- Allocation -------------------------------------------------------- */
 
@@ -136,4 +136,4 @@ void TTensorRowLogSumExp(const TTensor& A, TTensor& out) {
   }
 }
 
-}  // namespace _
+} //< namespace iGeek

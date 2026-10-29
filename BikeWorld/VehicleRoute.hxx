@@ -5,7 +5,7 @@
 #include "VehicleRoute.h"
 #include "VehicleMap.hxx"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 TVehicleGuide TVehicleGuidance(const TVehicleRoute& route, FPD x, FPD y,
     FPD heading, FPD lookahead) {
   TVehicleGuide guide;
@@ -159,6 +159,6 @@ BOL AVehiclePlanner::Plan(const TileMap& map, FPD sx, FPD sy,
   }
   route.count = 0; return false;
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

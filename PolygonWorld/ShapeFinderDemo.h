@@ -3,7 +3,7 @@
 #pragma once
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 class LeukocyteWar : public JPanel,
                      public MouseListener,
@@ -81,5 +81,5 @@ class LeukocyteWar : public JPanel,
 
   void keyReleased(KeyEvent e);
 }
-}  //< namespace _
+} //< namespace iGeek
 }

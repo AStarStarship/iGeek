@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #include "ItemGroup.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 ItemGroup::ItemGroup(ISC max_size) {}
 
@@ -18,4 +18,4 @@ Item* ItemGroup::RemoveItem(ISC index) { return nullptr; }
 
 void Print() {}
 
-}  // namespace Typecraft
+}  //< namespace TypingWorld

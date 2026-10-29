@@ -2,12 +2,12 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef INCLUDED_TYPECRAFT_SERVER_DECL
-#define INCLUDED_TYPECRAFT_SERVER_DECL
+#ifndef INCLUDED_TYPINGWORLD_SERVER_DECL
+#define INCLUDED_TYPINGWORLD_SERVER_DECL
 #include "Block.h"
 #include "Entity.h"
 
-namespace Typecraft {
+namespace TypingWorld {
 
 // @cite: Comments are being learned and re-written from this source:
 // https://minecraft.gamepedia.com/Server.properties.
@@ -256,5 +256,5 @@ class Server {
  private:
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

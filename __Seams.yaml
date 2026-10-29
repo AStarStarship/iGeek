@@ -1,0 +1,55 @@
+# __Seams.yaml — ROOT: module list (build-up order).
+#
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h. Do not hand-edit the
+# ordering here without re-running SyncSeams.py; the module order defines
+# the contiguous global seam numbering.
+#
+# Regenerate: python3 Hatch/SyncSeams.py __Seams.yaml
+#
+project: iGeek
+mode: igeek
+release_module: TypingWorld
+
+modules:
+  - name: Core
+    folder: _Seams/Core
+    label: "Core module"
+  - name: MazeWorld
+    folder: _Seams/MazeWorld
+    label: "MazeWorld module"
+  - name: ArmWorld
+    folder: _Seams/ArmWorld
+    label: "ArmWorld module"
+  - name: BikeWorld
+    folder: _Seams/BikeWorld
+    label: "BikeWorld module"
+  - name: CarWorld
+    folder: _Seams/CarWorld
+    label: "CarWorld module"
+  - name: CardsWorld
+    folder: _Seams/CardsWorld
+    label: "CardsWorld module"
+  - name: Classical
+    folder: _Seams/Classical
+    label: "Classical module"
+  - name: PacWorld
+    folder: _Seams/PacWorld
+    label: "PacWorld module"
+  - name: PolygonWorld
+    folder: _Seams/PolygonWorld
+    label: "PolygonWorld module"
+  - name: PrisonerWorld
+    folder: _Seams/PrisonerWorld
+    label: "PrisonerWorld module"
+  - name: SpaceWorld
+    folder: _Seams/SpaceWorld
+    label: "SpaceWorld module"
+  - name: SudokuWorld
+    folder: _Seams/SudokuWorld
+    label: "SudokuWorld module"
+  - name: TileWorld
+    folder: _Seams/TileWorld
+    label: "TileWorld module"
+  - name: TypingWorld
+    folder: _Seams/TypingWorld
+    label: "TypingWorld module"

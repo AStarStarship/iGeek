@@ -2,7 +2,7 @@
 
 #include "Hand.h"
 #if SEAM >= IGEEK_HAND
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 Hand::Hand()
@@ -52,5 +52,5 @@ const CHA* Hand::Describe(CHA* buffer, ISC buffer_size) const {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

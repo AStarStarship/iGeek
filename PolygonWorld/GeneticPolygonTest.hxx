@@ -2,7 +2,7 @@
 
 #include <_Config.h>
 
-namespace _ {
+namespace iGeek {
 
 #include "c_geneticpolygontest.h"
 
@@ -18,4 +18,4 @@ static void main(Loom<> args) {
   window.setVisible(true);
 }
 
-}  //< namespace _
+} //< namespace iGeek

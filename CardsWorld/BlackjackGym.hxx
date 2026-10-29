@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #include "BlackjackGym.h"
 #if SEAM >= IGEEK_BLACKJACKGYM
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 BlackjackGym::BlackjackGym(ISC tables)
@@ -108,6 +108,6 @@ void BlackjackGym::StepBatch(const ISC* actions) {
   last_batch_reward_ = batch_reward;
 }
 
-}  // namespace CardsWorld
-}  // namespace _
+}  //< namespace CardsWorld
+} //< namespace iGeek
 #endif

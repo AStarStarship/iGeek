@@ -3,7 +3,7 @@
 #ifndef IGEEK_ENV_DECL
 #define IGEEK_ENV_DECL
 #include "EnvGoal.h"
-namespace _ {
+namespace iGeek {
 
 /* Base class for an iGeek world environment.
 
@@ -15,7 +15,7 @@ Migrated 2026-10-07 to the latest ASCIICrabs API:
     const-ISC* vs const-DTB* mismatch; `OpPush` undeclared) at
     ../ASCIICrabs/Room.hpp:297,310,332,341,348. The same blocker forced the
     card world's `BlackjackEnv` to be standalone. So the iGeek env/gym base
-    is standalone too; the Script2 "data node" role (storing percepts/actions
+    is standalone too; the ASCIICrabs Operand "data node" role (storing percepts/actions
     as Crabs datums) is opt-in per world, NOT the base class. Logged to
     ../ASCIICrabs/AGENT_PLAN.md.
   - `STA*` (dead type; in memory `const CHA*`) replaced with `const CHA*`.
@@ -64,5 +64,5 @@ Printer& PrintTo(Printer& p, const Env& env) {
   return p << "\nEnv";
 }
 
-}  // namespace _
+} //< namespace iGeek
 #endif

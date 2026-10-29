@@ -8,7 +8,7 @@
 #include "Deck.h"
 #include "Hand.h"
 #include "Player.h"
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 /* A dealer in a card game.
@@ -94,6 +94,6 @@ class Dealer {
 };
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

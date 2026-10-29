@@ -15,7 +15,7 @@
 #include "PolicyNet.hxx"  // for TPolicyLoss/TValueLoss + the Backward math shape
 #include <math.h>
 
-namespace _ {
+namespace iGeek {
 
 class TLinearPolicy : public TPolicy {
  public:
@@ -161,4 +161,4 @@ class TLinearPolicy : public TPolicy {
   void TLcgInit() {}
 };
 
-}  // namespace _
+} //< namespace iGeek

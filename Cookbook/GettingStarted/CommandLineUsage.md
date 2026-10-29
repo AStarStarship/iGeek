@@ -14,7 +14,7 @@ UI in the engine core.
 | `bikeworld` | `BikeWorld/` | 2D bicycle plant: classical reference driver drives 8 goals; prints goal count, frame count, simulated seconds, and wall seconds. |
 | `carworld` | `CarWorld/` | 2D car plant: classical driver drives 9 goals with the 4-tire friction model; same evidence format. |
 | `iGeekCardsWorld` / `blackjack_demo` / `blackjack_demo_tests` | `CardsWorld/` | Blackjack Gym. `iGeekCardsWorld` runs the seam test suite (card logic, Gym tensor ops, PolicyNet forward + gradcheck, PPO training to a learned rule) and exits 0 on pass; `blackjack_demo` is the demo run. |
-| `HBM` | `HBM/` | Hierarchical-reasoning Sudoku demo (solver research; prints puzzle + outcome). |
+| `HRM` | `Models/HRM/` | Hierarchical Reasoning Model — Sudoku solver research (H/L level recurrent processing; prints puzzle + outcome). |
 | `SudokuWorld` | `SudokuWorld/` | Standalone backtracking Sudoku demo (no RL). |
 
 Sanitizer builds are selected at configure time (see the next section); the

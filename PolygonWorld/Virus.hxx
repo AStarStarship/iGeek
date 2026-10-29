@@ -4,7 +4,7 @@
 
 #include "c_virus.h"
 
-namespace _ {
+namespace iGeek {
 
 Virus::Virus(FPD initX, FPD initY) {
   super();
@@ -293,5 +293,5 @@ void Virus::setDrawCircle(BOL newState) { ciricleVirus = newState; }
 void Virus::setCircleFillColor(Color newColor) { outlineColor = newColor; }
 void Virus::setFillCircle(BOL newState) { selected = newState; }
 
-}  //< namespace _
+} //< namespace iGeek
 }

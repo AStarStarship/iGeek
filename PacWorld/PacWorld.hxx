@@ -4,7 +4,7 @@
 #include "PacWorld.h"
 #include <math.h>
 
-namespace _ {
+namespace iGeek {
 
 /* Deterministic LCG (64-bit) — same family as the iGeek policy init. */
 IUD PacWorldEnv::NextRand() {
@@ -383,4 +383,4 @@ void PacWorldGym::StepBatch() {
   }
 }
 
-}  // namespace _
+} //< namespace iGeek

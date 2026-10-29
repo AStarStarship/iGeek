@@ -6,7 +6,7 @@
 #include "BikeWorld.hxx"
 #include "../Gym.hxx"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 ABikeGym::ABikeGym(const TileMap& map, const TVehicleRoute& route,
     const TBikeState& initial, ISC count, IUD seed)
     : Gym("bikeworld"), seed_(seed) {
@@ -52,6 +52,6 @@ void ABikeGym::StepBatch() {
     CopyObservation(i);
   }
 }
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

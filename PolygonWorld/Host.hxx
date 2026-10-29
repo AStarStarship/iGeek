@@ -4,7 +4,7 @@
 
 #include "host.h"
 
-namespace _ {
+namespace iGeek {
 
 Host::Host(ISC width, ISC height, ISC numberOfCells, ISC numberOfViruses) {
   setPreferredSize(new Dimension(width, height));
@@ -53,5 +53,5 @@ void Host::paintComponent(Graphics g) {
   viruses.draw(g);
 }
 
-}  //< namespace _
+} //< namespace iGeek
 }

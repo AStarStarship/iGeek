@@ -2,10 +2,10 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_RECIPE_H
-#define TYPECRAFT_RECIPE_H
+#ifndef TYPINGWORLD_RECIPE_H
+#define TYPINGWORLD_RECIPE_H
 #include "Item.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 /* A Crafting Table recipe.
 Recipes do not take up the entire crafting table. For this reason, the width and 
@@ -26,5 +26,5 @@ class Recipe : public Item {
   ItemType ingredients_[3][3];  //< The ingredients.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif

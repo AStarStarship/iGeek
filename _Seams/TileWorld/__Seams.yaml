@@ -1,0 +1,12 @@
+# __Seams.yaml — TileWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py __Seams.yaml
+seams:
+  - name: IGEEK_TILEWORLD_CORE
+    depends: [IGEEK_CORE]
+    file: 01.Core.hxx
+    label: "Testing TileWorld core..."
+  - name: IGEEK_TILEWORLD_RELEASE
+    depends: [IGEEK_TILEWORLD_CORE]
+    file: 02.Release.hxx
+    label: "Testing TileWorld release..."

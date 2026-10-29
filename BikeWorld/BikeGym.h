@@ -5,7 +5,7 @@
 #include "BikeWorld.h"
 #include "../Gym.h"
 #if SEAM >= CRABS_BIKEWORLD
-namespace _ {
+namespace iGeek {
 /** Actual iGeek Gym interface, with 1..GymEnvMax independent bike states.
  * Categorical actions select pilot speed commands; this is NOT an end-to-end
  * learned steering policy. ABikeEnv::StepControl exposes raw actuators instead.
@@ -36,6 +36,6 @@ class ABikeGym : public Gym
   IUD episodes_[GymEnvMax] = {}, seed_;
   void CopyObservation(ISC i);
 };
-}  //< namespace _
+} //< namespace iGeek
 #endif
 #endif

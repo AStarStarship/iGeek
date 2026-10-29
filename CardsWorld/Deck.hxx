@@ -2,7 +2,7 @@
 
 #include "Deck.h"
 #if SEAM >= IGEEK_DECK
-namespace _ {
+namespace iGeek {
 namespace CardsWorld {
 
 Deck::Deck(BOL deck_contains_jokers, ISC aces_are_high, SuitCulture culture)
@@ -77,5 +77,5 @@ const CHA* Deck::SuitString(ISC suit) const {
 }
 
 }  //< namespace CardsWorld
-}  //< namespace _
+} //< namespace iGeek
 #endif

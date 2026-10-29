@@ -1,9 +1,0 @@
-// Copyright AStarship <https://astarship.net>.
-
-// This file replaces the Script2-era _config.inl (module.cc config
-// section), which included <module_config.h> and defined the
-// original build flags (2014-2019, kabuki-toolkit, UTF-16LE,
-// Windows/MSVC).
-//
-// All configuration is now supplied by _Config.h (current
-// ASCIICrabs schema) and ASCIICrabs/_ConfigDefault.h.

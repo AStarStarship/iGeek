@@ -5,7 +5,7 @@
 #define IGEEK_SCHOOLCOURSE
 #include "SchoolCourse.h"
 #if SEAM >= IGEEK_CORE
-namespace _ {
+namespace iGeek {
 
 class SchoolCourse: public _::Operand {
 
@@ -23,6 +23,6 @@ class SchoolCourse: public _::Operand {
   ISC section_count_;   //< The number of different sections of this class.
 };
 
-}  // namespace _
+} //< namespace iGeek
 #endif
 #endif

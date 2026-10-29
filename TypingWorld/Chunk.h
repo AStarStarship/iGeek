@@ -2,11 +2,11 @@
 
 #pragma once
 #include <_Config.h>
-#ifndef TYPECRAFT_CHUNK_DECL
-#define TYPECRAFT_CHUNK_DECL
+#ifndef TYPINGWORLD_CHUNK_DECL
+#define TYPINGWORLD_CHUNK_DECL
 #include "Block.h"
 #include "Entity.h"
-namespace Typecraft {
+namespace TypingWorld {
 
 class Chunk {
  public:
@@ -43,5 +43,5 @@ class Chunk {
   //< The Block(s) in the Chunk.
 };
 
-}  //< namespace Typecraft
+}  //< namespace TypingWorld
 #endif
