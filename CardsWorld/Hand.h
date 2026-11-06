@@ -1,10 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
-#ifndef IGEEK_CARDSHAND_DECL
-#define IGEEK_CARDSHAND_DECL
+#ifndef _iGeekCardsWorldCoreHandH
+#define _iGeekCardsWorldCoreHandH
 #include <_Config.h>
-#if SEAM >= IGEEK_HAND
+#if _Seam >= _iGeekCardsWorldCore
 #include "CardStack.h"
 namespace iGeek {
 namespace CardsWorld {
@@ -24,10 +23,10 @@ class Hand : public CardStack {
   ISC DealTwoCards(CardStack& stock);
 
   /* Returns a one-line description of this hand. */
-  const CHA* Describe(CHA* buffer, ISC buffer_size) const;
+  const CHA* Describe(CHA* buffer, ISC buffer_size);
 };
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCore

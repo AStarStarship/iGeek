@@ -3,6 +3,7 @@
 // The TPPO loop resets the Gym at each rollout, so this is a short-horizon
 // learning signal, not full-episode reaching competence.
 #include "ArmGym.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "../PPO.hxx"
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,13 +16,13 @@ static FPD Seconds() {
   return FPD(time.tv_sec) + FPD(time.tv_nsec) * 1e-9;
 }
 static BOL ParseUInt(const CHA* text, IUD& value) {
-  if (text == NILP || *text == 0) return false;
+  if (text == _NilP || *text == 0) return false;
   for (const CHA* p = text; *p; ++p) if (*p < '0' || *p > '9') return false;
-  value = IUD(strtoull(text, NILP, 10));
+  value = IUD(strtoull(text, _NilP, 10));
   return value > 0;
 }
 static void Help() {
-  D_COUT(
+  _DROut(
       "  --updates N     PPO training updates (default 500)\n"
       "  --horizon N     Steps per rollout (default 128)\n"
       "  --envs N        Parallel environments (default 4, max 8)\n"
@@ -32,7 +33,7 @@ static void Help() {
       "  --help\n");
 }
 /* Evaluate: run the policy greedily (argmax) for K episodes, count reaches. */
-static void Evaluate(const TArmParams& params, ISC count, IUD seed,
+static void Evaluate(TArmParams& params, ISC count, IUD seed,
     TLinearPolicy& policy, ISC episodes, FPC& mean_reward, IUD& reaches) {
   AArmGym gym(params, count, seed);
   FPC total_reward = 0;
@@ -54,9 +55,9 @@ static void Evaluate(const TArmParams& params, ISC count, IUD seed,
           obs.At(i, j) = gym.Observations()[i * AArmEnv::ObsLength + j];
       policy.Forward(obs, logits, values);
       for (ISC i = 0; i < count; ++i) {
-        ISC best = 0; FPC best_logit = logits.AtC(i, 0);
+        ISC best = 0; FPC best_logit = logits.At(i, 0);
         for (ISC a = 1; a < A; ++a)
-          if (logits.AtC(i, a) > best_logit) { best_logit = logits.AtC(i, a); best = a; }
+          if (logits.At(i, a) > best_logit) { best_logit = logits.At(i, a); best = a; }
         gym.Actions()[i] = best;
       }
       gym.StepBatch();
@@ -72,7 +73,7 @@ static void Evaluate(const TArmParams& params, ISC count, IUD seed,
 // CLI PPO training run for the 2-link arm (converted from a standalone ISC
 // main() — now a callable). Not pulled by the test seam (the test suite has
 // its own PpoSmoke()); kept available for a future train-tool seam. Returns 0
-// on success, 2 on a bad flag. (D_COUT/fD_COUT kept as legacy debt.)
+// on success, 2 on a bad flag. (_DROut/fD_COUT kept as legacy debt.)
 ISC RunTrain(ISC argc, CHA** argv) {
   ISC updates = 500, horizon = 128, envs = 4, epochs = 4, report = 25;
   IUD seed = 7;
@@ -91,7 +92,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
     } else if (strcmp(flag, "--seed") == 0) {
       if (!ParseUInt(value, seed)) return 2;
     } else if (strcmp(flag, "--lr") == 0) {
-      lr = FPC(strtof(value, NILP));
+      lr = FPC(strtof(value, _NilP));
       if (lr <= 0 || lr > 0.1f) return 2;
     } else if (strcmp(flag, "--epochs") == 0) {
       IUD v; if (!ParseUInt(value, v) || v > 32) return 2; epochs = ISC(v);
@@ -100,7 +101,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
     } else { fD_COUT(stderr, , flag); return 2; }
   }
   TArmParams params;
-  D_COUT("updates=" << updates << " " << horizon << " " << envs << " " << epochs << " " << (unsigned long)seed << '\n');
+  _DROut("updates=" << updates << " " << horizon << " " << envs << " " << epochs << " " << (unsigned long)seed << '\n');
   AArmGym gym(params, envs, seed);
   TLinearPolicy policy(AArmEnv::ObsLength, gym.ActionCount(), seed);
   policy.SetLearnRate(lr);
@@ -108,15 +109,15 @@ ISC RunTrain(ISC argc, CHA** argv) {
   // Baseline evaluation.
   FPC base_reward = 0; IUD base_reaches = 0;
   Evaluate(params, envs, seed, policy, 4, base_reward, base_reaches);
-  D_COUT("base_reward=" << (double)base_reward << " " << (int)base_reaches << '\n');
+  _DROut("base_reward=" << (double)base_reward << " " << (int)base_reaches << '\n');
   FPD started = Seconds();
   TPPOStats stats = {};
   FPC best_reward = base_reward;
   IUD best_reaches = base_reaches;
   for (ISC update = 1; update <= updates; ++update) {
     stats = trainer.TrainStep();
-    if (!isfinite(stats.policy_loss_) || !isfinite(stats.value_loss_) ||
-        !isfinite(stats.entropy_)) {
+    if (!iGeek::IsFinite(stats.policy_loss_) || !iGeek::IsFinite(stats.value_loss_) ||
+        !iGeek::IsFinite(stats.entropy_)) {
       fD_COUT(stderr, , update);
       return 1;
     }
@@ -129,7 +130,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
         best_reaches = eval_reaches;
       }
       FPD wall = Seconds() - started;
-      D_COUT("update=" << update << " updates=" << updates << " eval_reward=" << (double)stats.policy_loss_ << " reaches=" << (double)stats.value_loss_ << " best=" << (double)stats.policy_loss_ << " wall_s=" << (double)stats.value_loss_ << " fps=" << 1.0 << "\n");
+      _DROut("update=" << update << " updates=" << updates << " eval_reward=" << (double)stats.policy_loss_ << " reaches=" << (double)stats.value_loss_ << " best=" << (double)stats.policy_loss_ << " wall_s=" << (double)stats.value_loss_ << " fps=" << 1.0 << "\n");
       fflush(stdout);
     }
   }
@@ -137,7 +138,7 @@ ISC RunTrain(ISC argc, CHA** argv) {
   FPC final_reward = 0; IUD final_reaches = 0;
   Evaluate(params, envs, seed + IUD(updates) * 7919, policy, 8,
       final_reward, final_reaches);
-  D_COUT("final_reward=" << (double)final_reward << " " << (int)final_reaches << " " << (int)(8 * envs) << '\n');
-  D_COUT("final_reaches=" << final_reaches > 0 ? 1 : 0 << '\n');
+  _DROut("final_reward=" << (double)final_reward << " " << (int)final_reaches << " " << (int)(8 * envs) << '\n');
+  _DROut("final_reaches=" << final_reaches > 0 ? 1 : 0 << '\n');
   return 0;
 }

@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_PHYSICS_H
-#define CRABS_BIKEWORLD_PHYSICS_H
-#include "_Config.h"
-#if SEAM >= CRABS_BIKEWORLD
+#ifndef _iGeekBikeWorldPhysicsH
+#define _iGeekBikeWorldPhysicsH
+#include <_Config.h>
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
 /** Local contact material. Slopes are dz/dx and dz/dy, not angles. */
 struct TVehicleSurface
@@ -40,9 +40,9 @@ struct alignas(ACPUCacheLineSize) TBikeState
  * @return false for invalid input; state is untouched on invalid input.
  * @pre dt is finite and in (0,0.01]; caller handles collisions separately.
  */
-BOL TBikeStep(TBikeState& bike, const TBikeParams& params,
-              const TBikeControl& control, const TVehicleSurface& front,
-              const TVehicleSurface& rear, FPD dt);
+BOL TBikeStep(TBikeState& bike, TBikeParams& params,
+              TBikeControl& control, TVehicleSurface& front,
+              TVehicleSurface& rear, FPD dt);
 } //< namespace iGeek
 #endif
 #endif

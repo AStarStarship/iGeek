@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_ROOM_H
-#define CRABS_CARWORLD_ROOM_H
+#ifndef _iGeekCarWorldRoomH
+#define _iGeekCarWorldRoomH
 #include "CarWorld2D.h"
 #include "../../ASCIICrabs/Room.hpp"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 
 enum { CarRoomAutopilot, CarRoomManual };
@@ -38,14 +38,14 @@ class ACarRoom : public TCarRoomBase
 {
  public:
   explicit ACarRoom(ACarEnv& env);
-  BOL SetCommand(const TCarRoomCommand& command);
+  BOL SetCommand(TCarRoomCommand& command);
   const Op* Star(CHC index, Crabs* crabs) override;
-  const TCarRoomReply& Reply() const { return reply_; }
+  TCarRoomReply& Reply() { return reply_; }
  private:
   ACarEnv& env_;
   TCarRoomReply reply_;
-  static BOL Valid(const TCarRoomCommand& command);
-  BOL ReadCommand(TCarRoomCommand& command) const;
+  static BOL Valid(TCarRoomCommand& command);
+  BOL ReadCommand(TCarRoomCommand& command);
   void Snapshot(ISC mode, FPC reward);
 };
 } //< namespace iGeek

@@ -1,14 +1,17 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_GYM_HXX
-#define CRABS_CARWORLD_GYM_HXX
+#ifndef _iGeekCarWorldCarGymHXX
+#define _iGeekCarWorldCarGymHXX
+#include <_Config.h>
 #include "CarGym.h"
 #include "CarWorld2D.hxx"
 #include "../Gym.hxx"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
-ACarGym::ACarGym(const TileMap& map, const TVehicleRoute& route,
-    const TCarState& initial, ISC count, IUD seed, ISC mode)
+using namespace ::_;
+
+ACarGym::ACarGym(TileMap& map, TVehicleRoute& route,
+    TCarState& initial, ISC count, IUD seed, ISC mode)
     : Gym("carworld"), seed_(seed), Mode(mode == CarActuatorActions ? mode : CarDriverActions) {
   env_count_ = count < 1 ? 1 : count > GymEnvMax ? GymEnvMax : count;
   obs_len_ = ACarEnv::ObsLength;
@@ -17,15 +20,15 @@ ACarGym::ACarGym(const TileMap& map, const TVehicleRoute& route,
   rewards_ = reward_storage_; terminals_ = terminal_storage_; action_mask_ = mask_storage_;
   for (ISC i = 0; i < env_count_; ++i) {
     cars_[i] = new ACarEnv(map, route, initial, seed_ + IUD(i) * 0x9E37u);
-    envs_[i] = NILP;
+    envs_[i] = _NilP;
   }
-  CopyStr(manifest_.name, ManifestNameLen, "carworld");
-  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  TSPrint(manifest_.name, ISW(ManifestNameLen), "carworld");
+  TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0");
   manifest_.kind = ManifestKindEnv;
   manifest_.domain = ManifestDomainRobotics;
-  CopyStr(manifest_.description, ManifestDescriptionLen,
+  TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
           "2D car driving with classical driver and MPC");
-  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
   manifest_.reward_low = FPC(-1.0);
   manifest_.reward_high = FPC(1.0);
   manifest_.reward_higher_is_better = true;
@@ -33,9 +36,9 @@ ACarGym::ACarGym(const TileMap& map, const TVehicleRoute& route,
   manifest_.obs_count = obs_len_;
   manifest_.action_count = action_count_;
   manifest_.max_episode_steps = ACarEnv::MaxFrames;
-  manifest_.env_count_max = GymEnvMax;
-  CopyStr(manifest_.world_name, ManifestWorldLen, "CarWorld");
-  manifest_.seam_number = IGEEK_CARWORLD_CORE;
+  manifest_.environment_count_max = GymEnvMax;
+  TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "CarWorld");
+  manifest_.seam_number = _iGeekCarWorldCore;
   manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
@@ -80,6 +83,7 @@ void ACarGym::StepBatch() {
     CopyObservation(i);
   }
 }
-} //< namespace iGeek
-#endif
-#endif
+
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCarWorldCore
+#endif  //< _iGeekCarWorldCarGymHXX

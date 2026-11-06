@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_BAYES_T
-#define IGEEK_CLASSICAL_BAYES_T 1
+#ifndef _iGeekClassicalBayesH
+#define _iGeekClassicalBayesH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -155,7 +155,7 @@ struct BaysNet {
   BOL Init(ISC var_count, ISC parent_cap, ISC ppt_cap);
   BOL TellVar(ISC var, const ISC* parents, ISC parent_count, const FPC* ppt);
   /* P(var=value | parent_values) — parent_values indexed by parent order. */
-  FPC P(ISC var, IUC value, const IUC* parent_values) const;
+  FPC P(ISC var, IUC value, const IUC* parent_values);
 };
 
 /* Evidence item (Fig 14.9 'e'). */
@@ -167,7 +167,7 @@ struct BaysEv {
 /* All inference answers are P(query_var = 1 | evidence). */
 
 /* Fig 14.9 ENUMERATION-ASK: exact, recursive ENUMERATE-ALL over the variable order. */
-FPC BaysEnumerate(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysEnumerate(BaysNet& bn, ISC query_var, const BaysEv* ev,
                     ISC ev_n);
 
 /* Fig 14.11 ELIMINATION-ASK: variable elimination with join and sum-out
@@ -188,26 +188,26 @@ struct BayesInfer {
   BayesInfer();
   ~BayesInfer();
   BOL Init(ISC var_count, IUD cells_cap);
-  FPC Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev, ISC ev_n);
+  FPC Ask(BaysNet& bn, ISC query_var, const BaysEv* ev, ISC ev_n);
 };
 
 /* Fig 14.13 PRIOR-SAMPLE: one sample into the caller array. */
-FPC BaysSample(const BaysNet& bn, IUD seed, IUC* out_event);
+FPC BaysSample(BaysNet& bn, IUD seed, IUC* out_event);
 
 /* Fig 14.14 REJECTION-SAMPLING: N samples, fixed seed. */
-FPC BaysReject(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysReject(BaysNet& bn, ISC query_var, const BaysEv* ev,
                  ISC ev_n, ISC n_samples, IUD seed);
 
 /* Fig 14.15 LIKELIHOOD-WEIGHTING: N weighted samples, fixed seed. */
-FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysLw(BaysNet& bn, ISC query_var, const BaysEv* ev,
              ISC ev_n, ISC n_samples, IUD seed);
 
 /* Fig 14.16 GIBBS-ASK: N full cycles over the nonevidence variables Z
 (query included, per the figure), fixed seed. A draw is counted after
 every single-variable resample (the figure's placement of the N[x]
 increment), so the estimate averages N * |Z| draws. */
-FPC BaysGibbs(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysGibbs(BaysNet& bn, ISC query_var, const BaysEv* ev,
                 ISC ev_n, ISC n_cycles, IUD seed);
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalBayesH

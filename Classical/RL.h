@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_RL_DECL
-#define IGEEK_CLASSICAL_RL_DECL
+#ifndef _iGeekClassicalRlH
+#define _iGeekClassicalRlH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -115,7 +115,7 @@ struct PassiveTDAgent {
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
            BOL (*IsTerminal)(ISC state), IUC (*Policy)(ISC state));
   IUC Percept(ISC s_next, FPC r);
-  FPC Utility(ISC state) const;
+  FPC Utility(ISC state);
   void Reset();
 };
 
@@ -145,7 +145,7 @@ struct QAgent {
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha, FPC eps,
            BOL (*IsTerminal)(ISC state), IUD seed);
   IUC Percept(ISC s_next, FPC r);
-  FPC Q(ISC state, IUC action) const;
+  FPC Q(ISC state, IUC action);
   void Reset();
 };
 
@@ -176,9 +176,9 @@ struct PassiveADPAgent {
   BOL Init(ISC state_count, ISC action_count, FPC gamma, FPC tol,
            BOL (*IsTerminal)(ISC state), IUC (*Policy)(ISC state));
   IUC Percept(ISC s_next, FPC r);
-  FPC Utility(ISC state) const;
+  FPC Utility(ISC state);
   void Reset();
 };
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalRlH

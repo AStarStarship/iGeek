@@ -23,16 +23,16 @@ Tile::Tile(_::ISM type, _::ISC grid_x, _::ISC grid_y, _::FPC grid_size_f_,
 
 Tile::~Tile() {}
 
-const _::ISM& Tile::GetType() const { return type_; }
+const _::ISM& Tile::GetType() { return type_; }
 
-const _::BOL& Tile::GetCollision() const { return collision_; }
+BOL Tile::GetCollision() { return collision_; }
 
-const _::TVec2F& Tile::GetPosition() const { return position_; }
+const _::FPC2& Tile::GetPosition() { return position_; }
 
-const _::TFloatRect Tile::GlobalBounds() const {
+const _::TFloatRect Tile::GlobalBounds() {
   return _::TFloatRect(position_.x, position_.y, grid_size_f_, grid_size_f_);
 }
 
-const _::BOL Tile::Intersects(const _::TFloatRect bounds) const {
+const _::BOL Tile::Intersects(const _::TFloatRect bounds) {
   return GlobalBounds().Intersects(bounds);
 }

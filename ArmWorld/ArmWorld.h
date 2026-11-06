@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_ARMWORLD_H
-#define CRABS_ARMWORLD_H
+#ifndef _iGeekArmWorldH
+#define _iGeekArmWorldH
 #include "ArmPhysics.h"
-#if SEAM >= CRABS_ARMWORLD
+#if _Seam >= _iGeekArmWorldCore
 namespace iGeek {
 enum { ArmRunning, ArmReach, ArmTimeout, ArmInvalid };
 const CHA* TArmStatusName(ISC status);
@@ -27,23 +27,23 @@ class AArmEnv
  public:
   enum { ObsLength = 6, MaxFrames = 2000 };
   static constexpr FPC GoalRadius = 0.02f;
-  AArmEnv(const TArmParams& params, IUD seed = 7);
+  AArmEnv(TArmParams& params, IUD seed = 7);
   void Reset();
   void ResetSeed(IUD seed) { seed_ = seed; Reset(); }
-  BOL Done() const { return status_ != ArmRunning; }
-  ISC Status() const { return status_; }
+  BOL Done() { return status_ != ArmRunning; }
+  ISC Status() { return status_; }
   /*Categorical action interface (ArmHold..ArmCross). */
   FPC Step(ISC action);
   /*Raw actuator interface for learned continuous policies (3D phase). */
-  FPC StepControl(const TArmControl& control);
+  FPC StepControl(TArmControl& control);
   void Observe();
-  const FPC* Obs() const { return obs_; }
-  const TArmState& State() const { return arm_; }
-  const TArmMetrics& Metrics() const { return metrics_; }
+  const FPC* Obs() { return obs_; }
+  TArmState& State() { return arm_; }
+  TArmMetrics& Metrics() { return metrics_; }
   TArmParams& Params() { return params_; }
-  FPD TargetX() const { return target_x_; }
-  FPD TargetY() const { return target_y_; }
-  FPD TipError() const { return tip_error_; }
+  FPD TargetX() { return target_x_; }
+  FPD TargetY() { return target_y_; }
+  FPD TipError() { return tip_error_; }
  private:
   TArmParams params_;
   TArmState initial_, arm_;

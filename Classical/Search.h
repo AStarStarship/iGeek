@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_SEARCH_DECL
-#define IGEEK_CLASSICAL_SEARCH_DECL
+#ifndef _iGeekClassicalSearchH
+#define _iGeekClassicalSearchH
 #include "../ASCIICrabs/_Config.h"
 namespace iGeek {
 
@@ -19,9 +19,9 @@ struct Problem {
   ISC (*Actions)(const IUC* state, ISC state_words, IUC* out, ISC cap);
   /* Writes the successor of state under action into out. */
   void (*Result)(const IUC* state, ISC state_words, IUC action, IUC* out);
-  /* Step cost of action from state (NILP => unit cost, UCS falls back). */
+  /* Step cost of action from state (_NilP => unit cost, UCS falls back). */
   FPC (*StepCost)(const IUC* state, ISC state_words, IUC action);
-  /* Heuristic h(state), admissible for RBFS (NILP => RBFS unavailable). */
+  /* Heuristic h(state), admissible for RBFS (_NilP => RBFS unavailable). */
   FPC (*Heuristic)(const IUC* state, ISC state_words);
 };
 
@@ -32,11 +32,11 @@ struct Problem {
  *   -2     — cutoff at the maximum depth (DLS/IDS only).
  * Paths are written as the action sequence from the initial state to a
  * goal; applying them through Result reaches the goal state. */
-ISC SearchBFS(const Problem* problem, IUC* path, ISC path_cap);
-ISC SearchUCS(const Problem* problem, IUC* path, ISC path_cap);
-ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit);
-ISC SearchIDS(const Problem* problem, IUC* path, ISC path_cap, ISC max_limit);
-ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap);
+ISC SearchBFS(Problem* problem, IUC* path, ISC path_cap);
+ISC SearchUCS(Problem* problem, IUC* path, ISC path_cap);
+ISC SearchDLS(Problem* problem, IUC* path, ISC path_cap, ISC limit);
+ISC SearchIDS(Problem* problem, IUC* path, ISC path_cap, ISC max_limit);
+ISC SearchRBFS(Problem* problem, IUC* path, ISC path_cap);
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalSearchH  //< _iGeekClassicalSearchHXX 

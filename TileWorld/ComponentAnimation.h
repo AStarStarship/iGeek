@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #ifndef TILEWORLD_ANIMATIONCOMPONENT_DECL
 #define TILEWORLD_ANIMATIONCOMPONENT_DECL
 #include <_Config.h>
@@ -31,11 +31,11 @@ class AnimationComponent {
       sprite.setTextureRect(start_rect);
     }
 
-    const bool& IsDone() const;
+    const bool& IsDone();
 
-    const bool& Play(const FPC& dt);
+    const bool& Play(FPC& dt);
 
-    const bool& Play(const FPC& dt, FPC mod_percent);
+    const bool& Play(FPC& dt, FPC mod_percent);
 
     void Reset();
     
@@ -67,10 +67,10 @@ class AnimationComponent {
                     ISN start_frame_x, ISN start_frame_y, ISN frames_x,
                     ISN frames_y, ISN width, ISN height);
 
-  const bool& Play(const _::AString key, const FPC& dt,
+  const bool& Play(const _::AString key, FPC& dt,
                    const bool priority = false);
-  const bool& Play(const _::AString key, const FPC& dt, const FPC& modifier,
-                   const FPC& modifier_max, const bool priority = false);
+  const bool& Play(const _::AString key, FPC& dt, FPC& modifier,
+                   FPC& modifier_max, const bool priority = false);
 };
 }  //< namespace TileWorld
 #endif

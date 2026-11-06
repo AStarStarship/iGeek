@@ -7,12 +7,12 @@
  *   then the built-in sample puzzle is used; see HRMReadPuzzle.)
  *
  * Single-TU build: this file is the only place the ASCIICrabs _Package.hxx
- * impls are compiled (COut/StdOut + printer chain); HRM.cpp is declarations
+ * impls are compiled (ROut/RefOut + printer chain); HRM.cpp is declarations
  * plus logic only.
  */
 
 #include "HRM.h"
-#include "../../../ASCIICrabs/_Package.hxx"  // COut/StdOut + printer impls (single-TU)
+#include "../../../ASCIICrabs/_Package.hxx"  // ROut/RefOut + printer impls (single-TU)
 #include "HRM.hxx"  // HRM solver impls (same TU)
 
 namespace iGeek {
@@ -59,7 +59,7 @@ BOL VerifyBoard(const IUD* board) {
 
 int main(int argc, char** argv) {
   using namespace _;
-  COut& out = StdOut();
+  ROut& out = RefOut();
 
   IUD puzzle[81];
   BOL loaded = false;

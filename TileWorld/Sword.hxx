@@ -1,10 +1,10 @@
-#include "TVec.h"
+#include "Homotuples.h"
 // Copyright AStarship <https://astarship.net>.
 #include "sword.h"
 
 Sword::Sword() {
   if (!weapon_texture.LoadFromFile("Resources/Images/Sprites/Player/sword.png"))
-    D_COUT("\nError: Couldn't load Player's weapon texture!.");
+    _DROut("\nError: Couldn't load Player's weapon texture!.");
 
   weapon_sprite.setTexture(weapon_texture);
 

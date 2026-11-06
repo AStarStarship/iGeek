@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldiGeekH
+#define _iGeekPolygonWorldiGeekH
 namespace iGeek {
 
 class iGeek : public App {
@@ -9,3 +11,5 @@ class iGeek : public App {
 };
 
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldiGeekH

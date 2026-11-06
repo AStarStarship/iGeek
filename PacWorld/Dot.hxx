@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_DOT_HXX
-#define IGEEK_DOT_HXX
+#ifndef _iGeekDotHXX
+#define _iGeekDotHXX
 #include "Dot.h"
 
 using namespace PacWorld;
@@ -16,4 +16,4 @@ TDot PacWorld::SuperDot() {
   return TDot(8.f, 0xFFFFFFFFu);
 }
 
-#endif  // IGEEK_DOT_HXX
+#endif  //< _iGeekDotHXX

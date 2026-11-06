@@ -1,4 +1,4 @@
-#include "TVec.h"
+#include "Homotuples.h"
 // Copyright AStarship <https://astarship.net>.
 #include "gui.h"
 
@@ -95,15 +95,15 @@ gui::Button::Button(float x, float y, float width, float height, sf::Font* font,
 
 gui::Button::~Button() {}
 
-const bool gui::Button::IsPressed() const {
+const bool gui::Button::IsPressed() {
   if (buttonState == kButtonActive) return true;
 
   return false;
 }
 
-const _::AString gui::Button::Text() const { return text.getString(); }
+const _::AString gui::Button::Text() { return text.getString(); }
 
-const short unsigned& gui::Button::Id() const { return id_; }
+const short unsigned& gui::Button::Id() { return id_; }
 
 void gui::Button::setText(const _::AString text) { text.setString(text); }
 
@@ -195,7 +195,7 @@ const bool gui::DropDownList::KeyTime() {
   return false;
 }
 
-const unsigned short& gui::DropDownList::GetActiveElementId() const {
+const unsigned short& gui::DropDownList::GetActiveElementId() {
   return activeElement->Id();
 }
 
@@ -289,9 +289,9 @@ gui::TextureSelector::TextureSelector(float x, float y, float width,
 
 gui::TextureSelector::~TextureSelector() { delete hide_button_; }
 
-const bool& gui::TextureSelector::getActive() const { return active_; }
+const bool& gui::TextureSelector::getActive() { return active_; }
 
-const _::ISC4& gui::TextureSelector::getTextureRect() const {
+const _::ISC4& gui::TextureSelector::getTextureRect() {
   return texture_rect_;
 }
 

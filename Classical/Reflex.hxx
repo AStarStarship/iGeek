@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_REFLEX_IMPL
-#define IGEEK_CLASSICAL_REFLEX_IMPL
+#ifndef _iGeekClassicalReflexHXX
+#define _iGeekClassicalReflexHXX
 #include "Reflex.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 
 static inline IUW* RfxFree(IUW* origin) {
@@ -20,7 +20,7 @@ static inline IUW* RfxFree(IUW* origin) {
 
 static inline void RfxWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -49,12 +49,12 @@ IUC ReflexVacuumAction(IUC location, BOL dirty) {
 // --- Fig 2.7 TableVacuumAgent -----------------------------------------------
 
 TableVacuumAgent::TableVacuumAgent()
-    : table_mem_(NILP, &ObjectFactoryHeap), history_len_(0), hist_count_(0),
-      history_(NILP) {}
+    : table_mem_(_NilP, &ObjectFactoryHeap), history_len_(0), hist_count_(0),
+      history_(_NilP) {}
 
 TableVacuumAgent::~TableVacuumAgent() {
   table_mem_.origin = RfxFree(table_mem_.origin);
-  history_ = NILP;
+  history_ = _NilP;
 }
 
 BOL TableVacuumAgent::Init(ISC history_len) {
@@ -63,17 +63,17 @@ BOL TableVacuumAgent::Init(ISC history_len) {
   }
   IUD entries = IUD(1) << IUD(2 * history_len);
   table_mem_.origin =
-      ObjectFactoryHeap(NILP, entries * IUD(sizeof(IUC)) +
+      ObjectFactoryHeap(_NilP, entries * IUD(sizeof(IUC)) +
                                   IUD(history_len) * IUD(sizeof(IUC)));
   if (IsError(table_mem_.origin)) {
-    table_mem_.origin = NILP;
+    table_mem_.origin = _NilP;
     return false;
   }
-  IUC* table = TPtr<IUC>(table_mem_.origin);
+  IUC* table = TRef<IUC>(table_mem_.origin);
   for (IUD i = 0; i < entries; ++i) {
     table[i] = kRfxUnpinned;
   }
-  history_ = TPtr<IUC>(table_mem_.origin) + entries;
+  history_ = TRef<IUC>(table_mem_.origin) + entries;
   RfxWipe(table_mem_.origin, IUD(history_len) * IUD(sizeof(IUC)));
   history_len_ = history_len;
   hist_count_ = 0;
@@ -105,7 +105,7 @@ IUC TableVacuumAgent::Action() {
     key = (key << 2) | history_[(start + i) % IUD(history_len_)];
   }
   key <<= IUC(2 * (history_len_ - n));  // left-align to the full width
-  IUC* table = TPtr<IUC>(table_mem_.origin);
+  IUC* table = TRef<IUC>(table_mem_.origin);
   IUC entry = table[key];
   if (entry != kRfxUnpinned) {
     return entry;
@@ -116,12 +116,12 @@ IUC TableVacuumAgent::Action() {
 }
 
 void TableVacuumAgent::PinEntry(IUC packed_history, IUC action) {
-  TPtr<IUC>(table_mem_.origin)[packed_history] = action;
+  TRef<IUC>(table_mem_.origin)[packed_history] = action;
 }
 
 void TableVacuumAgent::Reset() {
-  if (history_ != NILP) {
-    RfxWipe(TPtr<IUW>(history_), IUD(history_len_) * IUD(sizeof(IUC)));
+  if (history_ != _NilP) {
+    RfxWipe(TRef<IUW>(history_), IUD(history_len_) * IUD(sizeof(IUC)));
   }
   hist_count_ = 0;
 }
@@ -129,7 +129,7 @@ void TableVacuumAgent::Reset() {
 // --- Fig 2.12 SimpleReflexAgent ---------------------------------------------
 
 SimpleReflexAgent::SimpleReflexAgent()
-    : rules_mem_(NILP, &ObjectFactoryHeap), state_mem_(NILP, &ObjectFactoryHeap),
+    : rules_mem_(_NilP, &ObjectFactoryHeap), state_mem_(_NilP, &ObjectFactoryHeap),
       state_words_(0), rule_count_(0), rule_cap_(0), seen_(false) {}
 
 SimpleReflexAgent::~SimpleReflexAgent() {
@@ -142,10 +142,10 @@ BOL SimpleReflexAgent::Init(ISC state_words, ISC rule_cap) {
     return false;
   }
   rules_mem_.origin =
-      ObjectFactoryHeap(NILP, IUD(rule_cap) * IUD(state_words + 1) *
+      ObjectFactoryHeap(_NilP, IUD(rule_cap) * IUD(state_words + 1) *
                                   IUD(sizeof(IUC)));
   state_mem_.origin =
-      ObjectFactoryHeap(NILP, IUD(state_words) * IUD(sizeof(IUC)));
+      ObjectFactoryHeap(_NilP, IUD(state_words) * IUD(sizeof(IUC)));
   if (IsError(rules_mem_.origin) || IsError(state_mem_.origin)) {
     rules_mem_.origin = RfxFree(rules_mem_.origin);
     state_mem_.origin = RfxFree(state_mem_.origin);
@@ -162,7 +162,7 @@ BOL SimpleReflexAgent::AddRule(const IUC* condition, IUC action) {
   if (rule_count_ >= rule_cap_) {
     return false;
   }
-  IUC* slot = TPtr<IUC>(rules_mem_.origin) +
+  IUC* slot = TRef<IUC>(rules_mem_.origin) +
               IUD(rule_count_) * IUD(state_words_ + 1);
   for (ISC i = 0; i < state_words_; ++i) {
     slot[i] = condition[i];
@@ -174,13 +174,13 @@ BOL SimpleReflexAgent::AddRule(const IUC* condition, IUC action) {
 
 IUC SimpleReflexAgent::Percept(const IUC* state) {
   // state <- INTERPRET-INPUT(percept)
-  IUC* s = TPtr<IUC>(state_mem_.origin);
+  IUC* s = TRef<IUC>(state_mem_.origin);
   for (ISC i = 0; i < state_words_; ++i) {
     s[i] = state[i];
   }
   // rule <- RULE-MATCH(state, rules); first match wins
   for (ISC r = 0; r < rule_count_; ++r) {
-    const IUC* slot = TPtr<IUC>(rules_mem_.origin) +
+    const IUC* slot = TRef<IUC>(rules_mem_.origin) +
                       IUD(r) * IUD(state_words_ + 1);
     BOL match = true;
     for (ISC i = 0; i < state_words_; ++i) {
@@ -205,11 +205,11 @@ IUC SimpleReflexAgent::LastAction() {
   }
   // The last matched action is recomputed lazily by the world; expose the
   // stored state so the world can replay RULE-MATCH if needed.
-  return Percept(TPtr<IUC>(state_mem_.origin));
+  return Percept(TRef<IUC>(state_mem_.origin));
 }
 
 void SimpleReflexAgent::Reset() {
-  if (state_mem_.origin != NILP) {
+  if (state_mem_.origin != _NilP) {
     RfxWipe(state_mem_.origin, IUD(state_words_) * IUD(sizeof(IUC)));
   }
   seen_ = false;

@@ -1,8 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldBlackjackEnvHXX
+#define _iGeekCardsWorldBlackjackEnvHXX
 #include "BlackjackEnv.h"
-#if SEAM >= IGEEK_BLACKJACKENV
+#if _Seam >= _iGeekCardsWorldBlackjackEnv
 namespace iGeek {
+namespace CardsWorld {
+using namespace ::_;
 
 /* A simple baseline policy: hit until the hand value is >= 17.
 The percept format is "P:<val> D:<dealer_up> H:<hidden?>\n<cards>".
@@ -37,8 +41,8 @@ ISC PolicyHitTo17(const CHA* percept) {
 }
 
 BlackjackEnv::BlackjackEnv()
-    : game_(NILP),
-      agent_(NILP),
+    : game_(_NilP),
+      agent_(_NilP),
       total_reward_(0),
       rounds_played_(0),
       on_(true) {
@@ -50,27 +54,27 @@ BlackjackEnv::BlackjackEnv()
 }
 
 BlackjackEnv::~BlackjackEnv() {
-  if (game_ != NILP) delete game_;
-  if (agent_ != NILP) delete agent_;
-  game_ = NILP;
-  agent_ = NILP;
+  if (game_ != _NilP) delete game_;
+  if (agent_ != _NilP) delete agent_;
+  game_ = _NilP;
+  agent_ = _NilP;
 }
 
 void BlackjackEnv::Reset() {
-  if (game_ != NILP) game_->NewRound();
+  if (game_ != _NilP) game_->NewRound();
   percept_[0] = 0;
 }
 
 const CHA* BlackjackEnv::Observe() {
-  if (game_ == NILP) return percept_;
-  const CardsWorld::Hand& player_hand = game_->PlayerHand();
-  const CardsWorld::Hand& dealer_hand = game_->DealerHand();
+  if (game_ == _NilP) return percept_;
+  CardsWorld::Hand player_hand = game_->PlayerHand();
+  CardsWorld::Hand dealer_hand = game_->DealerHand();
   ISC player_val = game_->HandValue(player_hand);
   // Dealer up-card is the first card; the rest are hidden.
   ISC dealer_up = 0;
   if (dealer_hand.CardCount() > 0) {
-    const CardsWorld::Card* up = dealer_hand.PeekCard(0);
-    if (up != NILP) dealer_up = up->PointValue();
+    CardsWorld::Card* up = dealer_hand.PeekCard(0);
+    if (up != _NilP) dealer_up = up->PointValue();
   }
   ISC dealer_hidden = dealer_hand.CardCount() - 1;
   if (dealer_hidden < 0) dealer_hidden = 0;
@@ -110,8 +114,8 @@ const CHA* BlackjackEnv::Observe() {
 
   // Emit the player's cards as "Ac 2d" style tokens.
   for (ISC i = 0; i < player_hand.CardCount() && cursor < stop - 2; ++i) {
-    const CardsWorld::Card* c = player_hand.PeekCard(i);
-    if (c == NILP) break;
+    CardsWorld::Card* c = player_hand.PeekCard(i);
+    if (c == _NilP) break;
     CHA pip_char = '0';
     switch (c->PipValue()) {
       case 1: pip_char = 'A'; break;
@@ -136,7 +140,7 @@ const CHA* BlackjackEnv::Observe() {
 }
 
 ISC BlackjackEnv::Step(ISC action) {
-  if (game_ == NILP || game_->RoundOver()) return 0;
+  if (game_ == _NilP || game_->RoundOver()) return 0;
   if (action == static_cast<ISC>(CardsWorld::Action::kHit)) {
     game_->Hit();
   } else {
@@ -151,17 +155,17 @@ ISC BlackjackEnv::Step(ISC action) {
   return 0;  // Round still in progress.
 }
 
-BOL BlackjackEnv::Done() const {
-  return game_ == NILP ? true : game_->RoundOver();
+BOL BlackjackEnv::Done() {
+  return game_ == _NilP ? true : game_->RoundOver();
 }
 
-CardsWorld::Outcome BlackjackEnv::LastOutcome() const {
-  return game_ == NILP ? CardsWorld::Outcome::kInvalid
+CardsWorld::Outcome BlackjackEnv::LastOutcome() {
+  return game_ == _NilP ? CardsWorld::Outcome::kInvalid
                        : game_->GetOutcome();
 }
 
-ISC BlackjackEnv::Credit() const {
-  return agent_ == NILP ? 0 : agent_->PointsCount();
+ISC BlackjackEnv::Credit() {
+  return agent_ == _NilP ? 0 : agent_->PointsCount();
 }
 
 void BlackjackEnv::ComputeReward(Crabs* crabs, FPD achieved_goal,
@@ -170,7 +174,7 @@ void BlackjackEnv::ComputeReward(Crabs* crabs, FPD achieved_goal,
   // The reward is the difference between what we achieved and what we wanted.
   // A perfect round would hit exactly 21 (desired=21); busting scores low.
   FPD reward = achieved_goal - desired_goal;
-  if (info != NILP) {
+  if (info != _NilP) {
     // Write a short diagnostic like "a:<achieved> d:<desired> r:<reward>".
     info[0] = 0;
   }
@@ -189,5 +193,7 @@ ISC BlackjackEnv::RunPolicy(ISC (*policy)(const CHA*), ISC rounds) {
   return total;
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldBlackjackEnv
+#endif  //< _iGeekCardsWorldBlackjackEnvHXX

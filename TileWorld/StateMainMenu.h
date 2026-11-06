@@ -29,9 +29,9 @@ class MainMenuState : public State {
   virtual ~MainMenuState();
 
   // Functions
-  void updateInput(const FPC& dt);
+  void updateInput(FPC& dt);
   void updateButtons();
-  void Update(const FPC& dt);
+  void Update(FPC& dt);
   void renderButtons(sf::RenderTarget& target);
   void Render(sf::RenderTarget* target = nullptr);
 };

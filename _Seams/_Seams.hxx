@@ -1,0 +1,52 @@
+// Copyright AStarship <https://astarship.net>.
+// iGeek unified test tree. Pulls the RL/agent core rollup once, then every
+// world's seam units, and exposes iGeekTests — the single TTestTree the
+// _Seams/_Seams.cpp runs. _Seam selects which world's code is admitted (see
+// _Seams.h); a world's node runs its Release() at its *_RELEASE seam (the
+// official output) and its Core() unit tests otherwise.
+#include <_Config.h>
+#include "../_Package.hxx"
+#include "Core/01.Core.hxx"
+#include "Core/02.Release.hxx"
+#include "MazeWorld/_Tests.hxx"
+#include "ArmWorld/_Tests.hxx"
+#include "BikeWorld/_Tests.hxx"
+#include "CarWorld/_Tests.hxx"
+#include "CardsWorld/_Tests.hxx"
+#include "Classical/_Tests.hxx"
+#include "PacWorld/_Tests.hxx"
+#include "PolygonWorld/_Tests.hxx"
+#include "PrisonerWorld/_Tests.hxx"
+#include "SpaceWorld/_Tests.hxx"
+#include "SudokuWorld/_Tests.hxx"
+#include "TileWorld/_Tests.hxx"
+#include "TypingWorld/_Tests.hxx"
+#include "Gym/_Tests.hxx"
+namespace iGeekTest {
+using namespace ::_;
+using namespace iGeek;
+
+  inline const CHA* iGeekTests(const CHA* args) {
+  return TTestTree<iGeekTest::Core,
+    iGeekTest::AgentSlot,
+    iGeekTest::Script,
+    iGeekTest::JobQueue,
+    iGeekTest::RoomSandbox,
+    iGeekTest::RolloutCompare,
+    iGeekTest::Release,
+    MazeWorldTest::MazeWorld,
+    ArmWorldTest::ArmWorld,
+    BikeWorldTest::BikeWorld,
+    CarWorldTest::CarWorld,
+    CardsWorldTest::CardsWorld,
+    ClassicalTest::Classical,
+    PacWorldTest::PacWorld,
+    PolygonWorldTest::PolygonWorld,
+    PrisonerWorldTest::PrisonerWorld,
+    SpaceWorldTest::SpaceWorld,
+    SudokuWorldTest::SudokuWorld,
+    TileWorldTest::TileWorld,
+    TypingWorldTest::TypingWorld,
+    iGeekGymTest::Gym>(args);
+}
+} //< namespace iGeekTest

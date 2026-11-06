@@ -1,7 +1,6 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
+#include "Homotuples.h"
 #include "DefaultEditorMode.h"
-#include "stdafx.h"
 
 void DefaultEditorMode::InitVariables() {
   textureRect = _::ISC4(0, 0, static_cast<int>(stateData->gridSize),

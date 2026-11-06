@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_2D_H
-#define CRABS_CARWORLD_2D_H
+#ifndef _iGeekCarWorld2DH
+#define _iGeekCarWorld2DH
 #include "CarPilot.h"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 enum { CarRunning, CarGoal, CarCollision, CarTimeout, CarInvalid, CarBlocked, CarStopped };
 enum { CarCruise, CarSlow, CarFast, CarStop, CarCrawl, CarActionCount };
@@ -23,23 +23,23 @@ class ACarEnv
 {
  public:
   enum { ObsLength = 22, MaxFrames = 5000 };
-  ACarEnv(const TileMap& map, const TVehicleRoute& route,
-          const TCarState& initial, IUD seed = 7);
+  ACarEnv(TileMap& map, TVehicleRoute& route,
+          TCarState& initial, IUD seed = 7);
   void Reset();
   void ResetSeed(IUD seed) { seed_ = seed; Reset(); }
-  BOL Done() const { return status_ != CarRunning; }
-  ISC Status() const { return status_; }
+  BOL Done() { return status_ != CarRunning; }
+  ISC Status() { return status_; }
   FPC Step(ISC action = CarCruise);
-  FPC StepControl(const TCarControl& control);
+  FPC StepControl(TCarControl& control);
   void Observe();
-  const FPC* Obs() const { return obs_; }
-  const TCarState& State() const { return car_; }
-  const TCarMetrics& Metrics() const { return metrics_; }
+  const FPC* Obs() { return obs_; }
+  TCarState& State() { return car_; }
+  TCarMetrics& Metrics() { return metrics_; }
   TCarParams& Params() { return params_; }
-  FPD GoalDistance() const;
+  FPD GoalDistance();
  private:
-  const TileMap& map_;
-  const TVehicleRoute& route_;
+  TileMap& map_;
+  TVehicleRoute& route_;
   TCarState initial_, car_;
   TCarParams params_;
   ACarPilot pilot_;

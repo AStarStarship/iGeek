@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_GHOST_HXX
-#define IGEEK_GHOST_HXX
+#ifndef _iGeekGhostHXX
+#define _iGeekGhostHXX
 #include "Ghost.h"
 
 using namespace PacWorld;
@@ -10,14 +10,14 @@ Ghost::Ghost(const Pac* pac)
     : is_weak_(false), weakness_duration_(0.f), pac_(pac) {}
 
 Ghost::Ghost()
-    : is_weak_(false), weakness_duration_(0.f), pac_(NILP) {}
+    : is_weak_(false), weakness_duration_(0.f), pac_(_NilP) {}
 
 void Ghost::SetWeak(FPC duration) {
   is_weak_ = true;
   weakness_duration_ = duration;
 }
 
-BOL Ghost::IsWeak() const { return is_weak_; }
+BOL Ghost::IsWeak() { return is_weak_; }
 
 void Ghost::Update(FPC delta) {
   if (is_weak_) {
@@ -66,4 +66,4 @@ void Ghost::ChangeDirection() {
   }
 }
 
-#endif  // IGEEK_GHOST_HXX
+#endif  //< _iGeekGhostHXX

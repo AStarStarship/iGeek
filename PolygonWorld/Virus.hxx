@@ -1,9 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-
-#include <_Config.h>
-
-#include "c_virus.h"
-
+#include "Virus.h"
 namespace iGeek {
 
 Virus::Virus(FPD initX, FPD initY) {

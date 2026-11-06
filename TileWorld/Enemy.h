@@ -7,8 +7,8 @@
 // animation is 2nd-pass, so the headless Enemy is a concrete Entity subclass
 // (a "rat") with chase movement. Render() deleted (headless). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
+#include <_Config.h>
+#include <Homotuples.h>
 
 #ifndef TILEWORLD_ENEMY
 #define TILEWORLD_ENEMY
@@ -26,7 +26,7 @@ class Enemy : public Entity {
   virtual void Update(const _::FPC& dt);
 
   // Steer toward the target position (unit-ish direction into Move()).
-  void Chase(const _::TVec2F& target, const _::FPC& dt);
+  void Chase(const _::FPC2& target, const _::FPC& dt);
 };
 }  //< namespace TileWorld
 #endif

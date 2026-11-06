@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_PACWORLD_HXX
-#define IGEEK_PACWORLD_HXX
+#ifndef _iGeekPacWorldHXX
+#define _iGeekPacWorldHXX
 // PacWorld.hxx — headless Pac-Man env + vectorized Gym implementations.
 // No C++ stdlib. Math from <math.h> (C). Deterministic per seed.
 #include "PacWorld.h"
-#include <math.h>
+#include "../CrabsTK/Math/Blas.h"
 
 namespace iGeek {
 
@@ -17,7 +17,7 @@ IUD PacWorldEnv::NextRand() {
 
 PacWorldEnv::PacWorldEnv(ISC cols, ISC rows, IUD seed)
     : cols_(cols < 7 ? 7 : cols), rows_(rows < 7 ? 7 : rows), seed_(seed),
-      grid_(NILP), obs_(NILP), pac_x_(1), pac_y_(1), pac_dir_(ActionStay),
+      grid_(_NilP), obs_(_NilP), pac_x_(1), pac_y_(1), pac_dir_(ActionStay),
       ghost_count_(0), steps_(0), lives_(LifeCount), score_(0),
       done_(false), won_(false), rng_(seed_ ? seed_ : 1) {
   for (ISC i = 0; i < 16; ++i) {
@@ -31,17 +31,17 @@ PacWorldEnv::PacWorldEnv(ISC cols, ISC rows, IUD seed)
 }
 
 PacWorldEnv::~PacWorldEnv() {
-  if (grid_ != NILP) { delete[] grid_; grid_ = NILP; }
-  if (obs_ != NILP) { delete[] obs_; obs_ = NILP; }
+  if (grid_ != _NilP) { delete[] grid_; grid_ = _NilP; }
+  if (obs_ != _NilP) { delete[] obs_; obs_ = _NilP; }
 }
 
-ISC PacWorldEnv::Clamp(ISC v, ISC lo, ISC hi) const {
+ISC PacWorldEnv::Clamp(ISC v, ISC lo, ISC hi) {
   if (v < lo) return lo;
   if (v > hi) return hi;
   return v;
 }
 
-BOL PacWorldEnv::IsWall(ISC x, ISC y) const {
+BOL PacWorldEnv::IsWall(ISC x, ISC y) {
   if (x < 0 || y < 0 || x >= cols_ || y >= rows_) return true;
   return grid_[y * cols_ + x] == CellWall;
 }
@@ -153,8 +153,8 @@ void PacWorldEnv::Reset() {
   PlaceGhosts();
 }
 
-FPC PacWorldEnv::ComputeReward(Crabs* crabs, EnvGoal achieved_goal,
-                               EnvGoal desired_goal, const CHA* info) {
+FPC PacWorldEnv::ComputeReward(Crabs* crabs, EnvironmentGoal achieved_goal,
+                               EnvironmentGoal desired_goal, const CHA* info) {
   (void)crabs; (void)achieved_goal; (void)desired_goal; (void)info;
   // The per-step scalar reward is returned by Step(); ComputeReward is the
   // iGeek Env interface hook — return the last step's reward stored in score.
@@ -337,13 +337,13 @@ PacWorldGym::PacWorldGym(ISC envs, ISC cols, ISC rows, IUD seed)
     for (ISC j = 0; j < action_count_; ++j)
       action_mask_[i * action_count_ + j] = 1.0f;
   }
-  CopyStr(manifest_.name, ManifestNameLen, "pacworld");
-  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  TSPrint(manifest_.name, ISW(ManifestNameLen), "pacworld");
+  TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0");
   manifest_.kind = ManifestKindEnv;
   manifest_.domain = ManifestDomainGame;
-  CopyStr(manifest_.description, ManifestDescriptionLen,
+  TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
           "Pac-Man maze navigation");
-  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
   manifest_.reward_low = FPC(-1.0);
   manifest_.reward_high = FPC(1.0);
   manifest_.reward_higher_is_better = true;
@@ -351,25 +351,25 @@ PacWorldGym::PacWorldGym(ISC envs, ISC cols, ISC rows, IUD seed)
   manifest_.obs_count = obs_len_;
   manifest_.action_count = action_count_;
   manifest_.max_episode_steps = PacWorldEnv::MaxSteps;
-  manifest_.env_count_max = GymEnvMax;
-  CopyStr(manifest_.world_name, ManifestWorldLen, "PacWorld");
-  manifest_.seam_number = IGEEK_PACWORLD_CORE;
+  manifest_.environment_count_max = GymEnvMax;
+  TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "PacWorld");
+  manifest_.seam_number = _iGeekPackWorldCore;
   manifest_.manifest_version = ISC(1);
   ResetBatch();
 }
 
 PacWorldGym::~PacWorldGym() {
   for (ISC i = 0; i < env_count_used_; ++i) {
-    if (envs_[i] != NILP) delete envs_[i];
-    envs_[i] = NILP;
+    if (envs_[i] != _NilP) delete envs_[i];
+    envs_[i] = _NilP;
   }
-  if (observations_ != NILP) delete[] observations_;
-  if (actions_ != NILP) delete[] actions_;
-  if (rewards_ != NILP) delete[] rewards_;
-  if (terminals_ != NILP) delete[] terminals_;
-  if (action_mask_ != NILP) delete[] action_mask_;
-  observations_ = NILP; actions_ = NILP; rewards_ = NILP;
-  terminals_ = NILP; action_mask_ = NILP;
+  if (observations_ != _NilP) delete[] observations_;
+  if (actions_ != _NilP) delete[] actions_;
+  if (rewards_ != _NilP) delete[] rewards_;
+  if (terminals_ != _NilP) delete[] terminals_;
+  if (action_mask_ != _NilP) delete[] action_mask_;
+  observations_ = _NilP; actions_ = _NilP; rewards_ = _NilP;
+  terminals_ = _NilP; action_mask_ = _NilP;
 }
 
 void PacWorldGym::ResetBatch() {
@@ -388,7 +388,7 @@ void PacWorldGym::ResetBatch() {
 
 void PacWorldGym::StepBatch() {
   for (ISC i = 0; i < env_count_; ++i) {
-    ISC a = (actions_ != NILP) ? actions_[i] : 0;
+    ISC a = (actions_ != _NilP) ? actions_[i] : 0;
     FPC r = envs_[i]->Step(a);
     rewards_[i] = r;
     terminals_[i] = envs_[i]->Done() ? 1.0f : 0.0f;
@@ -406,4 +406,4 @@ void PacWorldGym::StepBatch() {
 
 } //< namespace iGeek
 
-#endif  // IGEEK_PACWORLD_HXX
+#endif  //< _iGeekPacWorldHXX

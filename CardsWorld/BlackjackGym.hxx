@@ -1,13 +1,17 @@
 // Copyright AStarship <https://astarship.net>.
+#pragma once
+#ifndef _iGeekCardsWorldBlackjackGymHXX
+#define _iGeekCardsWorldBlackjackGymHXX
 #include "BlackjackGym.h"
-#if SEAM >= IGEEK_BLACKJACKGYM
+#if _Seam >= _iGeekCardsWorldBlackjackGym
 namespace iGeek {
 namespace CardsWorld {
+using namespace ::_;
 
 BlackjackGym::BlackjackGym(ISC tables)
     : table_count_(tables < 1 ? 1 : (tables > TableMax ? TableMax : tables)),
-      observations_(NILP), rewards_(NILP), terminals_(NILP),
-      action_mask_(NILP), last_batch_reward_(0.0f) {
+      observations_(_NilP), rewards_(_NilP), terminals_(_NilP),
+      action_mask_(_NilP), last_batch_reward_(0.0f) {
   // Preallocate the flat batch arrays (preallocate at ctor, free at dtor).
   observations_ = new FPC[table_count_ * ObsLength]();
   rewards_ = new FPC[table_count_]();
@@ -23,27 +27,27 @@ BlackjackGym::BlackjackGym(ISC tables)
 
 BlackjackGym::~BlackjackGym() {
   for (ISC i = 0; i < table_count_; ++i) {
-    if (tables_[i] != NILP) delete tables_[i];
-    if (agents_[i] != NILP) delete agents_[i];
+    if (tables_[i] != _NilP) delete tables_[i];
+    if (agents_[i] != _NilP) delete agents_[i];
   }
   delete[] observations_;
   delete[] rewards_;
   delete[] terminals_;
   delete[] action_mask_;
-  observations_ = rewards_ = terminals_ = action_mask_ = NILP;
+  observations_ = rewards_ = terminals_ = action_mask_ = _NilP;
 }
 
 void BlackjackGym::ResetBatch() {
   for (ISC i = 0; i < table_count_; ++i) {
     tables_[i]->NewRound();
     // Encode the fresh observation.
-    const Hand& ph = tables_[i]->PlayerHand();
-    const Hand& dh = tables_[i]->DealerHand();
+    Hand& ph = tables_[i]->PlayerHand();
+    Hand& dh = tables_[i]->DealerHand();
     ISC pval = tables_[i]->HandValue(ph);
     ISC dup = 0;
     if (dh.CardCount() > 0) {
-      const Card* up = dh.PeekCard(0);
-      if (up != NILP) dup = up->PointValue();
+      Card* up = dh.PeekCard(0);
+      if (up != _NilP) dup = up->PointValue();
     }
     ISC hidden = dh.CardCount() - 1;
     if (hidden < 0) hidden = 0;
@@ -71,7 +75,7 @@ void BlackjackGym::StepBatch(const ISC* actions) {
       terminals_[i] = 1.0f;
       continue;
     }
-    ISC action = (actions != NILP) ? actions[i] : 0;
+    ISC action = (actions != _NilP) ? actions[i] : 0;
     if (action == static_cast<ISC>(Action::kHit)) {
       tables_[i]->Hit();
     } else {
@@ -87,13 +91,13 @@ void BlackjackGym::StepBatch(const ISC* actions) {
       terminals_[i] = 0.0f;
     }
     // Re-encode the observation.
-    const Hand& ph = tables_[i]->PlayerHand();
-    const Hand& dh = tables_[i]->DealerHand();
+    Hand& ph = tables_[i]->PlayerHand();
+    Hand& dh = tables_[i]->DealerHand();
     ISC pval = tables_[i]->HandValue(ph);
     ISC dup = 0;
     if (dh.CardCount() > 0) {
-      const Card* up = dh.PeekCard(0);
-      if (up != NILP) dup = up->PointValue();
+      Card* up = dh.PeekCard(0);
+      if (up != _NilP) dup = up->PointValue();
     }
     ISC hidden = dh.CardCount() - 1;
     if (hidden < 0) hidden = 0;
@@ -108,6 +112,7 @@ void BlackjackGym::StepBatch(const ISC* actions) {
   last_batch_reward_ = batch_reward;
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldBlackjackGym
+#endif  //< _iGeekCardsWorldBlackjackGymHXX

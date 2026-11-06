@@ -1,13 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 // Metrics.hxx — implementations of the qualia measurement protocol
 // primitives (BehaviorMetrics, StateRecord(Set), LinearProbe).
+#pragma once
+#ifndef _iGeekMetricsHXX
+#define _iGeekMetricsHXX
 #include "Metrics.h"
-#include <math.h>
-#ifndef IGEEK_METRICS_IMPL
-#define IGEEK_METRICS_IMPL 1
+#include <_Config.h>
+#include "../CrabsTK/Math/Blas.h"
 namespace iGeek {
-
-// --- BehaviorMetrics ------------------------------------------------------
 
 void BehaviorMetrics::RecordTrial(BOL was_present, BOL did_report,
                                   ISC steps_to_report) {
@@ -25,21 +25,21 @@ void BehaviorMetrics::RecordTrial(BOL was_present, BOL did_report,
   // !was_present && !did_report: correct rejection, no counter.
 }
 
-FPC BehaviorMetrics::Accuracy() const {
+FPC BehaviorMetrics::Accuracy() {
   if (trials == 0) {
     return 0.0f;
   }
   return FPC(correct) / FPC(trials);
 }
 
-FPC BehaviorMetrics::FalsePositiveRate() const {
+FPC BehaviorMetrics::FalsePositiveRate() {
   if (trials == 0) {
     return 0.0f;
   }
   return FPC(false_positives) / FPC(trials);
 }
 
-FPC BehaviorMetrics::FalseNegativeRate() const {
+FPC BehaviorMetrics::FalseNegativeRate() {
   if (trials == 0) {
     return 0.0f;
   }
@@ -52,9 +52,9 @@ StateRecord::~StateRecord() {
   delete[] words;
 }
 
-void StateRecord::Capture(const AgentState& state, ISC label) {
+void StateRecord::Capture(AgentState& state, ISC label) {
   delete[] words;
-  words = NILP;
+  words = _NilP;
   slots = state.SlotCount();
   this->label = label;
   if (slots <= 0) {
@@ -66,10 +66,10 @@ void StateRecord::Capture(const AgentState& state, ISC label) {
 
 void StateRecord::Capture(const IUC* words_in, ISC slots_in, ISC label) {
   delete[] words;
-  words = NILP;
+  words = _NilP;
   slots = slots_in < 0 ? 0 : slots_in;
   this->label = label;
-  if (slots <= 0 || words_in == NILP) {
+  if (slots <= 0 || words_in == _NilP) {
     return;
   }
   words = new IUC[slots]();
@@ -88,7 +88,7 @@ StateRecordSet::~StateRecordSet() {
   delete[] records_;
 }
 
-BOL StateRecordSet::Push(const AgentState& state, ISC label) {
+BOL StateRecordSet::Push(AgentState& state, ISC label) {
   if (count_ >= cap_) {
     return false;
   }
@@ -107,7 +107,7 @@ LinearProbe::~LinearProbe() {
   delete[] weights_;
 }
 
-FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
+FPC LinearProbe::Train(StateRecordSet& data, ISC epochs, FPC lr) {
   ISC n = data.Count();
   if (n == 0) {
     return 0.0f;
@@ -174,8 +174,8 @@ FPC LinearProbe::Train(const StateRecordSet& data, ISC epochs, FPC lr) {
   return Accuracy(data);
 }
 
-ISC LinearProbe::Predict(const IUC* words, ISC feature_dim) const {
-  if (words == NILP) {
+ISC LinearProbe::Predict(const IUC* words, ISC feature_dim) {
+  if (words == _NilP) {
     return 0;
   }
   FPC z = bias_;
@@ -186,7 +186,7 @@ ISC LinearProbe::Predict(const IUC* words, ISC feature_dim) const {
   return z > 0.0f ? 1 : 0;
 }
 
-FPC LinearProbe::Accuracy(const StateRecordSet& data) const {
+FPC LinearProbe::Accuracy(StateRecordSet& data) {
   ISC n = data.Count();
   if (n == 0) {
     return 0.0f;
@@ -201,7 +201,7 @@ FPC LinearProbe::Accuracy(const StateRecordSet& data) const {
   return FPC(correct) / FPC(n);
 }
 
-FPC LinearProbe::Weight(ISC i) const {
+FPC LinearProbe::Weight(ISC i) {
   if (i < 0 || i >= feature_dim_) {
     return 0.0f;
   }
@@ -209,4 +209,4 @@ FPC LinearProbe::Weight(ISC i) const {
 }
 
 } //< namespace iGeek
-#endif
+#endif  //< _iGeekMetricsHXX

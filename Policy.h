@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_POLICY_DECL
-#define IGEEK_POLICY_DECL
+#ifndef _iGeekPolicyH
+#define _iGeekPolicyH
 #include "Tensor.h"
 namespace iGeek {
 
@@ -30,7 +30,7 @@ struct TBlock {
        it for baselines, no network needed.
      - The PPO loop depends only on this, not on any concrete net.
 
-   All tensors are batched [B, ...] where B = the Gym's EnvCount.
+   All tensors are batched [B, ...] where B = the Gym's EnvironmentCount.
 */
 class TPolicy {
  public:
@@ -44,13 +44,13 @@ class TPolicy {
 
   /* Forward: obs [B, obs_len] -> logits [B, A] + values [B].
      Deterministic for a given obs (same weights, no sampling here). */
-  virtual void Forward(const TTensor& obs, TTensor& logits,
+  virtual void Forward(TTensor obs, TTensor& logits,
                        TTensor& values) = 0;
 
   /* Sample an action per row from the (categorical) logits. Writes chosen
      action index into actions_[b] and log-prob into logp_[b]. Uses the
      world RNG (seeded + clamped) for the sampling noise. */
-  virtual void SampleActions(const TTensor& logits, ISC* actions,
+  virtual void SampleActions(TTensor logits, ISC* actions,
                              FPC* logp) = 0;
 
   /* Backward: given the current logits, the taken actions, the advantages,
@@ -73,14 +73,14 @@ class TPolicy {
      @param returns  Per-row target return (adv + value) [B].
      @param grad_logits  OUT: dL/dlogits [B, A].
      @param grad_value   OUT: dV/dvalue [B]. */
-  virtual void Backward(const TTensor& logits, const ISC* actions,
-                        const TTensor& advantages, const TTensor& old_logp,
-                        const TTensor& values, const TTensor& returns,
+  virtual void Backward(TTensor logits, const ISC* actions,
+                        TTensor advantages, TTensor old_logp,
+                        TTensor values, TTensor returns,
                         TTensor& grad_logits, TTensor& grad_value) = 0;
 
   /* Learn rate (Adam/lr). vectorized-batch: the PPO kernel exposes lr. */
   virtual void SetLearnRate(FPC lr) { lr_ = lr; }
-  FPC LearnRate() const { return lr_; }
+  FPC LearnRate() { return lr_; }
 
  protected:
 
@@ -99,11 +99,11 @@ class TTransformer : public TPolicy {
 
   ISC ActionCount() override;
   ISC ObsLength() override;
-  void Forward(const TTensor& obs, TTensor& logits, TTensor& values) override;
-  void SampleActions(const TTensor& logits, ISC* actions, FPC* logp) override;
-  void Backward(const TTensor& logits, const ISC* actions,
-                const TTensor& advantages, const TTensor& old_logp,
-                const TTensor& values, const TTensor& returns,
+  void Forward(TTensor obs, TTensor& logits, TTensor& values) override;
+  void SampleActions(TTensor logits, ISC* actions, FPC* logp) override;
+  void Backward(TTensor logits, const ISC* actions,
+                TTensor advantages, TTensor old_logp,
+                TTensor values, TTensor returns,
                 TTensor& grad_logits, TTensor& grad_value) override;
 
  private:

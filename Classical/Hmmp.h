@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_HMMP_T
-#define IGEEK_CLASSICAL_HMMP_T 1
+#ifndef _iGeekClassicalHmmpH
+#define _iGeekClassicalHmmpH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -85,5 +85,5 @@ P(X0) local variables: W, a TArray of weights of size N
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalHmmpH

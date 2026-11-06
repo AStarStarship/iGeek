@@ -1,7 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
-
+#ifndef _iGeekPolygonWorldBezierH
+#define _iGeekPolygonWorldBezierH
+#pragma once
 namespace iGeek {
 
 /* A fourth order BezierCurve.
@@ -53,3 +54,5 @@ class BezierCurve {
 };
 
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldBezierH

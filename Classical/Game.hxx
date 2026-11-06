@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_GAME_IMPL
-#define IGEEK_CLASSICAL_GAME_IMPL
+#ifndef _iGeekClassicalGameHXX
+#define _iGeekClassicalGameHXX
 #include "Game.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -12,7 +12,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete).  Fixed-capacity action scratch uses AArray
 // (stack-first, RAMFactory-managed under its Autoboofer). No naked
 // new/delete/malloc in this folder.
@@ -25,7 +25,7 @@ static const ISC kGameBranch = 256;
 // magnitudes above this saturate the pruning bounds.
 static const FPC kGameUtilityInf = FPC(1e30f);
 
-/* Returns a RAMFactory block to the factory (a no-op for NILP origins). */
+/* Returns a RAMFactory block to the factory (a no-op for _NilP origins). */
 static inline IUW* GameFree(IUW* origin) {
   return ObjectFactoryHeap(origin, RAMFactoryDelete);
 }
@@ -46,12 +46,12 @@ static BOL GameStackEnsure(GameStateStack* stk, ISC level) {
     new_cap = level + 1;
   }
   IUW* nm = ObjectFactoryHeap(
-      NILP, IUD(new_cap) * IUD(stk->state_words) * IUD(sizeof(IUC)));
+      _NilP, IUD(new_cap) * IUD(stk->state_words) * IUD(sizeof(IUC)));
   if (IsError(nm)) {
     return false;
   }
-  IUC* nd = TPtr<IUC>(nm);
-  const IUC* od = TPtr<IUC>(stk->mem);
+  IUC* nd = TRef<IUC>(nm);
+  const IUC* od = TRef<IUC>(stk->mem);
   for (ISC i = 0; i < stk->cap; ++i) {
     for (ISC w = 0; w < stk->state_words; ++w) {
       nd[IUD(i) * stk->state_words + w] = od[IUD(i) * stk->state_words + w];
@@ -71,7 +71,7 @@ static IUC GameMinimaxRec(const Game* game, ISC level, GameStateStack* stk,
                           const IUC* state, FPC alpha, FPC beta,
                           ISC* out_nodes, FPC* value_out, BOL prune,
                           IUC* best_action_out) {
-  if (out_nodes != NILP) {
+  if (out_nodes != _NilP) {
     ++(*out_nodes);
   }
   if (game->IsTerminal(state, game->state_words)) {
@@ -97,7 +97,7 @@ static IUC GameMinimaxRec(const Game* game, ISC level, GameStateStack* stk,
       break;
     }
     IUC* child =
-        TPtr<IUC>(stk->mem) + IUD(level + 1) * IUD(stk->state_words);
+        TRef<IUC>(stk->mem) + IUD(level + 1) * IUD(stk->state_words);
     game->Result(state, game->state_words, action, child);
     FPC child_value = FPC(0.0f);
     IUC child_best = 0;
@@ -133,11 +133,11 @@ static IUC GameMinimaxRec(const Game* game, ISC level, GameStateStack* stk,
 }
 
 static IUC MinimaxRoot(const Game* game, ISC* out_nodes, BOL prune) {
-  if (out_nodes != NILP) {
+  if (out_nodes != _NilP) {
     *out_nodes = 0;
   }
   GameStateStack stk;
-  stk.mem = NILP;
+  stk.mem = _NilP;
   stk.cap = 0;
   stk.state_words = game->state_words < 1 ? 1 : game->state_words;
   if (!GameStackEnsure(&stk, 0)) {
@@ -159,5 +159,5 @@ IUC MinimaxAlphaBetaAction(const Game* game, ISC* out_nodes) {
   return MinimaxRoot(game, out_nodes, true);
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalGameHXX

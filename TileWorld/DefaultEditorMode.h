@@ -1,4 +1,4 @@
-#include "TVec.h"
+#include "Homotuples.h"
 // Copyright AStarship <https://astarship.net>.
 #ifndef TILEWORLD_DEFAULTEDITORMODE_DECL
 #define TILEWORLD_DEFAULTEDITORMODE_DECL
@@ -32,9 +32,9 @@ class DefaultEditorMode : public EditorMode {
                     EditorStateData* editor_state_data);
   virtual ~DefaultEditorMode();
 
-  void UpdateInput(const FPC& dt);
-  void UpdateGui(const FPC& dt);
-  void Update(const FPC& dt);
+  void UpdateInput(FPC& dt);
+  void UpdateGui(FPC& dt);
+  void Update(FPC& dt);
 
   void RenderGui(sf::RenderTarget& target);
   void Render(sf::RenderTarget& target);

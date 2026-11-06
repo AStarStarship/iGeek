@@ -1,0 +1,22 @@
+seams:
+  - name: _iGeekClassicalCore
+    file: 01.Core.hxx
+    label: "Testing Classical core..."
+  - name: _iGeekClassicalRelease
+    file: 02.Release.hxx
+    label: "Testing Classical release..."
+  - name: _iGeekClassicalSearch
+    file: 03.Search.hxx
+    label: "Testing Classical Search..."
+  - name: _iGeekClassicalCSPH
+    file: 04.Csp.hxx
+    label: "Testing Classical Csp..."
+  - name: _iGeekClassicalMDP
+    file: 05.Mdp.hxx
+    label: "Testing Classical Mdp..."
+  - name: _iGeekClassicalSAT
+    file: 06.Sat.hxx
+    label: "Testing Classical Sat..."
+  - name: _iGeekClassicalGame
+    file: 07.Game.hxx
+    label: "Testing Classical Game..."

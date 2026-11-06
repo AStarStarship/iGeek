@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_GAME_DECL
-#define IGEEK_CLASSICAL_GAME_DECL
+#ifndef _iGeekClassicalGameH
+#define _iGeekClassicalGameH
 #include "../ASCIICrabs/_Config.h"
 namespace iGeek {
 
@@ -25,12 +25,12 @@ struct Game {
 /* Figures 5.3/5.7 minimax with alpha-beta pruning. Returns the best
 action at the initial state (first best on ties; 0 when there are no
 actions). out_nodes is an optional counter of evaluated states
-(NILP is fine). MinimaxAction passes -inf/+inf bounds, which is
+(_NilP is fine). MinimaxAction passes -inf/+inf bounds, which is
 plain minimax; MinimaxAlphaBetaAction is the same routine with
 pruning enabled — with utility values below kGameUtilityInf the
 decisions are identical, only the node count differs. */
 IUC MinimaxAction(const Game* game, ISC* out_nodes);
 IUC MinimaxAlphaBetaAction(const Game* game, ISC* out_nodes);
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalGameH

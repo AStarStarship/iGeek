@@ -1,21 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
-
-// The card world's POLICY seam unit: unit tests for the TTransformer forward
-// (M3). Gated on IGEEK_CARDSWORLD_CORE so it runs with the default build.
-//
-// What we verify (forward is the deliverable for M3; backward/gradcheck is M4):
-//   - Shape: logits is [B, A], values is [B].
-//   - Determinism: two independently-constructed nets (same seed) produce
-//     IDENTICAL logits + values for the same obs.
-//   - Sanity: logits and values are finite (no NaN/Inf) and within a sane
-//     range for the small net.
-//   - SampleActions: greedy argmax is consistent with the logits, and the
-//     log-prob is <= 0.
-
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-
-using namespace ::_;
+#if _Seam >= _iGeekCardsWorldCore
 namespace CardsWorldTest {
+using namespace ::_;
+using namespace iGeek; 
 
 namespace {
 inline ISC& POLFAILS() {
@@ -25,7 +12,7 @@ inline ISC& POLFAILS() {
 #define POL_CHECK(cond)                                       \
   do {                                                        \
     if (!::_::Test(cond)) {                                   \
-      ::_::StdOut() << "\nFAILURE Policy at line:" << __LINE__ \
+      ::_::RefOut() << "\nFAILURE Policy at line:" << __LINE__ \
                     << " in \"" << __FILE__ << "\"\n";        \
       ++POLFAILS();                                           \
     }                                                         \
@@ -34,7 +21,7 @@ inline ISC& POLFAILS() {
   do {                                                        \
     { FPC _d = (a) - (b); if (_d < 0) _d = -_d;              \
       if (!::_::Test(_d < 1e-4f)) {                          \
-        ::_::StdOut() << "\nFAILURE Policy (close " << (a)   \
+        ::_::RefOut() << "\nFAILURE Policy (close " << (a)   \
                       << " vs " << (b) << ") at line:"       \
                       << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
         ++POLFAILS();                                         \
@@ -42,7 +29,7 @@ inline ISC& POLFAILS() {
 }  //< namespace
 
 inline const CHA* Policy(const CHA* args) {
-  A_TEST_BEGIN;
+  _ATestBegin;
   const ISC B = 4, A = 2, OBS = 4, DIM = 16, LAYERS = 2;
 
   // Build a fixed observation batch (4 tables, 4 obs features each).
@@ -52,7 +39,7 @@ inline const CHA* Policy(const CHA* args) {
   obs.At(2,0)=7.0f;  obs.At(2,1)=2.0f; obs.At(2,2)=1.0f; obs.At(2,3)=0.0f;
   obs.At(3,0)=21.0f; obs.At(3,1)=10.0f; obs.At(3,2)=1.0f; obs.At(3,3)=0.0f;
 
-  D_COUT("Policy: shape (logits [B,A], values [B])\n");
+  _DROut("Policy: shape (logits [B,A], values [B])\n");
   {
     TTransformer net(OBS, A, DIM, LAYERS);
     TTensor logits = TTensorAlloc(B, A);
@@ -73,7 +60,7 @@ inline const CHA* Policy(const CHA* args) {
     TTensorFree(logits); TTensorFree(values);
   }
 
-  D_COUT("Policy: determinism (two nets, same seed, same obs -> identical)\n");
+  _DROut("Policy: determinism (two nets, same seed, same obs -> identical)\n");
   {
     TTransformer n1(OBS, A, DIM, LAYERS);
     TTransformer n2(OBS, A, DIM, LAYERS);
@@ -94,7 +81,7 @@ inline const CHA* Policy(const CHA* args) {
     TTensorFree(v1); TTensorFree(v2);
   }
 
-  D_COUT("Policy: different obs -> (generally) different logits\n");
+  _DROut("Policy: different obs -> (generally) different logits\n");
   {
     TTransformer net(OBS, A, DIM, LAYERS);
     TTensor l1 = TTensorAlloc(B, A), l2 = TTensorAlloc(B, A);
@@ -103,7 +90,7 @@ inline const CHA* Policy(const CHA* args) {
     // Build a fresh obs with every feature shifted by +5 (different input).
     TTensor obsb = TTensorAlloc(B, OBS);
     for (ISC i = 0; i < B; ++i)
-      for (ISC j = 0; j < OBS; ++j) obsb.At(i,j) = obs.AtC(i,j) + 5.0f;
+      for (ISC j = 0; j < OBS; ++j) obsb.At(i,j) = obs.At(i,j) + 5.0f;
     net.Forward(obsb, l2, v2);
     // At least one (i,j) should differ (deterministic net, different input).
     BOL any_diff = false;
@@ -117,7 +104,7 @@ inline const CHA* Policy(const CHA* args) {
     TTensorFree(obsb);
   }
 
-  D_COUT("Policy: SampleActions (greedy argmax + logp <= 0)\n");
+  _DROut("Policy: SampleActions (greedy argmax + logp <= 0)\n");
   {
     TTransformer net(OBS, A, DIM, LAYERS);
     TTensor logits = TTensorAlloc(B, A);
@@ -137,10 +124,10 @@ inline const CHA* Policy(const CHA* args) {
 
   TTensorFree(obs);
   if (POLFAILS() != 0) {
-    D_COUT("\n" << POLFAILS() << " Policy assertion(s) FAILED\n");
+    _DROut("\n" << POLFAILS() << " Policy assertion(s) FAILED\n");
     return "cards_world_policy_test_failure";
   }
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace CardsWorldTest

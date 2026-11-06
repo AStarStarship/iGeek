@@ -3,7 +3,6 @@
 // Verifies (a) the env steps deterministically, (b) a linear policy can be
 // trained on PacWorldGym via TPPO without crashing, (c) obs is fixed-length.
 // Self-contained: config/seam header + probe body in one .hxx.
-
 #pragma once
 #include "../../ASCIICrabs/_ConfigHeader.h"
 #include "../../ASCIICrabs/_ConfigDefault.h"
@@ -11,13 +10,13 @@
 
 // Seam levels for the PacWorld world (local to this probe; the real world
 // _Seams.h would define these).
-#ifndef IGEEK_PACWORLD
-#define IGEEK_PACWORLD 900
+#ifndef _iGeekPacWorldHXX
+#define _iGeekPacWorldHXX
 #endif
 
 #include "../Tensor.h"
 #include "../Policy.h"
-#include "../Env.h"
+#include "../Environment.h"
 #include "../Gym.h"
 #include "../PPO.h"
 
@@ -49,7 +48,7 @@ static void OK(const CHA* what) {
 // the mean per-env reward.
 static FPC GreedyReward(PacWorldGym& gym, TPolicy& pol) {
   gym.ResetBatch();
-  ISC B = gym.EnvCount();
+  ISC B = gym.EnvironmentCount();
   TTensor obs = TTensorAlloc(B, PacWorldEnv::ObsLength);
   for (ISC i = 0; i < B; ++i)
     for (ISC j = 0; j < PacWorldEnv::ObsLength; ++j)
@@ -59,9 +58,9 @@ static FPC GreedyReward(PacWorldGym& gym, TPolicy& pol) {
   pol.Forward(obs, logits, values);
   FPC total = 0.0f;
   for (ISC i = 0; i < B; ++i) {
-    ISC best = 0; FPC bv = logits.AtC(i, 0);
+    ISC best = 0; FPC bv = logits.At(i, 0);
     for (ISC a = 1; a < PacWorldEnv::ActionCount; ++a)
-      if (logits.AtC(i, a) > bv) { bv = logits.AtC(i, a); best = a; }
+      if (logits.At(i, a) > bv) { bv = logits.At(i, a); best = a; }
     gym.Actions()[i] = best;
   }
   gym.StepBatch();
@@ -70,7 +69,7 @@ static FPC GreedyReward(PacWorldGym& gym, TPolicy& pol) {
   return total / (FPC)B;
 }
 
-int main() {
+ISC main() {
   // 1. Env steps + obs is fixed-length.
   {
     PacWorldEnv env(9, 9, 42);
@@ -104,7 +103,7 @@ int main() {
   {
     const ISC B = 4, Cols = 9, Rows = 9;
     PacWorldGym gym(B, Cols, Rows, 7);
-    if (gym.EnvCount() != B) FAIL("gym env count");
+    if (gym.EnvironmentCount() != B) FAIL("gym env count");
     TLinearPolicy pol(PacWorldEnv::ObsLength, PacWorldEnv::ActionCount, 11);
     pol.SetLearnRate(0.1f);
     TPPO ppo(gym, pol, /*horizon=*/2, /*epochs=*/2);

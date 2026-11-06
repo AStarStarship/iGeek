@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_PHYSICS_H
-#define CRABS_CARWORLD_PHYSICS_H
+#ifndef _iGeekCarWorldPhysicsH
+#define _iGeekCarWorldPhysicsH
 #include "CarConfig.h"
 #include "../BikeWorld/BikePhysics.h"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 enum { CarFrontLeft, CarFrontRight, CarRearLeft, CarRearRight, CarWheelCount };
 /** SI units. Planar rigid body; four independent tire forces, static axle loads. */
@@ -36,8 +36,8 @@ struct alignas(ACPUCacheLineSize) TCarState
  * @return false without mutating state for invalid/nonfinite input.
  * @pre dt in (0,0.01]; caller handles collisions separately.
  */
-BOL TCarStep(TCarState& car, const TCarParams& params,
-             const TCarControl& control, const TCarContacts& contacts, FPD dt);
+BOL TCarStep(TCarState& car, TCarParams& params,
+             TCarControl& control, TCarContacts& contacts, FPD dt);
 } //< namespace iGeek
 #endif
 #endif

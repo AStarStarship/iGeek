@@ -1,28 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// SudokuWorld core seam unit: unit tests for the deterministic Sudoku engine
-// (constraint check, solver, verifier, generator) AND the swappable gym
-// (ASudokuGym). The gym is model-agnostic — the tests drive it with a scripted
-// policy (solve-by-target) to confirm the interface is agent-independent, NOT
-// to validate any one hard-coded model. Gated on IGEEK_SUDOKUWORLD_CORE.
-#if SEAM >= IGEEK_SUDOKUWORLD_CORE
-#if SEAM == IGEEK_SUDOKUWORLD_CORE
+#if _Seam >= _iGeekSudokuWorldCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-// SudokuWorld.hxx is pulled ONCE by the rollup _Tests.hxx (unguarded); this
-// unit relies on that rather than re-including it.
-using namespace ::_;
 namespace SudokuWorldTest {
-using namespace iGeek;   // engine types (in iGeek) used unqualified
+using namespace ::_;
+using namespace iGeek;
 
 inline ISC core_fails = 0;
 inline void CoreCheck(BOL ok, const CHA* what) {
   if (!::_::Test(ok)) {
     core_fails += 1;
-    ::_::StdOut() << "\ncore FAIL: " << what << '\n';
+    ::_::RefOut() << "\ncore FAIL: " << what << '\n';
   }
 }
 
@@ -31,8 +21,8 @@ inline void CoreCheck(BOL ok, const CHA* what) {
 // agent — the same interface a PPO policy or HRM would use.
 inline void ScriptedSolve(ASudokuGym& gym) {
   for (ISC step = 0; step < SudokuCells * 2; ++step) {
-    const TBoard& board = gym.Board(0);
-    const TBoard& target = gym.Target(0);
+    TBoard& board = gym.Board(0);
+    TBoard& target = gym.Target(0);
     ISC cell = -1;
     for (ISC i = 0; i < SudokuCells; ++i) {
       if (board[i] == 0) { cell = i; break; }
@@ -45,10 +35,9 @@ inline void ScriptedSolve(ASudokuGym& gym) {
 }
 
 inline const CHA* Core(const CHA* args) {
-  (void)args;
-#if SEAM >= IGEEK_SUDOKUWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing SudokuWorld (swappable gym + engine)..."));
+#if _Seam >= _iGeekSudokuWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing SudokuWorld (swappable gym + engine)..."));
   core_fails = 0;
 
   // 1. Constraint check: the default puzzle is consistent (every pre-filled
@@ -109,7 +98,7 @@ inline const CHA* Core(const CHA* args) {
   //    solution — proving the interface is agent-independent.
   {
     ASudokuGym gym(1, 7, 40);
-    CoreCheck(gym.EnvCount() == 1, "gym has 1 env");
+    CoreCheck(gym.EnvironmentCount() == 1, "gym has 1 env");
     CoreCheck(gym.ObsLength() == SudokuCells, "gym obs length is 81");
     ScriptedSolve(gym);
     CoreCheck(gym.Terminals()[0] > 0.5f, "scripted agent completes the episode");
@@ -125,7 +114,7 @@ inline const CHA* Core(const CHA* args) {
   //    does not corrupt the board.
   {
     ASudokuGym gym(1, 7, 40);
-    const TBoard& before = gym.Board(0);
+    TBoard& before = gym.Board(0);
     ISC filled = -1;
     for (ISC i = 0; i < SudokuCells; ++i) if (before[i] != 0) { filled = i; break; }
     if (filled >= 0) {
@@ -139,7 +128,7 @@ inline const CHA* Core(const CHA* args) {
   // 8. Gym: batch interface — two parallel envs, both step in one call.
   {
     ASudokuGym gym(2, 99, 30);
-    CoreCheck(gym.EnvCount() == 2, "gym batches 2 envs");
+    CoreCheck(gym.EnvironmentCount() == 2, "gym batches 2 envs");
     gym.Actions()[0] = 0;  // no-op (cell 0, digit 0 = illegal)
     gym.Actions()[1] = 0;
     gym.StepBatch();
@@ -147,12 +136,12 @@ inline const CHA* Core(const CHA* args) {
   }
 
   if (core_fails != 0) {
-    ::_::StdOut() << "\nSudokuWorld core: " << core_fails << " check(s) FAILED\n";
+    ::_::RefOut() << "\nSudokuWorld core: " << core_fails << " check(s) FAILED\n";
     return "sudokuworld_core_test_failure";
   }
-  D_COUT("  SudokuWorld core: all checks passed\n");
+  _DROut("  SudokuWorld core: all checks passed\n");
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace SudokuWorldTest

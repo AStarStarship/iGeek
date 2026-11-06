@@ -38,10 +38,10 @@ identifiers and filenames fleet-wide.
 ```
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_<NAME>_<H|HPP>
-#define CRABS_<NAME>_<H|HPP>
+#ifndef _iGeek<NAME><H|HPP>
+#define _iGeek<NAME><H|HPP>
 #include "..."
-#if SEAM >= CRABS_<NAME>
+#if SEAM >= _iGeek<NAME>
 ... body ...
 #endif
 #endif
@@ -60,6 +60,21 @@ identifiers and filenames fleet-wide.
 get a trailing `_`; types are short CAPS width-codes (CHA/ISC/IUD/BOL); structs are
 CamelCase with T(POD)/A(utoject) prefix; functions are CamelCase with T/A kind prefixes
 and _NC/C markers; locals are snake_case; everything lives in `namespace _`; every file
-starts with AStarship copyright, `#pragma once`, a `CRABS_*` guard, and `#if SEAM >= CRABS_*`
+starts with AStarship copyright, `#pragma once`, a `_iGeek*` guard, and `#if SEAM >= _iGeek*`
 gating.** The name tells you the kind, width, access level, and mutability — before you
 read the body.
+
+## Git Protocol
+
+- **Do NOT undelete files from git.** A deleted or renamed file was done so on
+  purpose — it wasn't supposed to be there, it got merged into another file, or
+  it wasn't named correctly. Fix the current files in place; do not try to
+  rescue or restore stale files from git history (no `git checkout -- <path>`,
+  `git restore <path>`, `git show <ref>:<path>` written back to disk, or
+  `git revert` to bring a deleted path back).
+- **Only `master-agent` and the Captain may modify git.** No other agent or
+  profile may run git write operations on a tracked repo — no `git commit`,
+  `git add`, `git push`, `git reset`, `git rebase`, `git merge`, `git rm`,
+  branch creation, force-push, or PR changes. Read-only inspection
+  (`git status`, `git log`, `git diff`, `git show`, `git ls-files`) is allowed
+  for anyone.

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_REFLEX_DECL
-#define IGEEK_CLASSICAL_REFLEX_DECL
+#ifndef _iGeekClassicalReflexH
+#define _iGeekClassicalReflexH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -136,5 +136,5 @@ struct SimpleReflexAgent {
   void Reset();
 };
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalReflexH

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_GAMESTATE_HXX
-#define IGEEK_GAMESTATE_HXX
+#ifndef _iGeekGameStateHXX
+#define _iGeekGameStateHXX
 #include "GameState.h"
 #include "Game.h"
 
@@ -246,4 +246,4 @@ void StateError::Update(FPC delta) { (void)delta; }
 
 void StateError::Draw() {}
 
-#endif  // IGEEK_GAMESTATE_HXX
+#endif  //< _iGeekGameStateHXX

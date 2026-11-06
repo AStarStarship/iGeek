@@ -1,14 +1,15 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_GYM_HXX
-#define CRABS_BIKEWORLD_GYM_HXX
+#ifndef _iGeekBikeWorldGymHXX
+#define _iGeekBikeWorldGymHXX
+#include <_Config.h>
 #include "BikeGym.h"
 #include "BikeWorld.hxx"
 #include "../Gym.hxx"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
-ABikeGym::ABikeGym(const TileMap& map, const TVehicleRoute& route,
-    const TBikeState& initial, ISC count, IUD seed)
+ABikeGym::ABikeGym(TileMap& map, TVehicleRoute& route,
+    TBikeState& initial, ISC count, IUD seed)
     : Gym("bikeworld"), seed_(seed) {
   env_count_ = count < 1 ? 1 : count > GymEnvMax ? GymEnvMax : count;
   obs_len_ = ABikeEnv::ObsLength; action_count_ = BikeActionCount;
@@ -17,15 +18,15 @@ ABikeGym::ABikeGym(const TileMap& map, const TVehicleRoute& route,
   action_mask_ = mask_storage_;
   for (ISC i = 0; i < env_count_; ++i) {
     bikes_[i] = new ABikeEnv(map, route, initial, seed_ + IUD(i) * 0x9E37u);
-    envs_[i] = NILP;
+    envs_[i] = _NilP;
   }
-  CopyStr(manifest_.name, ManifestNameLen, "bikeworld");
-  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  TSPrint(manifest_.name, ISW(ManifestNameLen), "bikeworld");
+  TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0");
   manifest_.kind = ManifestKindEnv;
   manifest_.domain = ManifestDomainRobotics;
-  CopyStr(manifest_.description, ManifestDescriptionLen,
+  TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
           "Bicycle riding with speed command control");
-  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
   manifest_.reward_low = FPC(-1.0);
   manifest_.reward_high = FPC(1.0);
   manifest_.reward_higher_is_better = true;
@@ -33,9 +34,9 @@ ABikeGym::ABikeGym(const TileMap& map, const TVehicleRoute& route,
   manifest_.obs_count = obs_len_;
   manifest_.action_count = action_count_;
   manifest_.max_episode_steps = ABikeEnv::MaxFrames;
-  manifest_.env_count_max = GymEnvMax;
-  CopyStr(manifest_.world_name, ManifestWorldLen, "BikeWorld");
-  manifest_.seam_number = IGEEK_BIKEWORLD_CORE;
+  manifest_.environment_count_max = GymEnvMax;
+  TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "BikeWorld");
+  manifest_.seam_number = _iGeekBikeWorldCore;
   manifest_.manifest_version = ISC(1);
   ResetBatch();
 }

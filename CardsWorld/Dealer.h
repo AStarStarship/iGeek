@@ -1,10 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
-#ifndef IGEEK_CARDSDEALER_DECL
-#define IGEEK_CARDSDEALER_DECL
+#ifndef _iGeekCardsWorldCoreH
+#define _iGeekCardsWorldCoreH
 #include <_Config.h>
-#if SEAM >= IGEEK_DEALER
+#if _Seam >= _iGeekCardsWorldCore
 #include "Deck.h"
 #include "Hand.h"
 #include "Player.h"
@@ -53,11 +52,11 @@ class Dealer {
   ISC AddPlayer(Player* new_player);
 
   /* Returns the number of players. */
-  ISC PlayerCount() const { return player_count_; }
+  ISC PlayerCount() { return player_count_; }
 
   /* Returns a pointer to the player at index, or nil if out of range. */
-  Player* GetPlayer(ISC index) const {
-    if (index < 0 || index >= player_count_) return NILP;
+  Player* GetPlayer(ISC index) {
+    if (index < 0 || index >= player_count_) return _NilP;
     return players_[index];
   }
 
@@ -68,15 +67,15 @@ class Dealer {
   CardStack& GetStock() { return stock_; }
 
   /* Returns the current ante. */
-  ISC GetAnte() const { return ante_; }
+  ISC GetAnte() { return ante_; }
   void SetAnte(ISC ante) { ante_ = ante < 0 ? 0 : ante; }
 
   /* Returns the minimum bet. */
-  ISC GetMinBet() const { return min_bet_; }
+  ISC GetMinBet() { return min_bet_; }
   void SetMinBet(ISC value) { min_bet_ = value < 1 ? 1 : value; }
 
   /* Returns the pot total. */
-  ISC GetPotTotal() const { return pot_total_; }
+  ISC GetPotTotal() { return pot_total_; }
   void SetPotTotal(ISC total) { pot_total_ = total < 0 ? 0 : total; }
   void AddToPot(ISC points) { pot_total_ += points; }
 
@@ -90,10 +89,10 @@ class Dealer {
   ISC NextPlayer();
 
   /* Returns the current player's turn index. */
-  ISC CurrentPlayer() const { return current_player_; }
+  ISC CurrentPlayer() { return current_player_; }
 };
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreH

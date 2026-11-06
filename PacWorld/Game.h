@@ -1,16 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef PACWORLD_GAME
-#define PACWORLD_GAME
-
+#ifndef _iGeekPacWorldGameH
+#define _iGeekPacWorldGameH
 #include "GameState.h"
-
 namespace PacWorld {
 
 /* The headless game. Owns the state objects and the current state.
-   `Update(delta)` delegates to the current state. `Run()` is stubbed —
-   the browser/display layer provides the main loop (headless-first
-   design). No SFML, no stdlib. */
+  `Update(delta)` delegates to the current state. `Run()` is stubbed —
+  the browser/display layer provides the main loop (headless-first
+  design). No SFML, no stdlib. */
 class Game {
   GameState* state_;  // current state.
  public:
@@ -47,5 +45,5 @@ class Game {
   void PressButton();
   void MoveStick(ISC2 direction);
 };
-}  // namespace PacWorld
+}  //< namespace PacWorld
 #endif

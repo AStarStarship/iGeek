@@ -1,34 +1,15 @@
 // Copyright AStarship <https://astarship.net>.
 
-
 #pragma once
 
-#ifndef MODULE_CONFIG_HEADER
-#define MODULE_CONFIG_HEADER 1
+#ifndef _iGeekCarWorldConfigH
+#define _iGeekCarWorldConfigH 1
 
 #include <Crabs/_config_header.inl>
 
-#define SEAM Crabs_LIST
+#define _Seam _CrabsList
 
-#define ASSEMBLY_TYPE ASSEMBLE_EXE 1
 #define Crabs_RUN_TESTS YES_0
-
-#define ALU_SIZE ALU_64_BIT
-#define CPU_ENDIAN CPU_ENDIAN_LITTLE
-
-#define USING_CONSOLE YES_0
-
-#define USING_UTF8 YES_0
-#define USING_UTF16 YES_0
-#define USING_UTF32 YES_0
-#define LARGEST_CHAR STRING_TYPE_1
-#define USING_STR STRING_TYPE_1
-
-#define USING_FP 8
-#define USING_FP4 YES_0
-#define USING_FP8 YES_0
-
-#define USING_16_BYTE_POD_TYPES NO_0
 
 #include <Crabs/_config_footer.inl>
 

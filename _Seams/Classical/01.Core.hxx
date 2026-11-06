@@ -1,19 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// AUTO-GENERATED from __Seams.yaml (iGeek CLASSICAL).
-// CLASSICAL core seam unit: the unit tests for the deterministic parts of the
-// CLASSICAL engine. Gated on IGEEK_CLASSICAL_CORE (the first / default seam).
-#if SEAM >= IGEEK_CLASSICAL_CORE
-#if SEAM == IGEEK_CLASSICAL_CORE
+#if _Seam >= _iGeekClassicalCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-#include "Bayes.hxx"
-#include <cstdio>
-#include <cmath>
+#include "../../Classical/Bayes.hxx"
+#include "../../CrabsTK/Math/Blas.h"
 namespace iGeek {
+using namespace ::_;
+using namespace iGeek; 
 
 static int g_pass = 0;
 static int g_fail = 0;
@@ -21,10 +16,10 @@ static int g_fail = 0;
 static void CheckF(const char* name, FPC got, FPC want, FPC tol) {
   if (std::abs(got - want) <= tol) {
     g_pass++;
-    D_COUT("PASS " << name << '\n');
+    _DROut("PASS " << name << '\n');
   } else {
     g_fail++;
-    D_COUT("FAIL " << name << " got=" << got << " want=" << want << '\n');
+    _DROut("FAIL " << name << " got=" << got << " want=" << want << '\n');
   }
 }
 
@@ -34,7 +29,7 @@ static BOL BuildUmbrella(BaysNet* bn) {
   }
   {
     FPC ppt[1] = {FPC(0.5f)};  // U
-    if (!bn->TellVar(0, NILP, 0, ppt)) return false;
+    if (!bn->TellVar(0, _NilP, 0, ppt)) return false;
   }
   {
     FPC ppt[2] = {FPC(0.2f), FPC(0.9f)};  // R | U=0, R | U=1
@@ -50,14 +45,14 @@ static BOL BuildUmbrella(BaysNet* bn) {
 }
 
 inline const CHA* Core(const CHA* args) {
-#if SEAM >= IGEEK_CLASSICAL_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing Classical (Bayes net enumeration + VE)..."));
+#if _Seam >= _iGeekClassicalCore
+  _ATestBegin;
+  _DROut(Headingf("Testing Classical (Bayes net enumeration + VE)..."));
 
 
   BaysNet bn;
   if (!BuildUmbrella(&bn)) {
-    D_COUT("BuildUmbrella failed\n");
+    _DROut("BuildUmbrella failed\n");
     return "CLASSICAL_FAIL: BuildUmbrella failed";
   }
 
@@ -73,7 +68,7 @@ inline const CHA* Core(const CHA* args) {
 
   // --- Fig 14.9 ENUMERATION-ASK (exact) -----------------------------------
   {
-    CheckF("Enum P(R=1)", BaysEnumerate(bn, 1, NILP, 0), FPC(0.55f),
+    CheckF("Enum P(R=1)", BaysEnumerate(bn, 1, _NilP, 0), FPC(0.55f),
           FPC(1e-4f));
     BaysEv ev1[1] = {{2, 1}};  // W = 1
     CheckF("Enum P(R=1|W=1)", BaysEnumerate(bn, 1, ev1, 1),
@@ -90,10 +85,10 @@ inline const CHA* Core(const CHA* args) {
   {
     BayesInfer inf;
     if (!inf.Init(3, 512)) {
-      D_COUT("VE Init failed\n");
+      _DROut("VE Init failed\n");
       return "CLASSICAL_FAIL: VE Init failed";
     }
-    CheckF("VE P(R=1)", inf.Ask(bn, 1, NILP, 0), FPC(0.55f), FPC(1e-4f));
+    CheckF("VE P(R=1)", inf.Ask(bn, 1, _NilP, 0), FPC(0.55f), FPC(1e-4f));
     BaysEv ev1[1] = {{2, 1}};
     CheckF("VE P(R=1|W=1)", inf.Ask(bn, 1, ev1, 1), FPC(0.44f / 0.575f),
           FPC(1e-4f));
@@ -112,11 +107,11 @@ inline const CHA* Core(const CHA* args) {
     FPC ok = BaysSample(bn, 42, x);
     if (ok != FPC(1.0f) || (x[0] != 0 && x[0] != 1) ||
         (x[1] != 0 && x[1] != 1) || (x[2] != 0 && x[2] != 1)) {
-      D_COUT("(label)");
+      _DROut("(label)");
       g_fail++;
     } else {
       g_pass++;
-      D_COUT("IUC=" << IUC(x[0]) << " " << IUC(x[1]) << " " << IUC(x[2]) << '\n');
+      _DROut("IUC=" << IUC(x[0]) << " " << IUC(x[1]) << " " << IUC(x[2]) << '\n');
     }
     // 20k samples: P(R=1) should land near 0.55.
     IUD c1 = 0;
@@ -154,11 +149,11 @@ inline const CHA* Core(const CHA* args) {
           FPC(0.375f / 0.575f), FPC(0.03f));
   }
 
-  D_COUT("g_pass=" << g_pass << " g_fail=" << g_fail << '\n');
-  return g_fail ? "CLASSICAL_FAIL: " : NILP;
+  _DROut("g_pass=" << g_pass << " g_fail=" << g_fail << '\n');
+  return g_fail ? "CLASSICAL_FAIL: " : _NilP;
 
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace ClassicalTest

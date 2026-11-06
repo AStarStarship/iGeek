@@ -12,16 +12,14 @@
 // the TTransformer uses and the one M4 gradchecked.
 #pragma once
 #include "Policy.h"
-#include "PolicyNet.hxx"  // for TPolicyLoss/TValueLoss + the Backward math shape
-#include <math.h>
-
+#include "../CrabsTK/Math/Blas.h"
 namespace iGeek {
 
 class TLinearPolicy : public TPolicy {
  public:
   TLinearPolicy(ISC obs_len, ISC action_count, IUD seed)
       : obs_len_(obs_len), action_count_(action_count), seed_(seed),
-        W_(NILP), b_(NILP), W_v_(NILP), b_v_(NILP), built_(false), lr_(0.1f) {}
+        W_(_NilP), b_(_NilP), W_v_(_NilP), b_v_(_NilP), built_(false), lr_(0.1f) {}
   ~TLinearPolicy() {
     TTensorFree(W_); TTensorFree(b_);
     TTensorFree(W_v_); TTensorFree(b_v_);
@@ -55,13 +53,13 @@ class TLinearPolicy : public TPolicy {
     built_ = true;
   }
 
-  void Forward(const TTensor& obs, TTensor& logits, TTensor& values) override {
+  void Forward(TTensor obs, TTensor& logits, TTensor& values) override {
     if (!built_) Build(12345);
     TTensorMatMul(obs, W_, logits); TTensorAddBiasInPlace(logits, b_);
     TTensorMatMul(obs, W_v_, values); TTensorAddBiasInPlace(values, b_v_);
   }
 
-  void SampleActions(const TTensor& logits, ISC* actions,
+  void SampleActions(TTensor logits, ISC* actions,
                      FPC* logp) override {
     ISC B = logits.rows_;
     // Allocate the LSE output for ALL rows once (TTensorRowLogSumExp writes
@@ -79,42 +77,42 @@ class TLinearPolicy : public TPolicy {
       FPC cumsum = 0.0f;
       ISC sampled = logits.cols_ - 1;
       for (ISC a = 0; a < logits.cols_; ++a) {
-        cumsum += FPC(exp(logits.AtC(b, a) - lse.At(b, 0)));
+        cumsum += FPC(exp(logits.At(b, a) - lse.At(b, 0)));
         if (u < cumsum) { sampled = a; break; }
       }
       actions[b] = sampled;
-      logp[b] = logits.AtC(b, sampled) - lse.At(b, 0);
+      logp[b] = logits.At(b, sampled) - lse.At(b, 0);
     }
     TTensorFree(lse);
   }
 
-  void Backward(const TTensor& logits, const ISC* actions,
-                const TTensor& advantages, const TTensor& old_logp,
-                const TTensor& values, const TTensor& returns,
+  void Backward(TTensor logits, const ISC* actions,
+                TTensor advantages, TTensor old_logp,
+                TTensor values, TTensor returns,
                 TTensor& grad_logits, TTensor& grad_value) override {
     // Same base-gradient math as TTransformer::Backward (verified by M4).
     (void)old_logp;
     ISC B = logits.rows_, A = logits.cols_;
     for (ISC b = 0; b < B; ++b) {
       TTensor row = TTensorAlloc(1, A);
-      for (ISC a = 0; a < A; ++a) row.At(0, a) = logits.AtC(b, a);
+      for (ISC a = 0; a < A; ++a) row.At(0, a) = logits.At(b, a);
       TTensorSoftmaxInPlace(row);
-      ISC a_b = (actions != NILP) ? actions[b] : 0;
-      FPC adv = advantages.AtC(b, 0);
+      ISC a_b = (actions != _NilP) ? actions[b] : 0;
+      FPC adv = advantages.At(b, 0);
       for (ISC a = 0; a < A; ++a) {
         FPC onehot = (a == a_b) ? 1.0f : 0.0f;
         grad_logits.At(b, a) = -adv * (onehot - row.At(0, a));
       }
       TTensorFree(row);
-      grad_value.At(b, 0) = 2.0f * (values.AtC(b, 0) - returns.AtC(b, 0));
+      grad_value.At(b, 0) = 2.0f * (values.At(b, 0) - returns.At(b, 0));
     }
   }
 
   /* SGD step: W -= lr * dL/dW, where dL/dW = obs^T @ grad_logits (the linear
      head's hidden state is the obs). Also steps the value head. This is the
      weight update the TPPO loop calls after Backward. */
-  void SgdStep(const TTensor& obs, const TTensor& grad_logits,
-               const TTensor& grad_value, FPC lr) {
+  void SgdStep(TTensor obs, TTensor grad_logits,
+               TTensor grad_value, FPC lr) {
     ISC B = obs.rows_;
     // dW[a-feature][a] = sum_b obs[b, f] * grad_logits[b, a].
     // W_ is [obs_len, action_count]; grad_logits is [B, action_count].
@@ -126,14 +124,14 @@ class TLinearPolicy : public TPolicy {
     TTensor dbv = TTensorAlloc(1, 1);
     for (ISC b = 0; b < B; ++b) {
       for (ISC f = 0; f < obs_len_; ++f) {
-        FPC ob = obs.AtC(b, f);
+        FPC ob = obs.At(b, f);
         for (ISC a = 0; a < action_count_; ++a)
-          dW.At(f, a) += ob * grad_logits.AtC(b, a);
-        dWv.At(f, 0) += ob * grad_value.AtC(b, 0);
+          dW.At(f, a) += ob * grad_logits.At(b, a);
+        dWv.At(f, 0) += ob * grad_value.At(b, 0);
       }
       for (ISC a = 0; a < action_count_; ++a)
-        db.At(a, 0) += grad_logits.AtC(b, a);
-      dbv.At(0, 0) += grad_value.AtC(b, 0);
+        db.At(a, 0) += grad_logits.At(b, a);
+      dbv.At(0, 0) += grad_value.At(b, 0);
     }
     // Average over the batch.
     FPC invB = 1.0f / FPC(B);

@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldHostH
+#define _iGeekPolygonWorldHostH
 namespace iGeek {
 
 class Host : public JPanel {
@@ -33,3 +35,4 @@ class Host : public JPanel {
                                  DefaultBackgroundColor = Color.black;
   / < The default background color.
 }
+#endif  //< _iGeekPolygonWorldHostH

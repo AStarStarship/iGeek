@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_MAZEWORLD_DECL
-#define IGEEK_MAZEWORLD_DECL
+#ifndef _iGeekMazeWorldH
+#define _iGeekMazeWorldH
 #include <_Config.h>
 #include "../../ASCIICrabs/Random.h"
 namespace iGeek {
@@ -24,7 +24,7 @@ namespace iGeek {
 
    The maze is seeded: same seed, same maze. The recursive backtracker is
    driven by a deterministic LCG (not the std-backed ASCIICrabs Random, which
-   only compiles under SEAM < CRABS_RANDOM) so the world itself is no-stdlib.
+   only compiles under _Seam < CRABS_RANDOM) so the world itself is no-stdlib.
 */
 struct MazeWorld {
   enum {
@@ -57,11 +57,11 @@ struct MazeWorld {
      S at (1,1) and E at (width-2, height-2). Returns false on bad args. */
   BOL Generate(IUD gen_seed);
 
-  ISC Cols() const { return cols_; }
-  ISC Rows() const { return rows_; }
-  CHA Tile(ISC x, ISC y) const { return tiles_[y * cols_ + x]; }
-  BOL InBounds(ISC x, ISC y) const;
-  BOL IsWall(ISC x, ISC y) const { return InBounds(x, y) && Tile(x, y) == CellWall; }
+  ISC Cols() { return cols_; }
+  ISC Rows() { return rows_; }
+  CHA Tile(ISC x, ISC y) { return tiles_[y * cols_ + x]; }
+  BOL InBounds(ISC x, ISC y);
+  BOL IsWall(ISC x, ISC y) { return InBounds(x, y) && Tile(x, y) == CellWall; }
 
   /* A* on the maze grid (4-neighborhood, unit cost). Fills parent_[] and
      returns the path length in cells (including start and exit); 0 when
@@ -70,9 +70,9 @@ struct MazeWorld {
   ISC Solve(ISC start_x, ISC start_y, ISC goal_x, ISC goal_y);
 
   /* Re-draws the grid on the terminal: border, tiles, path, then the player.
-     Pure COut (no ANSI cursor codes) — safe on any terminal, friendly for
+     Pure ROut (no ANSI cursor codes) — safe on any terminal, friendly for
      the no-color TUI constraint. */
-  void Print(ISC player_x = -1, ISC player_y = -1) const;
+  void Print(ISC player_x = -1, ISC player_y = -1);
 
   private:
   ISC cols_;

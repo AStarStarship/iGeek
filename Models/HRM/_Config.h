@@ -4,7 +4,7 @@
 #ifndef HRM_CONFIG_H
 #define HRM_CONFIG_H 1
 
-// HRM model seam. CRABS_FILE (19) puts the build past the COut/
+// HRM model seam. CRABS_FILE (19) puts the build past the ROut/
 // Stringf/Uniprinter seams (1-4) so the printer impls in _Package.hxx
 // compile for this TU.
 #define HRM_MODEL 19
@@ -25,8 +25,8 @@
 #include "../../../ASCIICrabs/_ConfigFooter.h"
 
 // The model seam (HRM_MODEL, defined above) must be visible to the ASCIICrabs
-// headers' #if SEAM >= ... checks, and SEAM must not be redefined by any
+// headers' #if _Seam >= ... checks, and _Seam must not be redefined by any
 // upstream config header.
-#define SEAM HRM_MODEL
+#define _Seam HRM_MODEL
 
 #endif

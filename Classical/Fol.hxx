@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_FOL_IMPL
-#define IGEEK_CLASSICAL_FOL_IMPL 1
+#ifndef _iGeekClassicalFolHXX
+#define _iGeekClassicalFolHXX
 #include "Fol.h"
 #include "../ASCIICrabs/Autoject.hxx"
 #include "Sat.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 
 static inline IUW* FolFree(IUW* origin) {
@@ -20,7 +20,7 @@ static inline IUW* FolFree(IUW* origin) {
 
 static inline void FolWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -119,7 +119,7 @@ static BOL FolUnifyRecNC(const FolTerm* pool, IUD x, IUD y,
 BOL FolUnify(const FolTerm* pool, IUD x, IUD y, const FolSubst* theta,
              ISC theta_n, ISC var_count, FolSubst* out_theta, ISC out_cap,
              ISC* out_n) {
-  if (pool == NILP || var_count < 0 || out_cap < 0 || theta_n < 0) {
+  if (pool == _NilP || var_count < 0 || out_cap < 0 || theta_n < 0) {
     return false;
   }
   for (ISC i = 0; i < theta_n; ++i) {
@@ -140,11 +140,11 @@ struct TFolClauseRec {
 };
 
 static TFolClauseRec* FolTabNC(const FolKb* kb) {
-  return TPtr<TFolClauseRec>(kb->tab_.origin);
+  return TRef<TFolClauseRec>(kb->tab_.origin);
 }
 
 FolKb::FolKb()
-    : tab_(NILP, &ObjectFactoryHeap), pool_(NILP, &ObjectFactoryHeap),
+    : tab_(_NilP, &ObjectFactoryHeap), pool_(_NilP, &ObjectFactoryHeap),
       var_count_(0), clause_cap_(0), clause_count_(0), pool_count_(0) {}
 
 FolKb::~FolKb() {
@@ -157,9 +157,9 @@ BOL FolKb::Init(ISC clause_cap, ISC var_count) {
     return false;
   }
   tab_.origin = ObjectFactoryHeap(
-      NILP, IUD(clause_cap) * IUD(sizeof(TFolClauseRec)));
+      _NilP, IUD(clause_cap) * IUD(sizeof(TFolClauseRec)));
   pool_.origin =
-      ObjectFactoryHeap(NILP, IUD(clause_cap * 32) * IUD(sizeof(FolTerm)));
+      ObjectFactoryHeap(_NilP, IUD(clause_cap * 32) * IUD(sizeof(FolTerm)));
   if (IsError(tab_.origin) || IsError(pool_.origin)) {
     tab_.origin = FolFree(tab_.origin);
     pool_.origin = FolFree(pool_.origin);
@@ -176,18 +176,18 @@ BOL FolKb::Init(ISC clause_cap, ISC var_count) {
 
 BOL FolKb::Tell(const FolTerm* premises, ISC premise_count,
                  IUD conclusion_atom) {
-  if (premises == NILP || premise_count > 32 || clause_count_ >= clause_cap_) {
+  if (premises == _NilP || premise_count > 32 || clause_count_ >= clause_cap_) {
     return false;
   }
   ISC start = pool_count_;
-  FolTerm* pool = TPtr<FolTerm>(pool_.origin);
+  FolTerm* pool = TRef<FolTerm>(pool_.origin);
   for (ISC i = 0; i < premise_count; ++i) {
     if (pool_count_ >= clause_cap_ * 32) {
       return false;
     }
     pool[pool_count_++] = premises[i];
   }
-  TFolClauseRec* tab = TPtr<TFolClauseRec>(tab_.origin);
+  TFolClauseRec* tab = TRef<TFolClauseRec>(tab_.origin);
   tab[clause_count_++] = (TFolClauseRec){conclusion_atom, start, premise_count};
   return true;
 }
@@ -208,7 +208,7 @@ static BOL FolAskRecNC(const FolKb* kb, IUD goal, ISC depth, IUD path) {
     return false;
   }
   TFolClauseRec* tab = FolTabNC(kb);
-  FolTerm* pool = TPtr<FolTerm>(kb->pool_.origin);
+  FolTerm* pool = TRef<FolTerm>(kb->pool_.origin);
   path |= IUD(1) << goal;
   for (ISC c = 0; c < kb->clause_count_; ++c) {
     if (tab[c].conclusion != goal) {
@@ -234,7 +234,7 @@ static BOL FolAskRecNC(const FolKb* kb, IUD goal, ISC depth, IUD path) {
   return false;
 }
 
-BOL FolKb::Ask(IUD goal_atom, ISC max_depth) const {
+BOL FolKb::Ask(IUD goal_atom, ISC max_depth) {
   if (max_depth < 1) {
     return false;
   }
@@ -244,8 +244,8 @@ BOL FolKb::Ask(IUD goal_atom, ISC max_depth) const {
 // --- Fig 9.3 NAIVE-ENTAILS -------------------------------------------------
 
 BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
-                         ISC domain_size) const {
-  if (goal == NILP || constants == NILP || domain_size < 1 || domain_size > 8 ||
+                         ISC domain_size) {
+  if (goal == _NilP || constants == _NilP || domain_size < 1 || domain_size > 8 ||
       goal->kind != 0 && goal->kind != 1) {
     return false;
   }
@@ -254,8 +254,8 @@ BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
   IUD total_groundings = 1;
   for (ISC c = 0; c < clause_count_; ++c) {
     ISC distinct = 0;
-    TFolClauseRec* tab = TPtr<TFolClauseRec>(tab_.origin);
-    FolTerm* pool = TPtr<FolTerm>(pool_.origin);
+    TFolClauseRec* tab = TRef<TFolClauseRec>(tab_.origin);
+    FolTerm* pool = TRef<FolTerm>(pool_.origin);
     IUD seen = 0;
     for (ISC i = tab[c].prem_start; i < tab[c].prem_start + tab[c].prem_count;
          ++i) {
@@ -279,19 +279,19 @@ BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
     total_groundings += g;
   }
   // Temporary RAMFactory allocation for the ground clause table.
-  Autoject tmp(NILP, &ObjectFactoryHeap);
+  Autoject tmp(_NilP, &ObjectFactoryHeap);
   IUD tmp_bytes =
       IUD(total_groundings) * IUD(sizeof(TFolClauseRec)) +
       IUD(goal->kind == 1 ? domain_size : 1) * IUD(sizeof(SatClause));
-  tmp.origin = ObjectFactoryHeap(NILP, tmp_bytes);
+  tmp.origin = ObjectFactoryHeap(_NilP, tmp_bytes);
   if (IsError(tmp.origin)) {
     return false;
   }
   FolWipe(tmp.origin, tmp_bytes);
-  TFolClauseRec* ground = TPtr<TFolClauseRec>(tmp.origin);
+  TFolClauseRec* ground = TRef<TFolClauseRec>(tmp.origin);
   ISC ground_n = 0;
-  TFolClauseRec* tab = TPtr<TFolClauseRec>(tab_.origin);
-  FolTerm* pool = TPtr<FolTerm>(pool_.origin);
+  TFolClauseRec* tab = TRef<TFolClauseRec>(tab_.origin);
+  FolTerm* pool = TRef<FolTerm>(pool_.origin);
   for (ISC c = 0; c < clause_count_; ++c) {
     // Enumerate assignments of the clause's distinct premise vars.
     ISC var_ids[8];
@@ -350,7 +350,7 @@ BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
     }
   }
   // 2) For each grounding of the goal: KB ∪ {¬g} must be unsatisfiable.
-  SatClause* sat = TPtr<SatClause>(tmp.origin) + ground_n;
+  SatClause* sat = TRef<SatClause>(tmp.origin) + ground_n;
   IUD goal_atoms[8];
   ISC goal_atom_n = 0;
   if (goal->kind == 1) {
@@ -367,7 +367,7 @@ BOL FolKb::NaiveEntails(const FolTerm* goal, const IUD* constants,
     ISC clause_n = ground_n + 1;
     // Rebuild the SatClause table in place (ground recs are 24B, SatClause
     // is 16B; write over the same RAM).
-    SatClause* clauses = TPtr<SatClause>(tmp.origin);
+    SatClause* clauses = TRef<SatClause>(tmp.origin);
     for (ISC i = 0; i < ground_n; ++i) {
       // definite premise ⇒ conclusion  ==  (¬p1 ∧ ... ∨ q)
       clauses[i].negative = ground[i].prem_start;
@@ -393,7 +393,7 @@ BOL FolAppend(const IUD* ax, ISC ax_n, const IUD* y, ISC y_n, IUD* az,
   if (ax_n < 0 || y_n < 0) {
     return false;
   }
-  if (az == NILP || az_cap < ax_n + y_n) {
+  if (az == _NilP || az_cap < ax_n + y_n) {
     return false;
   }
   // ax = [a | x]: the compiled scheme's base case ax = [] and UNIFY(y, az)
@@ -410,5 +410,5 @@ BOL FolAppend(const IUD* ax, ISC ax_n, const IUD* y, ISC y_n, IUD* az,
   return true;
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalFolHXX

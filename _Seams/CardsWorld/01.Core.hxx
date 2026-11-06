@@ -1,22 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
-
-// The card world's CORE seam unit: the unit tests for the deterministic
-// parts of the blackjack engine. Mimics ASCIICrabs/_Seams/NN.Xxx.hxx.
-// Gated on IGEEK_CARDSWORLD_CORE (the first / default seam).
-
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-#if SEAM == IGEEK_CARDSWORLD_CORE
+#if _Seam >= _iGeekCardsWorldCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
+#include "../../../ASCIICrabs/ROut.h"
 #endif
-#endif
-
-using namespace ::_;
 namespace CardsWorldTest {
-using namespace iGeek;   // engine types (in iGeek) used unqualified
+using namespace ::_;
+using namespace iGeek; 
 
-namespace {
 // Fail counter so the unit can make the process exit non-zero on a bad
 // assertion. The ASCIICrabs A_ASSERT/A_AVOW macros print-and-continue (they do
 // not set the exit code), so we wrap them: on a failed condition we bump the
@@ -29,7 +21,7 @@ inline ISC& CWFails() {
 #define CORE_CHECK(cond)                                       \
   do {                                                         \
     if (!::_::Test(cond)) {                                    \
-      ::_::StdOut() << "\nFAILURE Core at line:" << __LINE__   \
+      ::_::RefOut() << "\nFAILURE Core at line:" << __LINE__   \
                     << " in \"" << __FILE__ << "\"\n";         \
       ++CWFails();                                             \
     }                                                          \
@@ -38,7 +30,7 @@ inline ISC& CWFails() {
 #define CORE_EQ(a, b)                                          \
   do {                                                         \
     if (!::_::TestEq(a, b)) {                                  \
-      ::_::StdOut() << "\nFAILURE Core (expecting " << (a)     \
+      ::_::RefOut() << "\nFAILURE Core (expecting " << (a)     \
                     << " found " << (b) << ") at line:"        \
                     << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
       ++CWFails();                                             \
@@ -48,7 +40,7 @@ inline ISC& CWFails() {
 #define CORE_PTR(p)                                            \
   do {                                                         \
     if (IsError(p)) {                                          \
-      ::_::StdOut() << "\nFAILURE Core (nil ptr) at line:"     \
+      ::_::RefOut() << "\nFAILURE Core (nil ptr) at line:"     \
                     << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
       ++CWFails();                                             \
     }                                                          \
@@ -59,7 +51,7 @@ CardsWorld::Card MakeCard(ISC pip, ISC suit = 1) {
   ISC face_value = pip;
   ISC point_value = (pip >= 11) ? 10 : pip;  // face cards are 10.
   return CardsWorld::Card(pip, suit, face_value, point_value,
-                          CardsWorld::SuitCulture::kFrench);
+                          CardsWorld::SuitCulture::SCFrench);
 }
 
 // A small helper: value of a hand built from the given pips (suits default to
@@ -75,20 +67,18 @@ ISC HandValueFromPips(const ISC* pips, ISC count) {
   CardsWorld::Blackjack bj(&player);
   return bj.HandValue(hand);
 }
-}  //< anonymous namespace
 
-// The unit tests for the card world core. Returns NILP on success, or an
+// The unit tests for the card world core. Returns _NilP on success, or an
 // error string naming the first failed assertion.
 inline const CHA* Core(const CHA* args) {
-  (void)args;
-  A_TEST_BEGIN;
+  _ATestBegin;
 
-  // --- Card: point values ----------------------------------------------
+  // Card: point values
   {
-    D_COUT("Testing Card point values\n");
-    CardsWorld::Card ace(1, 1, 0, 0, CardsWorld::SuitCulture::kFrench);
-    CardsWorld::Card ten(10, 2, 0, 0, CardsWorld::SuitCulture::kFrench);
-    CardsWorld::Card king(13, 4, 0, 0, CardsWorld::SuitCulture::kFrench);
+    _DROut("Testing Card point values\n");
+    CardsWorld::Card ace(1, 1, 0, 0, CardsWorld::SuitCulture::SCFrench);
+    CardsWorld::Card ten(10, 2, 0, 0, CardsWorld::SuitCulture::SCFrench);
+    CardsWorld::Card king(13, 4, 0, 0, CardsWorld::SuitCulture::SCFrench);
     CORE_CHECK(ace.PipValue() == 1);
     CORE_CHECK(ace.SuitValue() == 1);
     CORE_CHECK(ten.PipValue() == 10);
@@ -96,9 +86,9 @@ inline const CHA* Core(const CHA* args) {
     CORE_CHECK(king.SuitValue() == 4);
   }
 
-  // --- CardStack: add / peek / take / count ----------------------------
+  // CardStack: add / peek / take / count
   {
-    D_COUT("Testing CardStack add/peek/take/count\n");
+    _DROut("Testing CardStack add/peek/take/count\n");
     CardsWorld::Deck deck;
     CardsWorld::CardStack stock = deck.Stock();
     CORE_EQ(stock.CardCount(), 52);  // a fresh 52-card deck.
@@ -117,12 +107,12 @@ inline const CHA* Core(const CHA* args) {
     for (ISC i = 0; i < 51; ++i) stock.TakeNextCard();
     CORE_EQ(stock.CardCount(), 0);
     CORE_CHECK(stock.IsEmpty());
-    CORE_CHECK(stock.TakeNextCard() == NILP);  // empty -> nil, no crash.
+    CORE_CHECK(stock.TakeNextCard() == _NilP);  // empty -> nil, no crash.
   }
 
-  // --- CardStack: shuffle integrity (regression for count_ corruption) --
+  // CardStack: shuffle integrity (regression for count_ corruption)
   {
-    D_COUT("Testing CardStack shuffle integrity\n");
+    _DROut("Testing CardStack shuffle integrity\n");
     CardsWorld::Deck deck;
     for (ISC iter = 0; iter < 50; ++iter) {
       CardsWorld::CardStack stock = deck.Stock();
@@ -131,9 +121,9 @@ inline const CHA* Core(const CHA* args) {
     }
   }
 
-  // --- Deck: 52 unique cards -------------------------------------------
+  // Deck: 52 unique cards
   {
-    D_COUT("Testing Deck builds 52 unique cards\n");
+    _DROut("Testing Deck builds 52 unique cards\n");
     CardsWorld::Deck deck;
     CardsWorld::CardStack stock = deck.Stock();
     // Count distinct (suit, pip) pairs.
@@ -152,9 +142,9 @@ inline const CHA* Core(const CHA* args) {
     CORE_EQ(distinct, 52);  // exactly 52 unique (suit, pip) combos.
   }
 
-  // --- HandValue: ace demotion -----------------------------------------
+  // HandValue: ace demotion
   {
-    D_COUT("Testing HandValue ace demotion\n");
+    _DROut("Testing HandValue ace demotion\n");
     // A + 10 = 21 (ace counts as 11).
     { ISC pips[2] = {1, 10}; CORE_EQ(HandValueFromPips(pips, 2), 21); }
     // A + A + 9 = 21 (two aces 11 + 9 = 31, demote one ace -> 21).
@@ -167,9 +157,9 @@ inline const CHA* Core(const CHA* args) {
     { ISC pips[2] = {13, 5}; CORE_EQ(HandValueFromPips(pips, 2), 15); }
   }
 
-  // --- IsBlackjack: natural 21 -----------------------------------------
+  // IsBlackjack: natural 21
   {
-    D_COUT("Testing IsBlackjack\n");
+    _DROut("Testing IsBlackjack\n");
     {
       ISC pips[2] = {1, 10};
       CardsWorld::Card cards[2] = {MakeCard(pips[0], 1), MakeCard(pips[1], 2)};
@@ -193,9 +183,9 @@ inline const CHA* Core(const CHA* args) {
     }
   }
 
-  // --- Round outcome: deterministic bust --------------------------------
+  // Round outcome: player bust
   {
-    D_COUT("Testing round outcome (player bust)\n");
+    _DROut("Testing round outcome (player bust)\n");
     CardsWorld::Player player("Buster", 100);
     CardsWorld::Blackjack bj(&player);
     bj.NewRound();
@@ -214,10 +204,10 @@ inline const CHA* Core(const CHA* args) {
   }
 
   if (CWFails() != 0) {
-    D_COUT("\n" << CWFails() << " Core assertion(s) FAILED\n");
+    _DROut("\n" << CWFails() << " Core assertion(s) FAILED\n");
     return "cards_world_core_test_failure";
   }
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace CardsWorldTest

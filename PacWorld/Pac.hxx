@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_PAC_HXX
-#define IGEEK_PAC_HXX
+#ifndef _iGeekPacHXX
+#define _iGeekPacHXX
 #include "Pac.h"
 
 using namespace PacWorld;
@@ -21,9 +21,9 @@ void Pac::Reset() {
   // (run animator reset is a render concern — stubbed for headless)
 }
 
-BOL Pac::IsDying() const { return is_dying_; }
+BOL Pac::IsDying() { return is_dying_; }
 
-BOL Pac::IsDead() const { return is_dead_; }
+BOL Pac::IsDead() { return is_dead_; }
 
 void Pac::Update(FPC delta) {
   if (!is_dead_ && !is_dying_) {
@@ -41,4 +41,4 @@ void Pac::Update(FPC delta) {
   }
 }
 
-#endif  // IGEEK_PAC_HXX
+#endif  //< _iGeekPacHXX

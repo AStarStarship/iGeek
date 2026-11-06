@@ -1,25 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
-
-// The card world's PPO seam unit: the M5 test — verify the TPPO loop
-// (GAE + clipped PPO + entropy + value-clip) actually LEARNS on a toy env
-// with a known optimum: reward must go UP over training steps.
-// Gated on IGEEK_CARDSWORLD_CORE.
-//
-// Toy env (TToyGym): a B-parallel "match the hidden rule" task. Each env has
-// a hidden target bit; the obs encodes it; the correct action matches it.
-// Reward +1 for a correct action, -1 for wrong, 0 otherwise. The optimum is
-// to always pick the matching action -> reward -> +1 per step. A random-init
-// linear policy starts near 0.5 accuracy (~0 reward); PPO must drive reward
-// up toward +1.
-
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-
+#if _Seam >= _iGeekCardsWorldCore
 #include "../PPO.hxx"
-
-using namespace ::_;
 namespace CardsWorldTest {
+using namespace ::_;
+using namespace iGeek; 
 
-namespace {
 inline ISC& PPFAILS() {
   static ISC count = 0;
   return count;
@@ -28,8 +13,8 @@ inline ISC& PPFAILS() {
   do {                                                       \
     if (!::_::Test(cond)) {                                  \
       ++PPFAILS();                                           \
-      if (SEAM >= CRABS_COUT)                                \
-        ::_::StdOut() << "\nFAILURE PPO at line:" << __LINE__ \
+      if (_Seam >= CRABS_COUT)                                \
+        ::_::RefOut() << "\nFAILURE PPO at line:" << __LINE__ \
                       << " in \"" << __FILE__ << "\"\n";      \
     }                                                        \
   } while (0)
@@ -75,10 +60,9 @@ struct TToyGym : public Gym {
     }
   }
 };
-}  //< namespace
 
 inline const CHA* PPO(const CHA* args) {
-  A_TEST_BEGIN;
+  _ATestBegin;
   const ISC B = 8, OBS = 2, A = 2, HORIZON = 1, EPOCHS = 4;  // B <= GymEnvMax (8)
   const ISC TRAIN_STEPS = 300;
 
@@ -117,14 +101,14 @@ inline const CHA* PPO(const CHA* args) {
   };
 
   FPC r0 = measure();
-  D_COUT("PPO: reward before training (mean) = " << (ISC)(r0 * 1e6f) << "e-6\n");
+  _DROut("PPO: reward before training (mean) = " << (ISC)(r0 * 1e6f) << "e-6\n");
 
   // Train.
   for (ISC s = 0; s < TRAIN_STEPS; ++s) {
     ppo.TrainStep();
   }
   FPC r1 = measure();
-  D_COUT("PPO: reward after " << TRAIN_STEPS << " steps (mean) = "
+  _DROut("PPO: reward after " << TRAIN_STEPS << " steps (mean) = "
                               << (ISC)(r1 * 1e6f) << "e-6\n");
 
   // The policy must have IMPROVED: reward after > reward before.
@@ -132,14 +116,14 @@ inline const CHA* PPO(const CHA* args) {
   // And it should have learned the rule: reward close to +1 (the optimum).
   // With 300 steps x 4 epochs on a 2-action linear task, it should be > 0.5.
   PP_CHECK(r1 > 0.5f);
-  D_COUT("PPO: learned mean reward " << (ISC)(r1 * 1e4f) << "e-4 "
+  _DROut("PPO: learned mean reward " << (ISC)(r1 * 1e4f) << "e-4 "
             << (r1 > 0.5f ? "(PASS: rule learned)" : "(WARN: weak)") << "\n");
 
   if (PPFAILS() != 0) {
-    D_COUT("\n" << PPFAILS() << " PPO assertion(s) FAILED\n");
+    _DROut("\n" << PPFAILS() << " PPO assertion(s) FAILED\n");
     return "cards_world_ppo_test_failure";
   }
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace CardsWorldTest

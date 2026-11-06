@@ -1,7 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_TRAINSPEED_HXX
-#define IGEEK_TRAINSPEED_HXX
+
 // Headless training-speed probe: N real TPPO::TrainStep() on PacWorldGym @ -O2.
 // Reports elapsed + steps/sec. The "fast RL" number.
 #include "_probe_pacworld.hxx"
@@ -20,7 +19,7 @@ static IUD NowUS() {
 
 static FPC GreedyReward(PacWorldGym& gym, TPolicy& pol) {
   gym.ResetBatch();
-  ISC B = gym.EnvCount();
+  ISC B = gym.EnvironmentCount();
   TTensor obs = TTensorAlloc(B, PacWorldEnv::ObsLength);
   for (ISC i = 0; i < B; ++i)
     for (ISC j = 0; j < PacWorldEnv::ObsLength; ++j)
@@ -30,9 +29,9 @@ static FPC GreedyReward(PacWorldGym& gym, TPolicy& pol) {
   pol.Forward(obs, logits, values);
   FPC total = 0.0f;
   for (ISC i = 0; i < B; ++i) {
-    ISC best = 0; FPC bv = logits.AtC(i, 0);
+    ISC best = 0; FPC bv = logits.At(i, 0);
     for (ISC a = 1; a < PacWorldEnv::ActionCount; ++a)
-      if (logits.AtC(i, a) > bv) { bv = logits.AtC(i, a); best = a; }
+      if (logits.At(i, a) > bv) { bv = logits.At(i, a); best = a; }
     gym.Actions()[i] = best;
   }
   gym.StepBatch();
@@ -109,5 +108,3 @@ int main(int argc, char** argv) {
   write(1, line, (unsigned long)n);
   return 0;
 }
-
-#endif  // IGEEK_TRAINSPEED_HXX

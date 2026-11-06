@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_ROBOT_T
-#define IGEEK_CLASSICAL_ROBOT_T 1
+#ifndef _iGeekClassicalRobotHXX
+#define _iGeekClassicalRobotHXX
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -34,5 +34,5 @@ return S
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalRobotHXX

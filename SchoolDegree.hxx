@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
 #include "SchoolDegree.h"
-#if SEAM >= IGEEK_CORE
+#if _Seam >= _iGeekCore
 namespace iGeek {
 
 SchoolDegree::SchoolDegree() {

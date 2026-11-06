@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_BONUS_HXX
-#define IGEEK_BONUS_HXX
+#ifndef _iGeekBonusHXX
+#define _iGeekBonusHXX
 #include "Bonus.h"
 
 using namespace PacWorld;
@@ -21,4 +21,4 @@ void Bonus::SetFruit(Bonus::Fruit fruit) {
   }
 }
 
-#endif  // IGEEK_BONUS_HXX
+#endif  //< _iGeekBonusHXX

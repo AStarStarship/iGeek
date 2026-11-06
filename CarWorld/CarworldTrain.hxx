@@ -4,6 +4,7 @@
 // Uses the existing TPPO loop (CollectRollout resets the Gym per rollout,
 // so this is a short-horizon learning signal, not full-ride competence).
 #include "../BikeWorld/TileRuntime.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarGym.hxx"
 #include "CarScenarios.hxx"
 #include "../PPO.hxx"
@@ -18,13 +19,13 @@ static FPD Seconds() {
   return FPD(time.tv_sec) + FPD(time.tv_nsec) * 1e-9;
 }
 static BOL ParseUInt(const CHA* text, IUD& value) {
-  if (text == NILP || *text == 0) return false;
+  if (text == _NilP || *text == 0) return false;
   for (const CHA* p = text; *p; ++p) if (*p < '0' || *p > '9') return false;
-  value = IUD(strtoull(text, NILP, 10));
+  value = IUD(strtoull(text, _NilP, 10));
   return value > 0;
 }
 static void Help() {
-  D_COUT(
+  _DROut(
       "  --scenario NAME   straight|curves|obstacle|gravel|ice|uphill|downhill|launch|ice_curves (default straight)\n"
       "  --updates N       PPO training updates (default 200)\n"
       "  --horizon N       Steps per rollout (default 64)\n"
@@ -37,8 +38,8 @@ static void Help() {
       "  --help\n");
 }
 /** Evaluate: run the policy greedily (argmax) for K episodes, report goals. */
-static void Evaluate(const TileMap& map, const TVehicleRoute& route,
-    const TCarState& initial, ISC count, IUD seed, ISC mode,
+static void Evaluate(TileMap& map, TVehicleRoute& route,
+    TCarState& initial, ISC count, IUD seed, ISC mode,
     TLinearPolicy& policy, ISC episodes, FPC& mean_reward, IUD& goals) {
   ACarGym gym(map, route, initial, count, seed, mode);
   FPC total_reward = 0;
@@ -62,9 +63,9 @@ static void Evaluate(const TileMap& map, const TVehicleRoute& route,
           obs.At(i, j) = gym.Observations()[i * ACarEnv::ObsLength + j];
       policy.Forward(obs, logits, values);
       for (ISC i = 0; i < count; ++i) {
-        ISC best = 0; FPC best_logit = logits.AtC(i, 0);
+        ISC best = 0; FPC best_logit = logits.At(i, 0);
         for (ISC a = 1; a < A; ++a)
-          if (logits.AtC(i, a) > best_logit) { best_logit = logits.AtC(i, a); best = a; }
+          if (logits.At(i, a) > best_logit) { best_logit = logits.At(i, a); best = a; }
         gym.Actions()[i] = best;
       }
       gym.StepBatch();
@@ -101,7 +102,7 @@ ISC main(ISC argc, CHA** argv) {
     } else if (strcmp(flag, "--seed") == 0) {
       if (!ParseUInt(value, seed)) return 2;
     } else if (strcmp(flag, "--lr") == 0) {
-      lr = FPC(strtof(value, NILP));
+      lr = FPC(strtof(value, _NilP));
       if (lr <= 0 || lr > 0.1f) return 2;
     } else if (strcmp(flag, "--epochs") == 0) {
       IUD v; if (!ParseUInt(value, v) || v > 32) return 2; epochs = ISC(v);
@@ -119,7 +120,7 @@ ISC main(ISC argc, CHA** argv) {
     delete planner; return 1;
   }
   delete planner;
-  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) << " " << updates << " " << horizon << " " << envs << " " << epochs << " " << mode == CarActuatorActions ?  :  << " " << (unsigned long)seed << '\n');
+  _DROut("TCarScenarioName=" << TCarScenarioName(scenario) << " " << updates << " " << horizon << " " << envs << " " << epochs << " " << mode == CarActuatorActions ?  :  << " " << (unsigned long)seed << '\n');
   ACarGym gym(map, route, initial, envs, seed, mode);
   TLinearPolicy policy(ACarEnv::ObsLength, gym.ActionCount(), seed);
   policy.SetLearnRate(lr);
@@ -127,15 +128,15 @@ ISC main(ISC argc, CHA** argv) {
   // Baseline evaluation.
   FPC base_reward = 0; IUD base_goals = 0;
   Evaluate(map, route, initial, envs, seed, mode, policy, 4, base_reward, base_goals);
-  D_COUT("base_reward=" << (double)base_reward << " " << (int)base_goals << '\n');
+  _DROut("base_reward=" << (double)base_reward << " " << (int)base_goals << '\n');
   FPD started = Seconds();
   TPPOStats stats = {};
   FPC best_reward = base_reward;
   IUD best_goals = base_goals;
   for (ISC update = 1; update <= updates; ++update) {
     stats = trainer.TrainStep();
-    if (!isfinite(stats.policy_loss_) || !isfinite(stats.value_loss_) ||
-        !isfinite(stats.entropy_)) {
+    if (!iGeek::IsFinite(stats.policy_loss_) || !iGeek::IsFinite(stats.value_loss_) ||
+        !iGeek::IsFinite(stats.entropy_)) {
       fD_COUT(stderr, , update);
       return 1;
     }
@@ -145,7 +146,7 @@ ISC main(ISC argc, CHA** argv) {
           eval_reward, eval_goals);
       if (eval_reward > best_reward) { best_reward = eval_reward; best_goals = eval_goals; }
       FPD wall = Seconds() - started;
-      D_COUT("update=" << update << " updates=" << updates << " eval_reward=" << (double)stats.policy_loss_ << " goals=" << (double)stats.value_loss_ << " best=" << (double)stats.policy_loss_ << " wall_s=" << (double)stats.value_loss_ << " fps=" << 1.0 << "\n");
+      _DROut("update=" << update << " updates=" << updates << " eval_reward=" << (double)stats.policy_loss_ << " goals=" << (double)stats.value_loss_ << " best=" << (double)stats.policy_loss_ << " wall_s=" << (double)stats.value_loss_ << " fps=" << 1.0 << "\n");
       fflush(stdout);
     }
   }
@@ -154,7 +155,7 @@ ISC main(ISC argc, CHA** argv) {
   FPC final_reward = 0; IUD final_goals = 0;
   Evaluate(map, route, initial, envs, seed + IUD(updates) * 7919, mode, policy, 8,
       final_reward, final_goals);
-  D_COUT("final_reward=" << (double)final_reward << " " << (int)final_goals << " " << (int)(8 * envs) << '\n');
-  D_COUT("TCarScenarioName=" << TCarScenarioName(scenario) << " " << final_goals > 0 ? 1 : 0 << '\n');
+  _DROut("final_reward=" << (double)final_reward << " " << (int)final_goals << " " << (int)(8 * envs) << '\n');
+  _DROut("TCarScenarioName=" << TCarScenarioName(scenario) << " " << final_goals > 0 ? 1 : 0 << '\n');
   return 0;
 }

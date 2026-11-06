@@ -1,28 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// MazeWorld core seam unit: generates a seeded maze, solves it with A*, and
-// verifies the path. Converted from the old MazeWorld/_Seams/_Main.hxx
-// (which had an int main). Gated on IGEEK_MAZEWORLD_CORE.
-// No C/C++ standard library: I/O via COut (ASCIICrabs console primitive).
-#if SEAM >= IGEEK_MAZEWORLD_CORE
-#if SEAM == IGEEK_MAZEWORLD_CORE
+#if _Seam >= _iGeekMazeWorldCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-// MazeWorld.hxx is pulled ONCE by the rollup _Tests.hxx (it has no include
-// guard); this unit relies on that rather than re-including it.
-using namespace ::_;
 namespace MazeWorldTest {
-using namespace iGeek;   // engine types (in iGeek) used unqualified
+using namespace ::_;
+using namespace iGeek;
 
-// The deterministic A* solve: the core unit test. Returns NILP on success,
+// The deterministic A* solve: the core unit test. Returns _NilP on success,
 // an error string on failure (the CI exit-code signal).
 inline const CHA* Core(const CHA* args) {
-#if SEAM >= IGEEK_MAZEWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing MazeWorld (A* pathfind)..."));
+#if _Seam >= _iGeekMazeWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing MazeWorld (A* pathfind)..."));
 
   // Deterministic seed so the layout + A* path are reproducible.
   const IUD seed = 42;
@@ -42,10 +33,10 @@ inline const CHA* Core(const CHA* args) {
     return "MAZEWORLD_FAIL: path shorter than Manhattan distance";
   }
 
-  D_COUT("  A* path length: " << path_len << " (Manhattan lower bound "
+  _DROut("  A* path length: " << path_len << " (Manhattan lower bound "
           << manhattan << ")\n");
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace MazeWorldTest

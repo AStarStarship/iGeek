@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 
 #pragma once
-#ifndef IGEEK_CARDSCARDSTACK_DECL
-#define IGEEK_CARDSCARDSTACK_DECL
+#ifndef _iGeekCardsWorldCoreCardStackH
+#define _iGeekCardsWorldCoreCardStackH
 #include <_Config.h>
-#if SEAM >= IGEEK_CARDSTACK
+#if _Seam >= _iGeekCardsWorldCore
 #include "Card.h"
 namespace iGeek {
 namespace CardsWorld {
@@ -31,24 +31,27 @@ class CardStack {
   CardStack(ISC min_cards, ISC max_cards, BOL is_visible);
 
   /* Copies all cards from the given stack. */
-  CardStack(const CardStack& other);
+  CardStack(CardStack& other);
 
   /* Destructor. Does not delete cards (the Deck owns them). */
   virtual ~CardStack() {}
 
   /* Compares this stack to other by point value. */
-  ISC Compare(const CardStack& other) const;
+  ISC Compare(CardStack& other);
 
   /* Returns the point value total of this stack. */
-  ISC PointValue() const;
+  ISC PointValue();
 
   /* Fisher-Yates shuffle. */
   void Shuffle();
 
   /* Returns the number of cards in this stack. */
-  ISC CardCount() const { return count_; }
-  ISC CardCountMin() const { return card_count_min_; }
-  ISC CardCountMax() const { return card_count_max_; }
+  ISC CardCount() { return count_; }
+  ISC CardCountMin() { return card_count_min_; }
+  ISC CardCountMax() { return card_count_max_; }
+
+  /* Removes all cards from the stack. */
+  void Clear() { count_ = 0; }
 
   /* Adds the card to the top of the stack. @return 0 ok, 2 over max. */
   ISC AddCard(Card* new_card);
@@ -57,7 +60,7 @@ class CardStack {
   ISC InsertCard(Card* new_card, ISC index);
 
   /* Copies all cards from the given stack into this one. */
-  ISC AddCardStack(const CardStack& cards);
+  ISC AddCardStack(CardStack& cards);
 
   /* Draws cards_to_take cards from the source stack.
   @return the number drawn, or a negative error code. */
@@ -67,7 +70,7 @@ class CardStack {
   BOL RemoveCard(Card* card);
 
   /* Peeks the card at index without removing it. @return nil if out of range. */
-  Card* PeekCard(ISC index) const;
+  Card* PeekCard(ISC index);
 
   /* Returns and removes the card at index. @return nil if out of range. */
   Card* TakeCard(ISC index);
@@ -79,8 +82,8 @@ class CardStack {
   Card* TakeRandomCard();
 
   /* Returns true if the stack is empty. */
-  BOL IsEmpty() const { return count_ == 0; }
-  BOL IsVisible() const { return is_visible_; }
+  BOL IsEmpty() { return count_ == 0; }
+  BOL IsVisible() { return is_visible_; }
   void SetVisibility(BOL visible) { is_visible_ = visible; }
 };
 

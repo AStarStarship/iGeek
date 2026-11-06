@@ -1,9 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldBlackjackHXX
+#define _iGeekCardsWorldBlackjackHXX
 #include "Blackjack.h"
-#if SEAM >= IGEEK_BLACKJACK
+#if _Seam >= _iGeekCardsWorldBlackjack
 namespace iGeek {
 namespace CardsWorld {
+using namespace ::_;
 
 Blackjack::Blackjack(Player* player)
     : dealer_(Dealer()),
@@ -13,16 +16,16 @@ Blackjack::Blackjack(Player* player)
       round_over_(false),
       outcome_(Outcome::kInvalid),
       player_bet_(0) {
-  if (player != NILP) dealer_.AddPlayer(player);
+  if (player != _NilP) dealer_.AddPlayer(player);
 }
 
-ISC Blackjack::HandValue(const Hand& hand) const {
+ISC Blackjack::HandValue(Hand& hand) {
   // Total the point values, counting aces as 11 then demoting to 1 as needed.
   ISC total = 0;
   ISC aces = 0;
   for (ISC i = 0; i < hand.CardCount(); ++i) {
-    const Card* c = hand.PeekCard(i);
-    if (c == NILP) continue;
+    Card* c = hand.PeekCard(i);
+    if (c == _NilP) continue;
     ISC v = c->PointValue();
     if (c->PipValue() == 1) {
       // Ace: count as 11 tentatively.
@@ -39,14 +42,15 @@ ISC Blackjack::HandValue(const Hand& hand) const {
   return total;
 }
 
-BOL Blackjack::IsBlackjack(const Hand& hand) const {
+BOL Blackjack::IsBlackjack(Hand& hand) {
   return hand.CardCount() == 2 && HandValue(hand) == 21;
 }
 
 void Blackjack::NewRound() {
   // Reshuffle the stock if it's running low (less than 15 cards left).
   if (dealer_.GetStock().CardCount() < 15) {
-    dealer_.GetStock() = dealer_.GetDeck().Stock();
+    CardStack stock = dealer_.GetDeck().Stock();
+    dealer_.GetStock() = stock;
     dealer_.GetStock().Shuffle();
   }
 
@@ -82,7 +86,7 @@ void Blackjack::NewRound() {
 BOL Blackjack::Hit() {
   if (!player_turn_ || round_over_) return false;
   Card* next = dealer_.GetStock().TakeNextCard();
-  if (next == NILP) {
+  if (next == _NilP) {
     // Stock exhausted: force-stand to avoid an infinite loop.
     Stand();
     return false;
@@ -109,7 +113,7 @@ Outcome Blackjack::Stand() {
   // Dealer draws to 17 (stands on all 17s). Guard against stock exhaustion.
   while (HandValue(dealer_hand_) < 17) {
     Card* next = dealer_.GetStock().TakeNextCard();
-    if (next == NILP) break;  // Stock exhausted; dealer stands.
+    if (next == _NilP) break;  // Stock exhausted; dealer stands.
     dealer_hand_.AddCard(next);
   }
 
@@ -163,6 +167,7 @@ ISC Blackjack::SettleRound() {
   return reward;
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldBlackjack
+#endif  //< _iGeekCardsWorldBlackjackHXX

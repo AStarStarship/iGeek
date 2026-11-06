@@ -130,7 +130,7 @@ struct MazeAgent {
         speed_a,  //< Speed in the X-axis.
         history;  //< History of which of the 8
     State();
-    State(const State& other);
+    State(State& other);
     void Set(ISC new_x, ISC new_y, ISC new_a, ISC new_speed_a = 0,
              ISC new_speed_y = 0, ISC new_state = kBooting,
              ISC new_history = 0);
@@ -143,7 +143,7 @@ struct MazeAgent {
     ISC x, y;
     Point2D();
     Point2D(State& state);
-    Point2D(const Point2D& other);
+    Point2D(Point2D& other);
   };
 
   PolicyPilot pilot, autopilot;

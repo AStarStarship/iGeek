@@ -1,0 +1,13 @@
+# _Seams.yaml — MazeWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
+engine: ../../MazeWorld/MazeWorld.hxx
+seams:
+  - name: _iGeekMazeWorldCore
+    depends: [_iGeekCore]
+    file: 01.Core.hxx
+    label: "Testing MazeWorld core..."
+  - name: _iGeekMazeWorldRelease
+    depends: [_iGeekMazeWorldCore]
+    file: 02.Release.hxx
+    label: "Testing MazeWorld release..."

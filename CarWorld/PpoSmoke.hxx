@@ -1,6 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 // Integration/finite-update smoke, NOT learned route competence.
 #include "../BikeWorld/TileRuntime.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarGym.hxx"
 #include "../PPO.hxx"
 #include <stdio.h>
@@ -24,14 +25,14 @@ ISC main() {
     TPPOStats stats = {}; FPD started = Seconds();
     for (ISC update = 0; update < 10; ++update) {
       stats = trainer.TrainStep();
-      if (!isfinite(stats.policy_loss_) || !isfinite(stats.value_loss_) ||
-          !isfinite(stats.entropy_) || !isfinite(stats.approx_kl_) ||
-          !isfinite(stats.explained_var_)) {
-        D_COUT("CAR_PPO_SMOKE failed mode=" << mode << " update=" << update << "\n"); return 1;
+      if (!iGeek::IsFinite(stats.policy_loss_) || !iGeek::IsFinite(stats.value_loss_) ||
+          !iGeek::IsFinite(stats.entropy_) || !iGeek::IsFinite(stats.approx_kl_) ||
+          !iGeek::IsFinite(stats.explained_var_)) {
+        _DROut("CAR_PPO_SMOKE failed mode=" << mode << " update=" << update << "\n"); return 1;
       }
     }
     FPD wall = Seconds() - started;
-    D_COUT("CAR_PPO_SMOKE passed mode=" << mode == CarActuatorActions ? "raw" : "driver" << " updates=10 envs=" << gym.EnvCount() << " horizon=64 "
+    _DROut("CAR_PPO_SMOKE passed mode=" << mode == CarActuatorActions ? "raw" : "driver" << " updates=10 envs=" << gym.EnvironmentCount() << " horizon=64 "
         "policy_loss=%.6f value_loss=%.6f entropy=%.6f wall_s=%.6f\n");
   }
   return 0;

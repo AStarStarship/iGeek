@@ -25,8 +25,8 @@ void TileWorld::Enemy::Update(const _::FPC& dt) {
 // normalize the bearing to ~unit length via a Newton–Raphson reciprocal
 // square root (no <cmath>: initial guess from a 1/d2 scale, one refinement
 // step). Keeps dependency-free while giving sane constant-speed chases.
-void TileWorld::Enemy::Chase(const _::TVec2F& target, const _::FPC& dt) {
-  if (movement_ == NILP) return;
+void TileWorld::Enemy::Chase(const _::FPC2& target, const _::FPC& dt) {
+  if (movement_ == _NilP) return;
   _::FPC dx = target.x - pos_.x;
   _::FPC dy = target.y - pos_.y;
   _::FPC d2 = dx * dx + dy * dy;

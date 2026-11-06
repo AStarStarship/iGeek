@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
-#ifndef IGEEK_AI_AGENT_T
-#define IGEEK_AI_AGENT_T 1
+#ifndef _iGeekAIAgentHXX
+#define _iGeekAIAgentHXX
 
 namespace iGeek {
 
@@ -1718,5 +1718,5 @@ return S
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekAIAgentHXX

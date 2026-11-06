@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_AI_AGENT_T
-#define IGEEK_AI_AGENT_T 1
+#ifndef _iGeekAgentH
+#define _iGeekAgentH 1
 #include "../ASCIICrabs/_Config.h"
 #include "AgentState.h"
 namespace iGeek {
@@ -14,26 +14,26 @@ class AgentBase {
   virtual void OnPercept(const IUC* percept, ISC percept_len) = 0;
   /* Choose the next action (a single IUC word). */
   virtual IUC Action() = 0;
-  /* Internal state for inspection/snapshot. NILP for stateless tiers. */
-  virtual const AgentState* State() const { return NILP; }
+  /* Internal state for inspection/snapshot. _NilP for stateless tiers. */
+  virtual AgentState* State() { return _NilP; }
   /* Reset internal state to a fresh episode. */
   virtual void Reset() = 0;
   /* Number of distinct actions the tier can emit (the world's action count). */
-  virtual ISC ActionCount() const = 0;
+  virtual ISC ActionCount() = 0;
 };
 
 /* Tier 1 — table-driven: maps the last history_len percepts (concatenated
  * IUC words) to an action via a fixed lookup table. Shows whether the task is
  * even learnable. */
-class TTableAgent : public AgentBase {
+class TableAgent : public AgentBase {
  public:
-  TTableAgent(ISC action_count, ISC history_len, ISC percept_len);
-  ~TTableAgent() override;
+  TableAgent(ISC action_count, ISC history_len, ISC percept_len);
+  ~TableAgent() override;
   void OnPercept(const IUC* percept, ISC percept_len) override;
   IUC Action() override;
-  const AgentState* State() const override;
+  AgentState* State() override;
   void Reset() override;
-  ISC ActionCount() const override;
+  ISC ActionCount() override;
   /* Bind a key (history_len*percept_len IUC words) to an action. The world
   fills the table; the agent just looks up. */
   void SetEntry(const IUC* key, IUC action);
@@ -61,7 +61,7 @@ class TReflexAgent : public AgentBase {
   void OnPercept(const IUC* percept, ISC percept_len) override;
   IUC Action() override;
   void Reset() override;
-  ISC ActionCount() const override;
+  ISC ActionCount() override;
   /* If current percept == condition (percept_len words), take `action`. */
   BOL AddRule(const IUC* condition, IUC action);
   void SetDefaultAction(IUC action);
@@ -86,9 +86,9 @@ class TModelAgent : public AgentBase {
   ~TModelAgent() override;
   void OnPercept(const IUC* percept, ISC percept_len) override;
   IUC Action() override;
-  const AgentState* State() const override;
+  AgentState* State() override;
   void Reset() override;
-  ISC ActionCount() const override;
+  ISC ActionCount() override;
 
  private:
   ISC action_count_;

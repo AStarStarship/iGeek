@@ -1,33 +1,22 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// PrisonerWorld core seam unit: runs a deterministic prisoner's-dilemma
-// simulation and verifies the reward accounting. Converted from the old
-// PrisonerWorld/_Main.hxx (which had an int main and a #include <iostream>
-// no-stdlib violation — replaced with ASCIICrabs COut). Gated on
-// IGEEK_PRISONERWORLD_CORE (the first / default seam).
-#if SEAM >= IGEEK_PRISONERWORLD_CORE
-#if SEAM == IGEEK_PRISONERWORLD_CORE
-#include "_Debug.h"
+#if _Seam >= _iGeekPrisonerWorldCore
+#include "../../../ASCIICrabs/_Debug.h"
 #else
-#include "_Release.h"
+#include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-// PrisonerWorld.hxx + PrisonerEnvPtr are pulled ONCE by the rollup
-// _Tests.hxx (unguarded .hxx); this unit relies on that rather than
-// re-including them.
-using namespace ::_;
 namespace PrisonerWorldTest {
-using namespace iGeek;   // engine types (in iGeek) used unqualified
+using namespace ::_;
+using namespace iGeek;
 
 // All-cooperate: both agents play 0 (C) every round. After Reset() the
 // history is 0 and desired defaults to 0, so each step is C/C -> R=3.
 // Verify every step pays R=3 to both agents and the totals account.
 inline const CHA* Core(const CHA* args) {
-#if SEAM >= IGEEK_PRISONERWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing PrisonerWorld (dilemma sim)..."));
+#if _Seam >= _iGeekPrisonerWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing PrisonerWorld (dilemma sim)..."));
 
-  PrisonerEnv env;
+  PrisonerEnvironment env;
   env.SetPayoffs(5, 3, 1, 0);  // T=5, R=3, P=1, S=0
   env.Reset();
 
@@ -54,10 +43,10 @@ inline const CHA* Core(const CHA* args) {
     return "PRISONERWORLD_FAIL: reward accounting mismatch";
   }
 
-  D_COUT("  " << r3_steps << " cooperative steps, total reward "
+  _DROut("  " << r3_steps << " cooperative steps, total reward "
           << total[0] << " per agent\n");
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace PrisonerWorldTest

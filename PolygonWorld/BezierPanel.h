@@ -1,6 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
 
 #pragma once
+#ifndef _iGeekPolygonWorldBezierPanelH
+#define _iGeekPolygonWorldBezierPanelH
 #include <_Config.h>
 
 namespace iGeek {
@@ -62,6 +64,5 @@ class BezierCurvePanel {
   double[] points;  //< The bazier points.
 };
 
-}  //< namespace Homo
-}  //< namespace World
 }  //< namespace iGeek
+#endif  //< _iGeekPolygonWorldBezierPanelH

@@ -1,18 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_HXX
-#define CRABS_BIKEWORLD_HXX
+#ifndef _iGeekBikeWorldHXX
+#define _iGeekBikeWorldHXX
 #include "BikeWorld.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "BikePilot.hxx"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
 const CHA* TBikeStatusName(ISC status) {
   const CHA* names[] = {"running", "goal", "collision", "fallen", "timeout",
                        "invalid", "blocked", "stopped"};
   return status >= BikeRunning && status <= BikeStopped ? names[status] : "?";
 }
-ABikeEnv::ABikeEnv(const TileMap& map, const TVehicleRoute& route,
-    const TBikeState& initial, IUD seed)
+ABikeEnv::ABikeEnv(TileMap& map, TVehicleRoute& route,
+    TBikeState& initial, IUD seed)
     : map_(map), route_(route), initial_(initial), seed_(seed) { Reset(); }
 void ABikeEnv::Reset() {
   bike_ = initial_; pilot_.Reset(); metrics_ = {}; status_ = BikeRunning;
@@ -22,34 +23,34 @@ void ABikeEnv::Reset() {
   bike_.roll += (FPD(rng % 2001) / 1000.0 - 1.0) * 0.03;
   bike_.heading += (FPD((rng >> 16) % 2001) / 1000.0 - 1.0) * 0.015;
   FPD values[9]; TBikePack(bike_, values);
-  for (FPD value : values) if (!isfinite(value)) {
+  for (FPD value : values) if (!iGeek::IsFinite(value)) {
     status_ = BikeInvalid; Observe(); return;
   }
-  if (bike_.forward < 0 || !isfinite(bike_.time) || bike_.time < 0 ||
-      !isfinite(bike_.distance) || bike_.distance < 0 ||
-      !isfinite(bike_.lateral_accel) || !isfinite(bike_.utilization)) {
+  if (bike_.forward < 0 || !iGeek::IsFinite(bike_.time) || bike_.time < 0 ||
+      !iGeek::IsFinite(bike_.distance) || bike_.distance < 0 ||
+      !iGeek::IsFinite(bike_.lateral_accel) || !iGeek::IsFinite(bike_.utilization)) {
     status_ = BikeInvalid; Observe(); return;
   }
   if (route_.count < 2 || route_.count > VehicleRouteMax) {
     status_ = BikeBlocked; Observe(); return;
   }
   for (ISC i = 0; i < route_.count; ++i) {
-    const TVehiclePoint& point = route_.points[i];
-    if (!isfinite(point.x) || !isfinite(point.y) || point.x < 0 || point.y < 0 ||
+    TVehiclePoint& point = route_.points[i];
+    if (!iGeek::IsFinite(point.x) || !iGeek::IsFinite(point.y) || point.x < 0 || point.y < 0 ||
         point.x >= map_.SizeMaxF().x || point.y >= map_.SizeMaxF().y) {
       status_ = BikeInvalid; Observe(); return;
     }
   }
-  metrics_.max_roll = fabs(bike_.roll); metrics_.max_speed = bike_.forward;
-  if (bike_.fallen || fabs(bike_.roll) >= params_.fall_angle) status_ = BikeFallen;
+  metrics_.max_roll = Absolute(bike_.roll); metrics_.max_speed = bike_.forward;
+  if (bike_.fallen || Absolute(bike_.roll) >= params_.fall_angle) status_ = BikeFallen;
   FPD contact;
   if (TVehicleSweep(map_, bike_.x, bike_.y, bike_.x, bike_.y, 0.8, contact))
     status_ = BikeCollision;
   Observe();
 }
-FPD ABikeEnv::GoalDistance() const {
+FPD ABikeEnv::GoalDistance() {
   if (route_.count < 2 || route_.count > VehicleRouteMax) return 1e100;
-  const TVehiclePoint& goal = route_.points[route_.count - 1];
+  TVehiclePoint& goal = route_.points[route_.count - 1];
   return hypot(goal.x - bike_.x, goal.y - bike_.y);
 }
 FPC ABikeEnv::Step(ISC action) {
@@ -68,7 +69,7 @@ FPC ABikeEnv::Step(ISC action) {
   }
   return reward;
 }
-FPC ABikeEnv::StepControl(const TBikeControl& control) {
+FPC ABikeEnv::StepControl(TBikeControl& control) {
   if (Done()) return 0;
   TVehicleGuide before = TVehicleGuidance(route_, bike_.x, bike_.y,
                                          bike_.heading, 5);
@@ -83,7 +84,7 @@ FPC ABikeEnv::StepControl(const TBikeControl& control) {
       status_ = BikeInvalid; break;
     }
     ++metrics_.physics_steps;
-    metrics_.max_roll = TBikeMax(metrics_.max_roll, fabs(bike_.roll));
+    metrics_.max_roll = TBikeMax(metrics_.max_roll, Absolute(bike_.roll));
     metrics_.max_speed = TBikeMax(metrics_.max_speed, bike_.forward);
     FPD contact;
     if (TVehicleSweep(map_, old.x, old.y, bike_.x, bike_.y, 0.8, contact)) {
@@ -99,7 +100,7 @@ FPC ABikeEnv::StepControl(const TBikeControl& control) {
   ++metrics_.frames;
   TVehicleGuide after = TVehicleGuidance(route_, bike_.x, bike_.y,
                                         bike_.heading, 5);
-  metrics_.max_roll = TBikeMax(metrics_.max_roll, fabs(bike_.roll));
+  metrics_.max_roll = TBikeMax(metrics_.max_roll, Absolute(bike_.roll));
   metrics_.max_speed = TBikeMax(metrics_.max_speed, bike_.forward);
   metrics_.max_cross_track = TBikeMax(metrics_.max_cross_track, after.cross_track);
   metrics_.cross_track_squared += after.cross_track * after.cross_track;
@@ -117,7 +118,7 @@ void ABikeEnv::Observe() {
   for (ISC i = 0; i < ObsLength; ++i) obs_[i] = 0;
   if (status_ == BikeInvalid || route_.count < 2 || route_.count > VehicleRouteMax)
     return;
-  const TVehiclePoint& goal = route_.points[route_.count - 1];
+  TVehiclePoint& goal = route_.points[route_.count - 1];
   FPD ch = cos(bike_.heading), sh = sin(bike_.heading);
   FPD dx = goal.x - bike_.x, dy = goal.y - bike_.y;
   TVehicleGuide guide = TVehicleGuidance(route_, bike_.x, bike_.y,

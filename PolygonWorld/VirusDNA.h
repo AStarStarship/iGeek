@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldVirusDNAH
+#define _iGeekPolygonWorldVirusDNAH
 namespace iGeek {
 
 /* Class that represents a DNA Virus.
@@ -12,3 +14,5 @@ class DNAVirus : public Virus {
   DNAVirus(FPD init_x, FPD init_y);
 };
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldVirusDNAH

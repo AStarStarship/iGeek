@@ -1,10 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
 #include <_Config.h>
-#if SEAM >= IGEEK_CORE
-#ifndef IGEEK_COURSE_CODE
-#define IGEEK_COURSE_CODE
+#if _Seam >= _iGeekCore
+#ifndef _iGeekSchoolH
+#define _iGeekSchoolH
 #include "../ASCIICrabs/Operand.h"
 namespace iGeek {
 

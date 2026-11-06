@@ -1,7 +1,5 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
+#include "Homotuples.h"
 #include "movement_component.h"
 
 MovementComponent::MovementComponent(sf::Sprite& sprite, float velocity_max,
@@ -13,11 +11,11 @@ MovementComponent::MovementComponent(sf::Sprite& sprite, float velocity_max,
 
 MovementComponent::~MovementComponent() {}
 
-const float& MovementComponent::VelocityMax() const { return velocity_max_; }
+const float& MovementComponent::VelocityMax() { return velocity_max_; }
 
-const _::FPC2& MovementComponent::Velocity() const { return velocity_; }
+const _::FPC2& MovementComponent::Velocity() { return velocity_; }
 
-const bool MovementComponent::GetState(const short unsigned state) const {
+const bool MovementComponent::GetState(const short unsigned state) {
   switch (state) {
     case kIdle:
       if (velocity_.x == 0.f && velocity_.y == 0.f) return true;

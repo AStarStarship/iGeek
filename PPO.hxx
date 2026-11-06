@@ -13,15 +13,14 @@
 #include "PPO.h"
 #include "Tensor.hxx"
 #include "LinearPolicy.hxx"
-#include <math.h>
-
+#include "../CrabsTK/Math/Blas.h"
 namespace iGeek {
 
 TPPO::TPPO(Gym& gym, TPolicy& policy, ISC horizon, ISC epochs)
     : gym_(gym), policy_(policy), horizon_(horizon), epochs_(epochs),
       gamma_(0.99f), lam_(0.95f), clip_eps_(0.2f), vf_clip_eps_(0.2f),
       ent_coef_(0.01f), vf_coef_(0.5f) {
-  ISC B = gym.EnvCount();
+  ISC B = gym.EnvironmentCount();
   ISC N = horizon_ * B;  // total buffer rows.
   ISC obs_len = policy_.ObsLength();
   ISC A = policy_.ActionCount();
@@ -45,7 +44,7 @@ TPPO::~TPPO() {
 /* Collect one rollout: horizon batch-steps from the gym, each stored as
    horizon*B rows in the buffer. */
 void TPPO::CollectRollout() {
-  ISC B = gym_.EnvCount();
+  ISC B = gym_.EnvironmentCount();
   ISC A = policy_.ActionCount();
   gym_.ResetBatch();
   ISC n = 0;
@@ -88,7 +87,7 @@ void TPPO::CollectRollout() {
    adv_t = sum_k lambda^k delta_{t+k}. Within each env's trajectory (reset at
    terminals), compute backwards. */
 void TPPO::ComputeAdvantages() {
-  ISC B = gym_.EnvCount();
+  ISC B = gym_.EnvironmentCount();
   ISC N = horizon_ * B;
   // Zero advantages.
   for (ISC i = 0; i < N; ++i) {
@@ -121,7 +120,7 @@ void TPPO::ComputeAdvantages() {
     var += d * d;
   }
   var /= FPC(N2);
-  FPC inv = 1.0f / (FPC(sqrt(var)) + 1e-8f);
+  FPC inv = 1.0f / (FPC(SquareRoot(var)) + 1e-8f);
   for (ISC i = 0; i < N2; ++i) {
     advantages_[i] = (advantages_[i] - mean) * inv;
     returns_[i] = advantages_[i] + values_.At(i, 0);
@@ -131,7 +130,7 @@ void TPPO::ComputeAdvantages() {
 /* One epoch of clipped PPO + value-clip + entropy over the full buffer
    (minibatch = full buffer for the toy test). Returns the stats. */
 TPPOStats TPPO::UpdatePolicy() {
-  ISC N = horizon_ * gym_.EnvCount();
+  ISC N = horizon_ * gym_.EnvironmentCount();
   ISC A = policy_.ActionCount();
   // Build the per-row tensors the Backward interface wants.
   TTensor logits = TTensorAlloc(N, A);
@@ -157,20 +156,20 @@ TPPOStats TPPO::UpdatePolicy() {
   for (ISC i = 0; i < N; ++i) {
     // entropy of the categorical (diagnostic).
     FPC lse = 0.0f;
-    FPC mx = logits.AtC(i, 0);
-    for (ISC a = 1; a < A; ++a) if (logits.AtC(i, a) > mx) mx = logits.AtC(i, a);
+    FPC mx = logits.At(i, 0);
+    for (ISC a = 1; a < A; ++a) if (logits.At(i, a) > mx) mx = logits.At(i, a);
     FPC s = 0.0f;
-    for (ISC a = 0; a < A; ++a) s += FPC(exp(logits.AtC(i, a) - mx));
+    for (ISC a = 0; a < A; ++a) s += FPC(exp(logits.At(i, a) - mx));
     lse = mx + FPC(log(s));
     FPC ent = 0.0f;
     for (ISC a = 0; a < A; ++a) {
-      FPC p = FPC(exp(logits.AtC(i, a) - lse));
-      if (p > 0.0f) ent += -p * (logits.AtC(i, a) - lse);
+      FPC p = FPC(exp(logits.At(i, a) - lse));
+      if (p > 0.0f) ent += -p * (logits.At(i, a) - lse);
     }
     entropy += ent;
     // approx KL (new vs old) == 0 here (same logits).
-    val_loss += grad_value.AtC(i, 0) * grad_value.AtC(i, 0);
-    for (ISC a = 0; a < A; ++a) pol_loss += grad_logits.AtC(i, a) * grad_logits.AtC(i, a);
+    val_loss += grad_value.At(i, 0) * grad_value.At(i, 0);
+    for (ISC a = 0; a < A; ++a) pol_loss += grad_logits.At(i, a) * grad_logits.At(i, a);
   }
   entropy /= FPC(N);
   val_loss /= FPC(N);

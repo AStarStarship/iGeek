@@ -1,15 +1,17 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldCorePlayerHXX
+#define _iGeekCardsWorldCorePlayerHXX
 #include "Player.h"
-#if SEAM >= IGEEK_PLAYER
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
 /* Copies up to (dest_size-1) chars from src to dest, nil-terminating. */
 static void NameCopy(CHA* dest, ISC dest_size, const CHA* src) {
-  if (dest == NILP || dest_size <= 0) return;
+  if (dest == _NilP || dest_size <= 0) return;
   dest[0] = 0;
-  if (src == NILP) return;
+  if (src == _NilP) return;
   ISC i = 0;
   while (src[i] != 0 && i < dest_size - 1) {
     dest[i] = src[i];
@@ -34,6 +36,7 @@ ISC Player::PointsAdd(ISC num_points) {
   return point_count_;
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCorePlayerHXX

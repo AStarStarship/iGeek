@@ -1,7 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldCoreDeckHXX
+#define _iGeekCardsWorldCoreDeckHXX
+#include <_Config.h>
 #include "Deck.h"
-#if SEAM >= IGEEK_DECK
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
@@ -32,34 +35,34 @@ Deck::Deck(BOL deck_contains_jokers, ISC aces_are_high, SuitCulture culture)
   }
 }
 
-CardStack Deck::Stock() const {
-  CardStack stock;
-  stock.SetVisibility(false);
-  for (ISC i = 0; i < card_count_; ++i) stock.AddCard(const_cast<Card*>(&cards_[i]));
-  return stock;
+CardStack& Deck::Stock() {
+  stock_.SetVisibility(false);
+  stock_.Clear();
+  for (ISC i = 0; i < card_count_; ++i) stock_.AddCard(const_cast<Card*>(&cards_[i]));
+  return stock_;
 }
 
-const CHA* Deck::SuitString(ISC suit) const {
+const CHA* Deck::SuitString(ISC suit) {
   if (suit < 1 || suit > 4) return "Invalid";
   switch (culture_) {
-    case SuitCulture::kGerman:
+    case SuitCulture::SCGerman:
       switch (suit) {
         case 1: return "Acorns";
         case 2: return "Bells";
         case 3: return "Hearts";
         default: return "Lieves";
       }
-    case SuitCulture::kSwissGerman:
+    case SuitCulture::SCSwissGerman:
       switch (suit) {
         case 1: return "Acorns";
         case 2: return "Bells";
         case 3: return "Roses";
         default: return "Shields";
       }
-    case SuitCulture::kPiacentine:
-    case SuitCulture::kNapoletane:
-    case SuitCulture::kSpagnole:
-    case SuitCulture::kBergamasche:
+    case SuitCulture::SCPiacentine:
+    case SuitCulture::SCNapoletane:
+    case SuitCulture::SCSpagnole:
+    case SuitCulture::SCBergamasche:
       switch (suit) {
         case 1: return "Clubs";
         case 2: return "Coins";
@@ -76,6 +79,7 @@ const CHA* Deck::SuitString(ISC suit) const {
   }
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreDeckHXX

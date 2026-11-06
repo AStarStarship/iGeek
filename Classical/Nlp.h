@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_NLP_T
-#define IGEEK_CLASSICAL_NLP_T 1
+#ifndef _iGeekClassicalNlpH
+#define _iGeekClassicalNlpH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -63,5 +63,5 @@ to long
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalNlpH

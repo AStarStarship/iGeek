@@ -1,58 +1,80 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_ROOM_HXX
-#define CRABS_CARWORLD_ROOM_HXX
+#ifndef _iGeekCarWorldRoomHXX
+#define _iGeekCarWorldRoomHXX
 #include "CarWorld2D.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarRoom.h"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 ACarRoom::ACarRoom(ACarEnv& env) : TCarRoomBase("carworld"), env_(env) {
-  SetCommand(TCarRoomCommand());
+  TCarRoomCommand empty;
+    SetCommand(empty);
   Snapshot(CarRoomAutopilot, 0);
 }
-BOL ACarRoom::Valid(const TCarRoomCommand& command) {
+BOL ACarRoom::Valid(TCarRoomCommand& command) {
   return command.version == 1 &&
       (command.mode == CarRoomManual || command.mode == CarRoomAutopilot) &&
       command.action >= 0 && command.action < CarActionCount &&
-      isfinite(command.control.steer) && fabs(command.control.steer) <= 0.55 &&
-      isfinite(command.control.throttle) && command.control.throttle >= 0 &&
-      command.control.throttle <= 1 && isfinite(command.control.brake) &&
+      iGeek::IsFinite(command.control.steer) && Absolute(command.control.steer) <= 0.55 &&
+      iGeek::IsFinite(command.control.throttle) && command.control.throttle >= 0 &&
+      command.control.throttle <= 1 && iGeek::IsFinite(command.control.brake) &&
       command.control.brake >= 0 && command.control.brake <= 1;
 }
-BOL ACarRoom::SetCommand(const TCarRoomCommand& command) {
-  // Validate before changing the prior command. Six scalars fit the fixed Floor.
+BOL ACarRoom::SetCommand(TCarRoomCommand& command) {
+  // Validate before changing the prior command.
   if (!Valid(command)) return false;
   ClearFloor();
   auto* floor = Floor();
-  return TListInsert(floor, command.version) == 0 &&
-      TListInsert(floor, command.mode) == 1 &&
-      TListInsert(floor, command.action) == 2 &&
-      TListInsert(floor, command.control.steer) == 3 &&
-      TListInsert(floor, command.control.throttle) == 4 &&
-      TListInsert(floor, command.control.brake) == 5;
+  // Insert key-value pairs: the Floor is a TDic (keys Table at index 0).
+  CHA k_ver[]   = {'v','e','r',0};
+  CHA k_mode[]  = {'m','o','d','e',0};
+  CHA k_act[]   = {'a','c','t',0};
+  CHA k_steer[] = {'s','t','e','e','r',0};
+  CHA k_thr[]   = {'t','h','r',0};
+  CHA k_brk[]   = {'b','r','k',0};
+  return TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_ver,   _::_ISC, IUW(ISC(command.version))) >= 0 &&
+         TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_mode,  _::_ISC, IUW(ISC(command.mode))) >= 0 &&
+         TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_act,   _::_ISC, IUW(ISC(command.action))) >= 0 &&
+         TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_steer, _::_FPD, IUW(*TRef<IUW>(&command.control.steer))) >= 0 &&
+         TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_thr,   _::_FPD, IUW(*TRef<IUW>(&command.control.throttle))) >= 0 &&
+         TDicInsert<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_brk,   _::_FPD, IUW(*TRef<IUW>(&command.control.brake))) >= 0;
 }
-BOL ACarRoom::ReadCommand(TCarRoomCommand& command) const {
+BOL ACarRoom::ReadCommand(TCarRoomCommand& command) {
   const auto* floor = Floor();
-  if (floor->bytes != FloorSize || floor->map.total != FloorTupleMax ||
-      floor->map.count != 6) return false;
-  const DTB types[6] = {_ISC, _ISC, _ISC, _FPD, _FPD, _FPD};
-  ISC cursor = ISC(sizeof(*floor)) + FloorTupleMax * ISC(sizeof(ISC) + sizeof(DTB));
-  const ISC* offsets = TListValuesMap(floor);
-  // Check the canonical packed schema before dereferencing any stored offset.
-  for (ISC i = 0; i < 6; ++i) {
-    ISC bytes = i < 3 ? ISC(sizeof(ISC)) : ISC(sizeof(FPD));
-    cursor = (cursor + bytes - 1) & ~(bytes - 1);
-    if (TListType(floor, i) != types[i] || offsets[i] != cursor ||
-        cursor > FloorSize - bytes) return false;
-    cursor += bytes;
-  }
-  if (floor->top != cursor) return false;
-  command.version = *TPtr<const ISC>(TListValue(floor, ISC(0)));
-  command.mode = *TPtr<const ISC>(TListValue(floor, ISC(1)));
-  command.action = *TPtr<const ISC>(TListValue(floor, ISC(2)));
-  command.control.steer = *TPtr<const FPD>(TListValue(floor, ISC(3)));
-  command.control.throttle = *TPtr<const FPD>(TListValue(floor, ISC(4)));
-  command.control.brake = *TPtr<const FPD>(TListValue(floor, ISC(5)));
+  CHA k_ver[]   = {'v','e','r',0};
+  CHA k_mode[]  = {'m','o','d','e',0};
+  CHA k_act[]   = {'a','c','t',0};
+  CHA k_steer[] = {'s','t','e','e','r',0};
+  CHA k_thr[]   = {'t','h','r',0};
+  CHA k_brk[]   = {'b','r','k',0};
+  // Validate the Floor Dic type schema before reading any values.
+  // The values List stores type tags after the data (TListTypes).
+  // Index 0 = keys Table, indices 1..N = KV values in insertion order.
+  // Expected: ver=ISC, mode=ISC, act=ISC, steer=FPD, thr=FPD, brk=FPD.
+  const DTB* types = TListTypes(&floor->values, floor->values.map.total);
+  if (types[1] != _ISC || types[2] != _ISC || types[3] != _ISC ||
+      types[4] != _FPD || types[5] != _FPD || types[6] != _FPD)
+    return false;
+  ISC idx;
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_ver);
+  if (idx < 0) return false;
+  command.version = *TRef<const ISC>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_mode);
+  if (idx < 0) return false;
+  command.mode = *TRef<const ISC>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_act);
+  if (idx < 0) return false;
+  command.action = *TRef<const ISC>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_steer);
+  if (idx < 0) return false;
+  command.control.steer = *TRef<const FPD>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_thr);
+  if (idx < 0) return false;
+  command.control.throttle = *TRef<const FPD>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
+  idx = TDicFind<CHA, CHC, ISC, ISC, DTB, IUC>(floor, k_brk);
+  if (idx < 0) return false;
+  command.control.brake = *TRef<const FPD>(TDicValue_NC<CHA, CHC, ISC, ISC, DTB, IUC>(floor, idx));
   return Valid(command);
 }
 void ACarRoom::Snapshot(ISC mode, FPC reward) {
@@ -65,15 +87,16 @@ void ACarRoom::Snapshot(ISC mode, FPC reward) {
 const Op* ACarRoom::Star(CHC index, Crabs* crabs) {
   static const Op Metadata = {"CarWorld", OpFirst('r'), OpLast('t'),
       "Native vehicle Room: reset or tick validated Floor schema v1.",
-      ';', '}', 0, NILP};
+      ';', '}', 0, _NilP};
   // This native endpoint does not yet consume interpreter/Slot arguments.
-  if (crabs != NILP) return OpError(AErrorInvalidInput);
+  if (crabs != _NilP) return OpError(AErrorInvalidInput);
   if (index == '?') return &Metadata;
   if (index == 'r') {
     env_.Reset();
-    SetCommand(TCarRoomCommand());
+    TCarRoomCommand empty;
+    SetCommand(empty);
     Snapshot(CarRoomAutopilot, 0);
-    return NILP;
+    return _NilP;
   }
   if (index != 't') return OpError(AErrorInvalidOp);
   TCarRoomCommand command;
@@ -81,7 +104,7 @@ const Op* ACarRoom::Star(CHC index, Crabs* crabs) {
   FPC reward = command.mode == CarRoomManual ?
       env_.StepControl(command.control) : env_.Step(command.action);
   Snapshot(command.mode, reward);
-  return NILP;
+  return _NilP;
 }
 } //< namespace iGeek
 #endif

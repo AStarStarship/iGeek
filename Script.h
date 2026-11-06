@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_SCRIPT_H
-#define IGEEK_SCRIPT_H
+#ifndef _iGeekScriptH
+#define _iGeekScriptH
 #include <_Config.h>
-#if SEAM >= IGEEK_GYM_MANIFEST
+#if _Seam >= _iGeekEnvironmentManifest
 namespace iGeek {
 
 /* SCRIPT: Serial Chinese Room, Interprocess, and Telemetry.

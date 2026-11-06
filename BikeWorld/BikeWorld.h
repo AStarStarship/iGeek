@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_H
-#define CRABS_BIKEWORLD_H
+#ifndef _iGeekBikeWorldH
+#define _iGeekBikeWorldH
 #include "BikePilot.h"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
 enum {
   BikeRunning, BikeGoal, BikeCollision, BikeFallen, BikeTimeout,
@@ -27,23 +27,23 @@ class ABikeEnv
 {
  public:
   enum { ObsLength = 21, MaxFrames = 6000 };
-  ABikeEnv(const TileMap& map, const TVehicleRoute& route,
-           const TBikeState& initial, IUD seed = 1);
+  ABikeEnv(TileMap& map, TVehicleRoute& route,
+           TBikeState& initial, IUD seed = 1);
   void Reset();
   void ResetSeed(IUD seed) { seed_ = seed; Reset(); }
-  BOL Done() const { return status_ != BikeRunning; }
-  ISC Status() const { return status_; }
+  BOL Done() { return status_ != BikeRunning; }
+  ISC Status() { return status_; }
   FPC Step(ISC action = BikeCruise);
-  FPC StepControl(const TBikeControl& control);
+  FPC StepControl(TBikeControl& control);
   void Observe();
-  const FPC* Obs() const { return obs_; }
-  const TBikeState& State() const { return bike_; }
-  const TBikeMetrics& Metrics() const { return metrics_; }
+  const FPC* Obs() { return obs_; }
+  TBikeState& State() { return bike_; }
+  TBikeMetrics& Metrics() { return metrics_; }
   TBikeParams& Params() { return params_; }
-  FPD GoalDistance() const;
+  FPD GoalDistance();
  private:
-  const TileMap& map_;
-  const TVehicleRoute& route_;
+  TileMap& map_;
+  TVehicleRoute& route_;
   TBikeState initial_, bike_;
   TBikeParams params_;
   ABikePilot pilot_;

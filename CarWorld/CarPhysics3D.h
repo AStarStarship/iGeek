@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_PHYSICS_3D_H
-#define CRABS_CARWORLD_PHYSICS_3D_H
+#ifndef _iGeekCarWorldPhysics3DH
+#define _iGeekCarWorldPhysics3DH
 #include "CarPhysics.h"
 #include "CarPhysics.hxx"
-#include <math.h>
-#if SEAM >= CRABS_CARWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 /** 3D extension. Appends pitch/roll + 4x suspension to the 2D TCarState.
  * wheel_height = suspension compression (m): positive = compressed.
@@ -52,7 +52,7 @@ inline void TCarParams3DDerive(TCarParams3D& p) {
   p.roll_inertia = (1.0 / 12.0) * m * (L * L + H * H) + m * p.center_of_mass_height * p.center_of_mass_height;
 }
 /** Pack 19 continuous DOF into v. */
-inline void TCarState3DPack(const TCarState3D& s, FPD* v) {
+inline void TCarState3DPack(TCarState3D& s, FPD* v) {
   v[0] = s.x; v[1] = s.y; v[2] = s.heading; v[3] = s.forward;
   v[4] = s.lateral; v[5] = s.yaw_rate; v[6] = s.pitch;
   v[7] = s.pitch_rate; v[8] = s.roll; v[9] = s.roll_rate; v[10] = s.steer;
@@ -61,26 +61,26 @@ inline void TCarState3DPack(const TCarState3D& s, FPD* v) {
     v[15 + i] = s.wheel_vel[i];
   }
 }
-inline BOL TCarParams3DValid(const TCarParams3D& p) {
+inline BOL TCarParams3DValid(TCarParams3D& p) {
   if (!TCarParamsValid(p.base)) return false;
   FPD pos[] = {p.pitch_inertia, p.roll_inertia, p.suspension_stiffness,
       p.suspension_damping, p.suspension_rest_height, p.center_of_mass_height,
       p.body_length, p.body_width, p.body_height, p.unsprung_mass};
-  for (FPD v : pos) if (!isfinite(v) || v <= 0) return false;
-  return isfinite(p.pacejka_stiffness) && p.pacejka_stiffness > 0 &&
-      isfinite(p.pacejka_peak) && p.pacejka_peak > 0;
+  for (FPD v : pos) if (!iGeek::IsFinite(v) || v <= 0) return false;
+  return iGeek::IsFinite(p.pacejka_stiffness) && p.pacejka_stiffness > 0 &&
+      iGeek::IsFinite(p.pacejka_peak) && p.pacejka_peak > 0;
 }
-inline BOL TCarState3DValid(const TCarState3D& s) {
+inline BOL TCarState3DValid(TCarState3D& s) {
   FPD v[19]; TCarState3DPack(s, v);
-  for (ISC i = 0; i < 19; ++i) if (!isfinite(v[i])) return false;
+  for (ISC i = 0; i < 19; ++i) if (!iGeek::IsFinite(v[i])) return false;
   for (ISC i = 0; i < CarWheelCount; ++i)
-    if (!isfinite(s.vertical_tire_force[i]) || s.vertical_tire_force[i] < 0) return false;
-  return fabs(s.x) <= 1e9 && fabs(s.y) <= 1e9 && fabs(s.pitch) < 1.5 &&
-      fabs(s.roll) < 1.5 && s.forward >= 0 && s.forward <= 1e4;
+    if (!iGeek::IsFinite(s.vertical_tire_force[i]) || s.vertical_tire_force[i] < 0) return false;
+  return Absolute(s.x) <= 1e9 && Absolute(s.y) <= 1e9 && Absolute(s.pitch) < 1.5 &&
+      Absolute(s.roll) < 1.5 && s.forward >= 0 && s.forward <= 1e4;
 }
 /** Per-wheel 3D tire force (Pacejka lateral + friction circle). */
-inline void TCarTire3D(const FPD* v, const TCarParams3D& p,
-    const TCarControl& c, ISC wheel, const TVehicleSurface& surface,
+inline void TCarTire3D(const FPD* v, TCarParams3D& p,
+    TCarControl& c, ISC wheel, TVehicleSurface& surface,
     const FPD* fz, FPD* fx, FPD* fy, FPD* utilization) {
   FPD front_arm = p.base.front_arm, rear_arm = p.base.rear_arm;
   FPD track = p.base.track;
@@ -94,7 +94,7 @@ inline void TCarTire3D(const FPD* v, const TCarParams3D& p,
   FPD Fz = fz[wheel];
   if (Fz < 10) { *fx = 0; *fy = 0; *utilization = 0; return; }
   // Pacejka lateral: fy = -Fz * D * sin(C * atan(B*alpha - E*(B*alpha - atan(B*alpha))))
-  FPD alpha = atan2(v_tire, TBikeMax(fabs(u_tire), 2.0));
+  FPD alpha = atan2(v_tire, TBikeMax(Absolute(u_tire), 2.0));
   FPD B = p.pacejka_stiffness, C = p.pacejka_peak, E = p.pacejka_relax;
   FPD Balpha = B * alpha;
   FPD fy_pacejka = -Fz * sin(C * (Balpha - E * (Balpha - atan(Balpha))));
@@ -117,17 +117,17 @@ inline void TCarTire3D(const FPD* v, const TCarParams3D& p,
   }
 }
 /** Full 3D Newton-Euler derivative (19 DOF). */
-inline void TCarDerivative3D(const FPD* v, const TCarParams3D& p,
-    const TCarControl& c, const TCarContacts3D& contacts, FPD* d,
+inline void TCarDerivative3D(const FPD* v, TCarParams3D& p,
+    TCarControl& c, TCarContacts3D& contacts, FPD* d,
     FPD& utilization, FPD& ax, FPD& ay) {
   FPD front_arm = p.base.front_arm, rear_arm = p.base.rear_arm;
   FPD track = p.base.track, m = p.base.mass;
   FPD slope_x = 0, slope_y = 0;
-  for (const TVehicleSurface& s : contacts.wheels) {
+  for (TVehicleSurface& s : contacts.wheels) {
     slope_x += 0.25 * s.slope_x; slope_y += 0.25 * s.slope_y;
   }
   FPD g = BikeGravity;
-  FPD normal_g = g / sqrt(1 + slope_x * slope_x + slope_y * slope_y);
+  FPD normal_g = g / SquareRoot(1 + slope_x * slope_x + slope_y * slope_y);
   // Suspension + Fz (quasi-static with load transfer).
   FPD fz[CarWheelCount], h[CarWheelCount];
   FPD front_axle = front_arm, rear_axle = rear_arm;
@@ -170,7 +170,7 @@ inline void TCarDerivative3D(const FPD* v, const TCarParams3D& p,
     rolling += fz[i] * contacts.wheels[i].rolling * tanh(v[3] / 0.2);
   }
   FPD ch = cos(v[2]), sh = sin(v[2]);
-  FPD drag = 0.5 * p.base.air_density * p.base.drag_area * v[3] * fabs(v[3]);
+  FPD drag = 0.5 * p.base.air_density * p.base.drag_area * v[3] * Absolute(v[3]);
   ax = (fx_total - drag - rolling) / m -
       normal_g * (slope_x * ch + slope_y * sh);
   ay = fy_total / m - normal_g * (-slope_x * sh + slope_y * ch);
@@ -202,14 +202,14 @@ inline void TCarDerivative3D(const FPD* v, const TCarParams3D& p,
   }
 }
 /** RK4 3D step. dt in (0,0.01]; returns false without mutating on invalid input. */
-inline BOL TCarStep3D(TCarState3D& car, const TCarParams3D& p,
-    const TCarControl& c, const TCarContacts3D& contacts, FPD dt) {
-  if (!isfinite(dt) || dt <= 0 || dt > 0.01 || !TCarParams3DValid(p) ||
-      !TCarState3DValid(car) || !isfinite(c.steer) || !isfinite(c.throttle) ||
-      !isfinite(c.brake)) return false;
-  for (const TVehicleSurface& s : contacts.wheels)
+inline BOL TCarStep3D(TCarState3D& car, TCarParams3D& p,
+    TCarControl& c, TCarContacts3D& contacts, FPD dt) {
+  if (!iGeek::IsFinite(dt) || dt <= 0 || dt > 0.01 || !TCarParams3DValid(p) ||
+      !TCarState3DValid(car) || !iGeek::IsFinite(c.steer) || !iGeek::IsFinite(c.throttle) ||
+      !iGeek::IsFinite(c.brake)) return false;
+  for (TVehicleSurface& s : contacts.wheels)
     if (!TBikeSurfaceValid(s) || s.friction > 2 || s.rolling > 1 ||
-        fabs(s.slope_x) > 1 || fabs(s.slope_y) > 1) return false;
+        Absolute(s.slope_x) > 1 || Absolute(s.slope_y) > 1) return false;
   FPD v[19], work[19], k1[19], k2[19], k3[19], k4[19];
   TCarState3DPack(car, v);
   FPD utilization = 0, ax = 0, ay = 0;
@@ -222,11 +222,11 @@ inline BOL TCarStep3D(TCarState3D& car, const TCarParams3D& p,
   TCarDerivative3D(work, p, c, contacts, k4, utilization, ax, ay);
   for (ISC i = 0; i < 19; ++i) {
     v[i] += dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
-    if (!isfinite(v[i])) return false;
+    if (!iGeek::IsFinite(v[i])) return false;
   }
   v[3] = TBikeMax(v[3], 0);
   TCarDerivative3D(v, p, c, contacts, work, utilization, ax, ay);
-  if (!isfinite(utilization) || !isfinite(ax) || !isfinite(ay)) return false;
+  if (!iGeek::IsFinite(utilization) || !iGeek::IsFinite(ax) || !iGeek::IsFinite(ay)) return false;
   TCarState3D next = car;
   next.x = v[0]; next.y = v[1]; next.heading = TBikeAngle(v[2]);
   next.forward = v[3]; next.lateral = v[4]; next.yaw_rate = v[5];
@@ -241,10 +241,10 @@ inline BOL TCarStep3D(TCarState3D& car, const TCarParams3D& p,
   next.longitudinal_accel = ax; next.lateral_accel = ay; next.utilization = utilization;
   // Store Fz from the derivative (recompute with load transfer).
   FPD slope_x2 = 0, slope_y2 = 0;
-  for (const TVehicleSurface& s : contacts.wheels) {
+  for (TVehicleSurface& s : contacts.wheels) {
     slope_x2 += 0.25 * s.slope_x; slope_y2 += 0.25 * s.slope_y;
   }
-  FPD normal_g2 = BikeGravity / sqrt(1 + slope_x2 * slope_x2 + slope_y2 * slope_y2);
+  FPD normal_g2 = BikeGravity / SquareRoot(1 + slope_x2 * slope_x2 + slope_y2 * slope_y2);
   FPD static_fz2 = 0.25 * p.base.mass * normal_g2;
   FPD lt_long2 = p.base.mass * ax * p.center_of_mass_height / (p.base.front_arm + p.base.rear_arm);
   FPD lt_lat2 = p.base.mass * ay * p.center_of_mass_height / p.base.track;

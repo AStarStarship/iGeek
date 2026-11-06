@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_RCS_H
-#define CRABS_SPACEWORLD_RCS_H
+#ifndef _iGeekSpaceWorldRcsH
+#define _iGeekSpaceWorldRcsH
 #include "SpaceConfig.h"
 #include "SpaceMath.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 constexpr ISC SpaceRcsTotal = 24;  //< Total RCS thrusters per spacecraft.
 /** One RCS thruster: body-frame mount position + unit force direction
@@ -21,9 +21,9 @@ struct TSpaceThruster
  * rotation about the body x/y/z axes respectively.
  * @pre half.x, half.y, half.z > 0 and finite.
  */
-void TSpaceRcsBuild(TSpaceThruster out[SpaceRcsTotal], const TSpaceHalf& half);
+void TSpaceRcsBuild(TSpaceThruster out[SpaceRcsTotal], TSpaceHalf& half);
 /** Sum of max thrust of a group (two index lists). */
 FPD TSpaceRcsGroupSum(const ISC idx[2][4], const FPD max[SpaceRcsTotal]);
 } //< namespace iGeek
-#endif
-#endif
+#endif  //< _Seam >= _iGeekSpaceWorldCore
+#endif  //< _iGeekSpaceWorldRcsH

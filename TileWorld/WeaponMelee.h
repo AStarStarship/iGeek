@@ -1,11 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
 #include <_Config.h>
-
-#ifndef TILEWORLD_MELEEWEAPON_H
-#define TILEWORLD_MELEEWEAPON_H
-
+#ifndef _iGeekTileWorldMeleeWeaponH
+#define _iGeekTileWorldMeleeWeaponH
+#include "Homotuples.h"
 #include "Item.h"
 
 class Item;

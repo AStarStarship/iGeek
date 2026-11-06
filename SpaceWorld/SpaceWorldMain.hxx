@@ -164,11 +164,11 @@ int main(int argc, char* argv[]) {
 
       if (trace && s % 60 == 0) {
         // Print state every second
-        D_COUT("Step " << s << ": pos=(%.2f, %.2f, %.2f) q=(%.2f, %.2f, %.2f, %.2f) v=(%.2f, %.2f, %.2f) wx=%.2f wy=%.2f wz=%.2f t=%.2f\n");
+        _DROut("Step " << s << ": pos=(%.2f, %.2f, %.2f) q=(%.2f, %.2f, %.2f, %.2f) v=(%.2f, %.2f, %.2f) wx=%.2f wy=%.2f wz=%.2f t=%.2f\n");
       }
     }
   }
 
-  if (trace) D_COUT("Simulation complete.\n");
+  if (trace) _DROut("Simulation complete.\n");
   return 0;
 }

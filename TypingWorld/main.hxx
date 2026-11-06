@@ -1,12 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
 
 #include "World.h"
-#include "_Config.h"
+#include <_Config.h>
 
 CHA ScanKeyboard() {
   CHA key = 127;
 
-  key = CIn.Get();
+  key = RIn.Get();
 
   if (key == 0 || key == -32) { // get a special key
     key = _getch();

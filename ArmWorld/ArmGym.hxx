@@ -1,13 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_ARMWORLD_GYM_HXX
-#define CRABS_ARMWORLD_GYM_HXX
+#ifndef _iGeekArmWorldGymHXX
+#define _iGeekArmWorldGymHXX
+#include <_Config.h>
 #include "ArmGym.h"
 #include "ArmWorld.hxx"
 #include "../Gym.hxx"
-#if SEAM >= CRABS_ARMWORLD
+#if _Seam >= _iGeekArmWorldCore
 namespace iGeek {
-AArmGym::AArmGym(const TArmParams& params, ISC count, IUD seed)
+AArmGym::AArmGym(TArmParams& params, ISC count, IUD seed)
     : Gym("armworld"), seed_(seed) {
   env_count_ = count < 1 ? 1 : count > GymEnvMax ? GymEnvMax : count;
   obs_len_ = AArmEnv::ObsLength;
@@ -17,15 +18,15 @@ AArmGym::AArmGym(const TArmParams& params, ISC count, IUD seed)
   action_mask_ = mask_storage_;
   for (ISC i = 0; i < env_count_; ++i) {
     arms_[i] = new AArmEnv(params, seed_ + IUD(i) * 0x9E37u);
-    envs_[i] = NILP;
+    envs_[i] = _NilP;
   }
-  CopyStr(manifest_.name, ManifestNameLen, "armworld");
-  CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+  TSPrint(manifest_.name, ISW(ManifestNameLen), "armworld");
+  TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0");
   manifest_.kind = ManifestKindEnv;
   manifest_.domain = ManifestDomainRobotics;
-  CopyStr(manifest_.description, ManifestDescriptionLen,
+  TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
           "2-link arm reacher with joint torque control");
-  CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+  TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
   manifest_.reward_low = FPC(-1.0);
   manifest_.reward_high = FPC(1.0);
   manifest_.reward_higher_is_better = true;
@@ -33,9 +34,9 @@ AArmGym::AArmGym(const TArmParams& params, ISC count, IUD seed)
   manifest_.obs_count = obs_len_;
   manifest_.action_count = action_count_;
   manifest_.max_episode_steps = AArmEnv::MaxFrames;
-  manifest_.env_count_max = GymEnvMax;
-  CopyStr(manifest_.world_name, ManifestWorldLen, "ArmWorld");
-  manifest_.seam_number = IGEEK_ARMWORLD_CORE;
+  manifest_.environment_count_max = GymEnvMax;
+  TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "ArmWorld");
+  manifest_.seam_number = _iGeekArmWorldCore;
   manifest_.manifest_version = ISC(1);
   ResetBatch();
 }

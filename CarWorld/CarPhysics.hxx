@@ -1,51 +1,52 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_PHYSICS_HXX
-#define CRABS_CARWORLD_PHYSICS_HXX
+#ifndef _iGeekCarWorldPhysicsHXX
+#define _iGeekCarWorldPhysicsHXX
 #include "CarPhysics.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "../BikeWorld/VehicleMap.hxx"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
-inline void TCarPack(const TCarState& s, FPD* v) {
+inline void TCarPack(TCarState& s, FPD* v) {
   v[0] = s.x; v[1] = s.y; v[2] = s.heading; v[3] = s.forward;
   v[4] = s.lateral; v[5] = s.yaw_rate; v[6] = s.steer;
 }
-inline BOL TCarParamsValid(const TCarParams& p) {
+inline BOL TCarParamsValid(TCarParams& p) {
   FPD positive[] = {p.mass, p.front_arm, p.rear_arm, p.track, p.yaw_inertia,
       p.front_stiffness, p.rear_stiffness, p.steer_limit, p.steer_rate,
       p.steer_tau, p.body_radius};
   for (FPD value : positive)
-    if (!isfinite(value) || value <= 0 || value > 1e12) return false;
+    if (!iGeek::IsFinite(value) || value <= 0 || value > 1e12) return false;
   FPD nonnegative[] = {p.drag_area, p.air_density, p.drive_force,
       p.drive_power, p.brake_force};
   for (FPD value : nonnegative)
-    if (!isfinite(value) || value < 0 || value > 1e12) return false;
+    if (!iGeek::IsFinite(value) || value < 0 || value > 1e12) return false;
   return p.steer_limit <= 1.3 && p.body_radius <= 100 &&
-      isfinite(p.brake_bias) && p.brake_bias >= 0 && p.brake_bias <= 1;
+      iGeek::IsFinite(p.brake_bias) && p.brake_bias >= 0 && p.brake_bias <= 1;
 }
-inline BOL TCarStateValid(const TCarState& s) {
+inline BOL TCarStateValid(TCarState& s) {
   FPD values[7]; TCarPack(s, values);
-  for (FPD value : values) if (!isfinite(value)) return false;
-  return fabs(s.x) <= 1e9 && fabs(s.y) <= 1e9 && fabs(s.heading) <= 1e6 &&
-      s.forward >= 0 && s.forward <= 1e4 && fabs(s.lateral) <= 1e4 &&
-      fabs(s.yaw_rate) <= 1e4 && fabs(s.steer) <= 1.3 &&
-      isfinite(s.time) && s.time >= 0 && s.time <= 1e12 &&
-      isfinite(s.distance) && s.distance >= 0 && s.distance <= 1e15 &&
-      isfinite(s.longitudinal_accel) && isfinite(s.lateral_accel) &&
-      isfinite(s.utilization) && s.utilization >= 0;
+  for (FPD value : values) if (!iGeek::IsFinite(value)) return false;
+  return Absolute(s.x) <= 1e9 && Absolute(s.y) <= 1e9 && Absolute(s.heading) <= 1e6 &&
+      s.forward >= 0 && s.forward <= 1e4 && Absolute(s.lateral) <= 1e4 &&
+      Absolute(s.yaw_rate) <= 1e4 && Absolute(s.steer) <= 1.3 &&
+      iGeek::IsFinite(s.time) && s.time >= 0 && s.time <= 1e12 &&
+      iGeek::IsFinite(s.distance) && s.distance >= 0 && s.distance <= 1e15 &&
+      iGeek::IsFinite(s.longitudinal_accel) && iGeek::IsFinite(s.lateral_accel) &&
+      iGeek::IsFinite(s.utilization) && s.utilization >= 0;
 }
 /** Each wheel has its own slip angle and friction circle. Front wheels share
  * one steer angle (parallel-steer approximation), rear wheels supply drive.
  * Static loads omit longitudinal/lateral transfer and suspension dynamics.
  */
-inline void TCarDerivative(const FPD* v, const TCarParams& p,
-    const TCarControl& c, const TCarContacts& contacts, FPD* d,
+inline void TCarDerivative(const FPD* v, TCarParams& p,
+    TCarControl& c, TCarContacts& contacts, FPD* d,
     FPD& utilization, FPD& ax, FPD& ay) {
   FPD slope_x = 0, slope_y = 0;
-  for (const TVehicleSurface& s : contacts.wheels) {
+  for (TVehicleSurface& s : contacts.wheels) {
     slope_x += 0.25 * s.slope_x; slope_y += 0.25 * s.slope_y;
   }
-  FPD normal_g = BikeGravity / sqrt(1 + slope_x * slope_x + slope_y * slope_y);
+  FPD normal_g = BikeGravity / SquareRoot(1 + slope_x * slope_x + slope_y * slope_y);
   FPD length = p.front_arm + p.rear_arm;
   FPD fx_total = 0, fy_total = 0, moment = 0, rolling = 0;
   utilization = 0;
@@ -65,7 +66,7 @@ inline void TCarDerivative(const FPD* v, const TCarParams& p,
     // Low-speed slip chart is regularized at 2 m/s, not a hidden driver.
     FPD fy = -0.5 * (front ? p.front_stiffness : p.rear_stiffness) *
         atan2(v_tire, TBikeMax(u_tire, 2.0));
-    const TVehicleSurface& surface = contacts.wheels[wheel];
+    TVehicleSurface& surface = contacts.wheels[wheel];
     utilization = TBikeMax(utilization,
         TBikeTire(fx, fy, surface.friction * normal));
     FPD bx = fx * cs - fy * sn, by = fx * sn + fy * cs;
@@ -73,7 +74,7 @@ inline void TCarDerivative(const FPD* v, const TCarParams& p,
     rolling += normal * surface.rolling * tanh(v[3] / 0.2);
   }
   FPD ch = cos(v[2]), sh = sin(v[2]);
-  FPD drag = 0.5 * p.air_density * p.drag_area * v[3] * fabs(v[3]);
+  FPD drag = 0.5 * p.air_density * p.drag_area * v[3] * Absolute(v[3]);
   ax = (fx_total - drag - rolling) / p.mass -
       normal_g * (slope_x * ch + slope_y * sh);
   ay = fy_total / p.mass - normal_g * (-slope_x * sh + slope_y * ch);
@@ -83,14 +84,14 @@ inline void TCarDerivative(const FPD* v, const TCarParams& p,
   d[6] = TBikeClamp((TBikeClamp(c.steer, -p.steer_limit, p.steer_limit) -
       v[6]) / p.steer_tau, -p.steer_rate, p.steer_rate);
 }
-BOL TCarStep(TCarState& car, const TCarParams& p,
-    const TCarControl& c, const TCarContacts& contacts, FPD dt) {
-  if (!isfinite(dt) || dt <= 0 || dt > 0.01 || !TCarParamsValid(p) ||
-      !TCarStateValid(car) || !isfinite(c.steer) || !isfinite(c.throttle) ||
-      !isfinite(c.brake)) return false;
-  for (const TVehicleSurface& s : contacts.wheels)
+BOL TCarStep(TCarState& car, TCarParams& p,
+    TCarControl& c, TCarContacts& contacts, FPD dt) {
+  if (!iGeek::IsFinite(dt) || dt <= 0 || dt > 0.01 || !TCarParamsValid(p) ||
+      !TCarStateValid(car) || !iGeek::IsFinite(c.steer) || !iGeek::IsFinite(c.throttle) ||
+      !iGeek::IsFinite(c.brake)) return false;
+  for (TVehicleSurface& s : contacts.wheels)
     if (!TBikeSurfaceValid(s) || s.friction > 2 || s.rolling > 1 ||
-        fabs(s.slope_x) > 1 || fabs(s.slope_y) > 1) return false;
+        Absolute(s.slope_x) > 1 || Absolute(s.slope_y) > 1) return false;
   FPD v[7], work[7], k1[7], k2[7], k3[7], k4[7];
   TCarPack(car, v);
   FPD utilization = 0, ax = 0, ay = 0;
@@ -103,11 +104,11 @@ BOL TCarStep(TCarState& car, const TCarParams& p,
   TCarDerivative(work, p, c, contacts, k4, utilization, ax, ay);
   for (ISC i = 0; i < 7; ++i) {
     v[i] += dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
-    if (!isfinite(v[i])) return false;
+    if (!iGeek::IsFinite(v[i])) return false;
   }
   v[3] = TBikeMax(v[3], 0);  // No reverse gear in this pilot.
   TCarDerivative(v, p, c, contacts, work, utilization, ax, ay);
-  if (!isfinite(utilization) || !isfinite(ax) || !isfinite(ay)) return false;
+  if (!iGeek::IsFinite(utilization) || !iGeek::IsFinite(ax) || !iGeek::IsFinite(ay)) return false;
   TCarState next = car;
   next.x = v[0]; next.y = v[1]; next.heading = TBikeAngle(v[2]);
   next.forward = v[3]; next.lateral = v[4]; next.yaw_rate = v[5]; next.steer = v[6];

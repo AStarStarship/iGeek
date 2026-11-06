@@ -1,10 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_HRM_H
-#define IGEEK_HRM_H
-
-#include "_Config.h"  // HRM seam config (SEAM = HRM_MODEL, types)
-
+#ifndef _iGeekModelsHRMH
+#define _iGeekModelsHRMH
+#include <_Config.h>
 namespace iGeek {
 
 /* Hierarchical Reasoning Model (HRM) for Sudoku solving.
@@ -21,7 +19,7 @@ namespace iGeek {
  * Board: flat 81-cell array.
  *
  * Single-TU build: main.cpp is the only translation unit and includes
- * _Package.hxx for the COut/StdOut + printer impls (the iGeek world pattern).
+ * _Package.hxx for the ROut/RefOut + printer impls (the iGeek world pattern).
  */
 
 /* HRM configuration — dual-level processing parameters. */
@@ -58,7 +56,7 @@ BOL HRMSolve(IUD* board, const IUD* puzzle, ISC max_steps);
  * side yet (upstream gap). Callers use the built-in sample puzzle. */
 BOL HRMReadPuzzle(const CHA* filename, IUD* puzzle);
 
-/* Print a Sudoku board (formatted 9x9, dots for empty cells) to StdOut.
+/* Print a Sudoku board (formatted 9x9, dots for empty cells) to RefOut.
  * @param board 81-cell board to print. */
 void HRMPrintBoard(const IUD* board);
 
@@ -73,4 +71,4 @@ BOL RunHRMSolving(IUD* board, const IUD* puzzle, ISC max_steps);
 
 } //< namespace iGeek
 
-#endif  // IGEEK_HRM_H
+#endif  //< _iGeekHRMHXX

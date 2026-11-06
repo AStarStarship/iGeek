@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_MATH_H
-#define CRABS_SPACEWORLD_MATH_H
+#ifndef _iGeekSpaceWorldMathH
+#define _iGeekSpaceWorldMathH
 #include "SpaceConfig.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 /** 3-component vector, FP64 SI. All SpaceWorld math uses these. */
 struct TSpaceVec
@@ -52,32 +52,32 @@ FPD TSpaceMax(FPD a, FPD b);
 FPD TSpaceMin(FPD a, FPD b);
 FPD TSpaceAbs(FPD a);
 FPD TSpaceClamp(FPD v, FPD lo, FPD hi);
-TSpaceVec TSpaceVecAdd(const TSpaceVec& a, const TSpaceVec& b);
-TSpaceVec TSpaceVecSub(const TSpaceVec& a, const TSpaceVec& b);
-TSpaceVec TSpaceVecScale(const TSpaceVec& a, FPD s);
-FPD TSpaceVecDot(const TSpaceVec& a, const TSpaceVec& b);
-TSpaceVec TSpaceVecCross(const TSpaceVec& a, const TSpaceVec& b);
-FPD TSpaceVecLength(const TSpaceVec& a);
-FPD TSpaceVecLengthSq(const TSpaceVec& a);
-TSpaceVec TSpaceVecNormalize(const TSpaceVec& a);
+TSpaceVec TSpaceVecAdd(TSpaceVec& a, TSpaceVec& b);
+TSpaceVec TSpaceVecSub(TSpaceVec& a, TSpaceVec& b);
+TSpaceVec TSpaceVecScale(TSpaceVec& a, FPD s);
+FPD TSpaceVecDot(TSpaceVec& a, TSpaceVec& b);
+TSpaceVec TSpaceVecCross(TSpaceVec& a, TSpaceVec& b);
+FPD TSpaceVecLength(TSpaceVec& a);
+FPD TSpaceVecLengthSq(TSpaceVec& a);
+TSpaceVec TSpaceVecNormalize(TSpaceVec& a);
 /** Normalize a quaternion in place. @return false if not finite/too small. */
 BOL TSpaceQuatNormalize(TSpaceQuat& q);
 /** Conjugate/inverse of a unit quaternion. */
-TSpaceQuat TSpaceQuatInvert(const TSpaceQuat& q);
+TSpaceQuat TSpaceQuatInvert(TSpaceQuat& q);
 /** Hamilton product a * b. */
-TSpaceQuat TSpaceQuatMul(const TSpaceQuat& a, const TSpaceQuat& b);
+TSpaceQuat TSpaceQuatMul(TSpaceQuat& a, TSpaceQuat& b);
 /** Rotate vector v by unit quaternion q (world frame). */
-TSpaceVec TSpaceQuatRotate(const TSpaceQuat& q, const TSpaceVec& v);
+TSpaceVec TSpaceQuatRotate(TSpaceQuat& q, TSpaceVec& v);
 /** Rotate world vector into the frame described by q (apply inverse). */
-TSpaceVec TSpaceQuatRotateInv(const TSpaceQuat& q, const TSpaceVec& v);
+TSpaceVec TSpaceQuatRotateInv(TSpaceQuat& q, TSpaceVec& v);
 /** Shortest-arc quaternion rotating unit vector from to unit vector to. */
-TSpaceQuat TSpaceQuatFromUnitVectors(const TSpaceVec& from, const TSpaceVec& to);
+TSpaceQuat TSpaceQuatFromUnitVectors(TSpaceVec& from, TSpaceVec& to);
 /** Quaternion rotating about unit axis by angle (rad). */
-TSpaceQuat TSpaceQuatFromAxisAngle(const TSpaceVec& axis, FPD angle);
+TSpaceQuat TSpaceQuatFromAxisAngle(TSpaceVec& axis, FPD angle);
 /** Error angle (rad, 0..pi) and unit axis between two quaternions. */
-void TSpaceQuatAngleAxis(const TSpaceQuat& q, FPD& angle, TSpaceVec& axis);
+void TSpaceQuatAngleAxis(TSpaceQuat& q, FPD& angle, TSpaceVec& axis);
 /** Quaternion sign-flipped so w >= 0 (shortest arc). */
-TSpaceQuat TSpaceQuatShortest(const TSpaceQuat& q);
+TSpaceQuat TSpaceQuatShortest(TSpaceQuat& q);
 } //< namespace iGeek
 #endif
 #endif

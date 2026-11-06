@@ -1,5 +1,5 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
+#include "Homotuples.h"
 #include "settings_graphics.h"
 
 GraphicsSettings::GraphicsSettings() {

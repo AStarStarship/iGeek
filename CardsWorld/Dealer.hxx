@@ -1,7 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldCoreDealerHXX
+#define _iGeekCardsWorldCoreDealerHXX
 #include "Dealer.h"
-#if SEAM >= IGEEK_DEALER
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
@@ -16,19 +18,19 @@ Dealer::Dealer(ISC ante, ISC min_bet, ISC min_cards, ISC max_cards)
       deck_(),
       stock_() {
   for (ISC i = 0; i < MaxPlayers; ++i) {
-    players_[i] = NILP;
+    players_[i] = _NilP;
     players_owned_[i] = 0;
   }
 }
 
 Dealer::~Dealer() {
   for (ISC i = 0; i < MaxPlayers; ++i) {
-    if (players_owned_[i] && players_[i] != NILP) delete players_[i];
+    if (players_owned_[i] && players_[i] != _NilP) delete players_[i];
   }
 }
 
 ISC Dealer::AddPlayer(Player* new_player) {
-  if (new_player == NILP) return -1;
+  if (new_player == _NilP) return -1;
   if (player_count_ >= MaxPlayers) return -1;
   ISC index = player_count_++;
   players_[index] = new_player;
@@ -47,7 +49,7 @@ void Dealer::StartNewGame() {
 
 void Dealer::Redeal() {
   for (ISC i = 0; i < player_count_; ++i) {
-    if (players_[i] != NILP) {
+    if (players_[i] != _NilP) {
       Hand fresh;
       players_[i]->GetHand() = fresh;
       players_[i]->GetHand().DealTwoCards(stock_);
@@ -61,6 +63,7 @@ ISC Dealer::NextPlayer() {
   return current_player_;
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreDealerHXX

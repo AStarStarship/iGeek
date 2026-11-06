@@ -1,19 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_EKF_H
-#define CRABS_CARWORLD_EKF_H
+#ifndef _iGeekCarWorldEKFH
+#define _iGeekCarWorldEKFH
 #include "CarPhysics.h"
 #include "BicycleModel.h"
-#include <math.h>
-#if SEAM >= CRABS_CARWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 /** 4x4 symmetric matrix (row-major). Used for EKF covariance. */
 struct TMat4
 {
   FPD m[16] = {};
   FPD& At(ISC r, ISC c) { return m[r * 4 + c]; }
-  const FPD& At(ISC r, ISC c) const { return m[r * 4 + c]; }
-  FPD AtC(ISC r, ISC c) const { return m[r * 4 + c]; }
+  FPD& At(ISC r, ISC c) { return m[r * 4 + c]; }
+  FPD AtC(ISC r, ISC c) { return m[r * 4 + c]; }
 };
 /** Extended Kalman Filter for car pose estimation (Course 2 w2).
  * State: [x, y, heading, speed]. Process model: kinematic bicycle.
@@ -72,12 +72,12 @@ class ACarEKF
     FPD z[1] = {meas_speed - state_[3]};
     Update1(h, r, z[0]);
   }
-  const FPD* State() const { return state_; }
-  FPD X() const { return state_[0]; }
-  FPD Y() const { return state_[1]; }
-  FPD Heading() const { return state_[2]; }
-  FPD Speed() const { return state_[3]; }
-  const TMat4& Covariance() const { return cov_; }
+  const FPD* State() { return state_; }
+  FPD X() { return state_[0]; }
+  FPD Y() { return state_[1]; }
+  FPD Heading() { return state_[2]; }
+  FPD Speed() { return state_[3]; }
+  TMat4& Covariance() { return cov_; }
   void SetWheelbase(FPD lb) { wheelbase_ = lb > 0 ? lb : 2.7; }
  private:
   FPD state_[Dim];
@@ -85,20 +85,20 @@ class ACarEKF
   FPD q_pos_, q_vel_, q_head_;
   FPD r_gps_, r_odom_, r_imu_;
   FPD wheelbase_;
-  static TMat4 MatMul(const TMat4& a, const TMat4& b) {
+  static TMat4 MatMul(TMat4& a, TMat4& b) {
     TMat4 c = {};
     for (ISC i = 0; i < 4; ++i)
       for (ISC j = 0; j < 4; ++j)
         for (ISC k = 0; k < 4; ++k) c.At(i, j) += a.At(i, k) * b.At(k, j);
     return c;
   }
-  static TMat4 MatTranspose(const TMat4& a) {
+  static TMat4 MatTranspose(TMat4& a) {
     TMat4 t = {};
     for (ISC i = 0; i < 4; ++i)
       for (ISC j = 0; j < 4; ++j) t.At(i, j) = a.At(j, i);
     return t;
   }
-  static TMat4 MatAdd(const TMat4& a, const TMat4& b) {
+  static TMat4 MatAdd(TMat4& a, TMat4& b) {
     TMat4 c = {};
     for (ISC i = 0; i < 16; ++i) c.m[i] = a.m[i] + b.m[i];
     return c;
@@ -111,7 +111,7 @@ class ACarEKF
       }
   }
   /** 1-D Kalman update. H is 1x4 (row 0 of h). */
-  void Update1(const TMat4& h, const TMat4& r, FPD z) {
+  void Update1(TMat4& h, TMat4& r, FPD z) {
     // hp_row[j] = sum_k h(0,k) * P(k,j).
     FPD hp_row[4] = {};
     for (ISC j = 0; j < 4; ++j)
@@ -138,7 +138,7 @@ class ACarEKF
     Symmetrize();
   }
   /** 2-D Kalman update. H is 2x4 (rows 0,1 of h). */
-  void Update2(const TMat4& h, const TMat4& r, const FPD* z) {
+  void Update2(TMat4& h, TMat4& r, const FPD* z) {
     // S = H P H^T + R (2x2).
     FPD s[2][2] = {};
     for (ISC i = 0; i < 2; ++i)
@@ -148,7 +148,7 @@ class ACarEKF
             s[i][j] += h.At(i, a) * cov_.At(a, b) * h.At(j, b);
     s[0][0] += r.At(0, 0); s[1][1] += r.At(1, 1);
     FPD det = s[0][0] * s[1][1] - s[0][1] * s[1][0];
-    if (fabs(det) < 1e-12) return;
+    if (Absolute(det) < 1e-12) return;
     FPD inv_det = 1.0 / det;
     FPD s_inv[2][2] = {{s[1][1] * inv_det, -s[0][1] * inv_det},
                        {-s[1][0] * inv_det, s[0][0] * inv_det}};

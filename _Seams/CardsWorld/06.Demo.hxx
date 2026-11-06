@@ -1,12 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
-#pragma once
-#ifndef CRABS_BLACKJACK_DEMO_TEST_HXX
-#define CRABS_BLACKJACK_DEMO_TEST_HXX
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-namespace iGeek {
+#if _Seam >= _iGeekCardsWorldCore
 namespace CardsWorldTest {
+using namespace ::_;
+using namespace iGeek; 
+
 inline const CHA* Demo(const CHA* args) {
-  A_TEST_BEGIN;
+  _ATestBegin;
   TBlackjackDemoGym gym(123), same(123), other(456);
   ISC nonzero = 0, different = 0;
   for (ISC i = 0; i < gym.Batch * gym.Features; ++i) {
@@ -41,7 +40,7 @@ inline const CHA* Demo(const CHA* args) {
   TBlackjackDemoScore replay = TBlackjackDemoEval(policy, 900001, 128, 1);
   if (score.count != 1024 || score.sum_sq <= 0 ||
       score.sum != replay.sum || score.sum_sq != replay.sum_sq ||
-      !isfinite(score.Mean()) || !isfinite(score.Error()))
+      !iGeek::IsFinite(score.Mean()) || !iGeek::IsFinite(score.Error()))
     return "heldout_evaluation_missing";
   TBlackjackDemoScore before = TBlackjackDemoEval(policy, 700001, 1024, 0);
   TBlackjackDemoGym training(12345);
@@ -49,11 +48,9 @@ inline const CHA* Demo(const CHA* args) {
   policy.SetLearnRate(0.1f);
   TBlackjackDemoTrain(trainer, 1000);
   TBlackjackDemoScore after = TBlackjackDemoEval(policy, 700001, 1024, 0);
-  if (!isfinite(after.Mean()) || after.Mean() < before.Mean() + 0.1)
+  if (!iGeek::IsFinite(after.Mean()) || after.Mean() < before.Mean() + 0.1)
     return "training_improvement_missing";
-  return NILP;
+  return _NilP;
 }
 }  //< namespace CardsWorldTest
-} //< namespace iGeek
-#endif
 #endif

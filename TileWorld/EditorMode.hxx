@@ -1,6 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
 #include "modeeditor.h"
-#include "stdafx.h"
 
 EditorMode::EditorMode(StateData* state_data, TileMap* tile_map,
                        EditorStateData* editor_state_data)

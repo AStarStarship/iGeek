@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_SCENARIOS_HXX
-#define CRABS_BIKEWORLD_SCENARIOS_HXX
+#ifndef _iGeekBikeWorldScenariosHXX
+#define _iGeekBikeWorldScenariosHXX
 #include "BikeWorld.hxx"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
 enum {
   BikeStraight, BikeCurves, BikeObstacle, BikeGravel, BikeIce,

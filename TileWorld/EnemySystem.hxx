@@ -1,6 +1,4 @@
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
 #include "enemy_system.h"
 
 EnemySystem::EnemySystem(_::Array<Enemy*>& active_enemies_,

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_PPO_DECL
-#define IGEEK_PPO_DECL
+#ifndef _iGeekPPOH
+#define _iGeekPPOH
 #include "Gym.h"
 #include "Policy.h"
 #include "Tensor.h"
@@ -28,7 +28,7 @@ struct TPPOStats {
 class TPPO {
  public:
 
-  /* @param gym       The vectorized environment (batch width = EnvCount).
+  /* @param gym       The vectorized environment (batch width = EnvironmentCount).
      @param policy    The trainable policy to update.
      @param horizon   Steps per rollout (trajectory length).
      @param epochs    PPO update epochs per rollout. */

@@ -21,7 +21,7 @@ ctest --test-dir CarWorld/build --output-on-failure
 CarWorld/build/carworld --scenario all --episodes 100 --seed 7
 ```
 
-Executable: `/home/astarcale/AStarStarship/iGeek/CarWorld/build/carworld`.
+Executable: `CarWorld/build/carworld` (run from the iGeek root).
 Use `--help` for the complete CLI. Examples, using fresh output paths:
 
 ```sh
@@ -230,7 +230,7 @@ Additional exercised behavior:
   warning. This is affected-world regression evidence, not workspace-wide green.
 
 Evidence archive:
-`/home/astarcale/AStarStarship/iGeek/CarWorld/build/verified_900_02/`.
+`CarWorld/build/verified_900_02/`.
 Its `verification_summary.json` records 95 hashed artifacts and 57 frozen
 project source inputs. `drives.csv` contains the exact 900 metrics rows;
 `replay.csv` is byte-identical. Obstacle and ice-curve traces have 946 and 1799

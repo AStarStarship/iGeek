@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_AGENT_SLOT_H
-#define IGEEK_AGENT_SLOT_H
+#ifndef _iGeekAgentSlotH
+#define _iGeekAgentSlotH
 #include <_Config.h>
-#if SEAM >= IGEEK_GYM_MANIFEST
-#include "GymManifest.h"
+#if _Seam >= _iGeekEnvironmentManifest
+#include "EnvironmentManifest.h"
 namespace iGeek {
 
 /* Max agents that can be active in one Gym (one per Slot). */

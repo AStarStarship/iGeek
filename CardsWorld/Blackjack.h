@@ -1,13 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 
 #pragma once
-#ifndef IGEEK_CARDSBLACKJACK_DECL
-#define IGEEK_CARDSBLACKJACK_DECL
+#ifndef _iGeekCardsWorldCoreSBLACKJACK_DECL
+#define _iGeekCardsWorldCoreSBLACKJACK_DECL
 #include <_Config.h>
-#if SEAM >= IGEEK_BLACKJACK
+#if _Seam >= _iGeekCardsWorldBlackjack
 #include "Dealer.h"
 namespace iGeek {
 namespace CardsWorld {
+using namespace ::_;
 
 /* The player's action in a round of Blackjack. */
 enum class Action : ISC {
@@ -69,22 +70,22 @@ class Blackjack {
 
   /* Returns the total point value of a hand, optimally counting aces.
   Aces count as 11 while the total is <= 21, then drop to 1. */
-  ISC HandValue(const Hand& hand) const;
+  ISC HandValue(Hand& hand);
 
   /* Returns true if the hand is a natural blackjack (2 cards totaling 21). */
-  BOL IsBlackjack(const Hand& hand) const;
+  BOL IsBlackjack(Hand& hand);
 
   /* Returns true if the hand busts (> 21). */
-  BOL IsBust(const Hand& hand) const { return HandValue(hand) > 21; }
+  BOL IsBust(Hand& hand) { return HandValue(hand) > 21; }
 
   /* Returns true if the player's turn is active. */
-  BOL PlayerTurn() const { return player_turn_; }
+  BOL PlayerTurn() { return player_turn_; }
 
   /* Returns true if the round is over. */
-  BOL RoundOver() const { return round_over_; }
+  BOL RoundOver() { return round_over_; }
 
   /* Returns the round outcome. */
-  Outcome GetOutcome() const { return outcome_; }
+  Outcome GetOutcome() { return outcome_; }
 
   /* Starts a new round: resets hands, deals 2 cards to player and dealer
   (dealer's second card face-down), and checks for naturals. */

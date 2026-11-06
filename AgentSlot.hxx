@@ -1,8 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_AGENT_SLOT_HXX
-#define IGEEK_AGENT_SLOT_HXX 1
+#ifndef _iGeekAgentSlotHXX
+#define _iGeekAgentSlotHXX
 #include "AgentSlot.h"
+#include "../ASCIICrabs/Stringf.hpp"
 namespace iGeek {
 
 void TAgentSlotInit(TAgentSlot* slot) {
@@ -34,7 +35,7 @@ BOL RoomJoin(TAgentSlot* slots, ISC count, IUC agent_id,
   ISC idx = TAgentSlotFindFree(slots, count);
   if (idx < 0) return false;
   slots[idx].agent_id = agent_id;
-  CopyStr(slots[idx].agent_name, 32, agent_name);
+  TSPrint(slots[idx].agent_name, ISW(32), agent_name);
   slots[idx].state = AgentStateJoining;
   slots[idx].join_frame = frame;
   slots[idx].last_heartbeat_frame = frame;
@@ -94,4 +95,4 @@ ISC TAgentSlotCountActive(const TAgentSlot* slots, ISC count) {
 }
 
 }  //< namespace iGeek
-#endif
+#endif  //< _iGeekAgentSlotHXX

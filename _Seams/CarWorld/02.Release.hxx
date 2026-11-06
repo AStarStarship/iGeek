@@ -1,25 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// AUTO-GENERATED from __Seams.yaml (iGeek CarWorld).
-// CarWorld release seam unit: the final sown test pass. Gated on
-// IGEEK_CARWORLD_RELEASE (SEAM_N). Runs once all lower seams pass.
-#if SEAM >= IGEEK_CARWORLD_RELEASE
-#if SEAM == IGEEK_CARWORLD_RELEASE
+#if _Seam >= _iGeekCarWorldRelease
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-
-using namespace ::_;
 namespace CarWorldTest {
+using namespace ::_;
+using namespace iGeek; 
 
 inline const CHA* Release(const CHA* args) {
-#if SEAM >= IGEEK_CARWORLD_RELEASE
-  A_TEST_BEGIN;
+#if _Seam >= _iGeekCarWorldRelease
+  _ATestBegin;
   // CarWorld release: runs the full sown tree. No checks of its own.
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace CarWorldTest

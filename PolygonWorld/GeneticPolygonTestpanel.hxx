@@ -1,7 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonTestpanelH
+#define _iGeekPolygonWorldGeneticPolygonTestpanelH
 #include <_Config.h>
-
 namespace iGeek {
 
 GeneticPolygonTestPanel::GeneticPolygonTestPanel() {
@@ -176,4 +177,4 @@ void TimerAction::actionPerformed(ActionEvent e) {
 }
 
 } //< namespace iGeek
-}
+#endif  //< _iGeekPolygonWorldGeneticPolygonTestpanelH

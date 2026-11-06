@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldVirusH
+#define _iGeekPolygonWorldVirusH
 #include "GeneticPolygon.h"
 #include "PathTrail.h"
 
@@ -170,3 +172,5 @@ curve waveform.
 };
 
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldVirusH

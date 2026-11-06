@@ -1,7 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldCoreCardStackHXX
+#define _iGeekCardsWorldCoreCardStackHXX
 #include "CardStack.h"
-#if SEAM >= IGEEK_CARDSTACK
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
@@ -10,7 +12,7 @@ CardStack::CardStack()
       card_count_max_(54),
       is_visible_(true),
       count_(0) {
-  for (ISC i = 0; i < CardStackMax; ++i) cards_[i] = NILP;
+  for (ISC i = 0; i < CardStackMax; ++i) cards_[i] = _NilP;
 }
 
 CardStack::CardStack(ISC min_cards, ISC max_cards, BOL is_visible)
@@ -18,26 +20,26 @@ CardStack::CardStack(ISC min_cards, ISC max_cards, BOL is_visible)
       card_count_max_(max_cards < 1 ? 1 : max_cards),
       is_visible_(is_visible),
       count_(0) {
-  for (ISC i = 0; i < CardStackMax; ++i) cards_[i] = NILP;
+  for (ISC i = 0; i < CardStackMax; ++i) cards_[i] = _NilP;
 }
 
-CardStack::CardStack(const CardStack& other)
+CardStack::CardStack(CardStack& other)
     : card_count_min_(other.card_count_min_),
       card_count_max_(other.card_count_max_),
       is_visible_(other.is_visible_),
       count_(other.count_) {
   for (ISC i = 0; i < CardStackMax; ++i)
-    cards_[i] = (i < other.count_) ? other.cards_[i] : NILP;
+    cards_[i] = (i < other.count_) ? other.cards_[i] : _NilP;
 }
 
-ISC CardStack::Compare(const CardStack& other) const {
+ISC CardStack::Compare(CardStack& other) {
   ISC point_value = PointValue(), other_point_value = other.PointValue();
   if (point_value > other_point_value) return 1;
   if (point_value < other_point_value) return -1;
   return 0;
 }
 
-ISC CardStack::PointValue() const {
+ISC CardStack::PointValue() {
   ISC total = 0;
   for (ISC i = 0; i < count_; ++i) total += cards_[i]->PointValue();
   return total;
@@ -45,7 +47,7 @@ ISC CardStack::PointValue() const {
 
 void CardStack::Shuffle() {
   // Fisher-Yates: walk from the top down, swap with a random card below.
-  // NOTE: _::Random(min,max) in the current ASCIICrabs core (high-SEAM
+  // NOTE: _::Random(min,max) in the current ASCIICrabs core (high-_Seam
   // TRandom) is not strictly uniform and can return values > max, so clamp
   // j to [0, i] to keep the swap in-bounds. (Upstream TRandom bug: it draws
   // from a half-normal instead of a uniform distribution.)
@@ -60,14 +62,14 @@ void CardStack::Shuffle() {
 }
 
 ISC CardStack::AddCard(Card* new_card) {
-  if (new_card == NILP) return -1;
+  if (new_card == _NilP) return -1;
   if (count_ + 1 > card_count_max_) return 2;
   cards_[count_++] = new_card;
   return 0;
 }
 
 ISC CardStack::InsertCard(Card* new_card, ISC index) {
-  if (new_card == NILP) return -1;
+  if (new_card == _NilP) return -1;
   if (index < 0 || index > count_) return 1;
   if (count_ + 1 > card_count_max_) return 2;
   for (ISC i = count_; i > index; --i) cards_[i] = cards_[i - 1];
@@ -76,7 +78,7 @@ ISC CardStack::InsertCard(Card* new_card, ISC index) {
   return 0;
 }
 
-ISC CardStack::AddCardStack(const CardStack& cards) {
+ISC CardStack::AddCardStack(CardStack& cards) {
   if (count_ + cards.count_ > card_count_max_) return 1;
   for (ISC i = 0; i < cards.count_; ++i) AddCard(cards.cards_[i]);
   return 0;
@@ -101,13 +103,13 @@ BOL CardStack::RemoveCard(Card* card) {
   return false;
 }
 
-Card* CardStack::PeekCard(ISC index) const {
-  if (index < 0 || index >= count_) return NILP;
+Card* CardStack::PeekCard(ISC index) {
+  if (index < 0 || index >= count_) return _NilP;
   return cards_[index];
 }
 
 Card* CardStack::TakeCard(ISC index) {
-  if (index < 0 || index >= count_) return NILP;
+  if (index < 0 || index >= count_) return _NilP;
   Card* result = cards_[index];
   for (ISC j = index; j < count_ - 1; ++j) cards_[j] = cards_[j + 1];
   --count_;
@@ -115,20 +117,21 @@ Card* CardStack::TakeCard(ISC index) {
 }
 
 Card* CardStack::TakeNextCard() {
-  if (count_ == 0) return NILP;
+  if (count_ == 0) return _NilP;
   Card* next_card = cards_[count_ - 1];
   --count_;
   return next_card;
 }
 
 Card* CardStack::TakeRandomCard() {
-  if (count_ == 0) return NILP;
+  if (count_ == 0) return _NilP;
   ISC random_index = Random(0, count_ - 1);
   if (random_index < 0) random_index = 0;
   if (random_index >= count_) random_index = count_ - 1;  // Clamp (Random may exceed max).
   return TakeCard(random_index);
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreCardStackHXX

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_MDP_DECL
-#define IGEEK_CLASSICAL_MDP_DECL
+#ifndef _iGeekClassicalMdpH
+#define _iGeekClassicalMdpH
 #include "../ASCIICrabs/_Config.h"
 namespace iGeek {
 
@@ -61,5 +61,5 @@ next percept, a plan in U with utility vectors computed according to Equation
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalMdpH

@@ -19,8 +19,8 @@ TileSpawner::TileSpawner(_::ISC grid_x, _::ISC grid_y, _::FPC grid_size_f_,
 
 TileSpawner::~TileSpawner() {}
 
-const _::ISC& TileSpawner::GetEnemyType() const { return enemy_type_; }
-const _::BOL& TileSpawner::GetSpawned() const { return spawned_; }
+const _::ISC& TileSpawner::GetEnemyType() { return enemy_type_; }
+const _::BOL& TileSpawner::GetSpawned() { return spawned_; }
 
 void TileSpawner::SetSpawned(const _::BOL spawned) { spawned_ = spawned; }
 

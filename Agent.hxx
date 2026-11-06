@@ -1,33 +1,33 @@
 // Copyright AStarship <https://astarship.net>.
 #include "Agent.h"
 #include "AgentState.hxx"
-#ifndef IGEEK_AGENT_IMPL
-#define IGEEK_AGENT_IMPL 1
+#ifndef _iGeekAgentHXX
+#define _iGeekAgentHXX
 namespace iGeek {
 
-TTableAgent::TTableAgent(ISC action_count, ISC history_len, ISC percept_len)
+TableAgent::TableAgent(ISC action_count, ISC history_len, ISC percept_len)
     : action_count_(action_count < 1 ? 1 : action_count),
       history_len_(history_len < 1 ? 1 : history_len),
       percept_len_(percept_len < 1 ? 1 : percept_len),
-      key_len_(0), key_count_(0), keys_(NILP), actions_(NILP),
-      history_(NILP), hist_pos_(0), hist_len_(0) {
+      key_len_(0), key_count_(0), keys_(_NilP), actions_(_NilP),
+      history_(_NilP), hist_pos_(0), hist_len_(0) {
   key_len_ = history_len_ * percept_len_;
   // Reserve a small key table; the world binds entries via SetEntry, which
   // grows the table by realloc (new[] / delete[] are compiler builtins).
   key_count_ = 0;
-  keys_ = NILP;
-  actions_ = NILP;
+  keys_ = _NilP;
+  actions_ = _NilP;
   history_ = new IUC[key_len_]();
 }
 
-TTableAgent::~TTableAgent() {
+TableAgent::~TableAgent() {
   delete[] keys_;
   delete[] actions_;
   delete[] history_;
 }
 
-void TTableAgent::OnPercept(const IUC* percept, ISC percept_len) {
-  if (percept == NILP) {
+void TableAgent::OnPercept(const IUC* percept, ISC percept_len) {
+  if (percept == _NilP) {
     return;
   }
   // Shift the rolling window left by one percept, append the new one at the
@@ -43,7 +43,7 @@ void TTableAgent::OnPercept(const IUC* percept, ISC percept_len) {
   }
 }
 
-IUC TTableAgent::Action() {
+IUC TableAgent::Action() {
   // Exact-match lookup over the bound keys (last key_len_ history words).
   for (ISC k = 0; k < key_count_; ++k) {
     BOL match = true;
@@ -60,12 +60,12 @@ IUC TTableAgent::Action() {
   return 0;  // no bound entry: the world's action 0 is the fallback.
 }
 
-const AgentState* TTableAgent::State() const {
-  return NILP;  // the table agent keeps no internal model.
+AgentState* TableAgent::State() {
+  return _NilP;  // the table agent keeps no internal model.
 }
 
-void TTableAgent::Reset() {
-  if (history_ != NILP) {
+void TableAgent::Reset() {
+  if (history_ != _NilP) {
     for (ISC i = 0; i < key_len_; ++i) {
       history_[i] = 0;
     }
@@ -74,16 +74,16 @@ void TTableAgent::Reset() {
   hist_len_ = 0;
 }
 
-ISC TTableAgent::ActionCount() const {
+ISC TableAgent::ActionCount() {
   return action_count_;
 }
 
-void TTableAgent::SetEntry(const IUC* key, IUC action) {
+void TableAgent::SetEntry(const IUC* key, IUC action) {
   // Grow the table by one slot (realloc). keys_/actions_ are owned here.
   ISC new_count = key_count_ + 1;
   IUC* new_keys = new IUC[IUD(new_count) * IUD(key_len_)]();
   IUC* new_actions = new IUC[new_count]();
-  if (keys_ != NILP) {
+  if (keys_ != _NilP) {
     for (ISC i = 0; i < key_count_ * key_len_; ++i) {
       new_keys[i] = keys_[i];
     }
@@ -108,7 +108,7 @@ TReflexAgent::TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap)
     : action_count_(action_count < 1 ? 1 : action_count),
       percept_len_(percept_len < 1 ? 1 : percept_len),
       rule_cap_(rule_cap < 1 ? 1 : rule_cap), rule_count_(0),
-      conditions_(NILP), rule_actions_(NILP), current_(NILP),
+      conditions_(_NilP), rule_actions_(_NilP), current_(_NilP),
       default_action_(0) {
   conditions_ = new IUC[IUD(rule_cap_) * IUD(percept_len_)]();
   rule_actions_ = new IUC[rule_cap_]();
@@ -122,7 +122,7 @@ TReflexAgent::~TReflexAgent() {
 }
 
 void TReflexAgent::OnPercept(const IUC* percept, ISC percept_len) {
-  if (percept == NILP) {
+  if (percept == _NilP) {
     return;
   }
   for (ISC i = 0; i < percept_len_; ++i) {
@@ -152,12 +152,12 @@ void TReflexAgent::Reset() {
   }
 }
 
-ISC TReflexAgent::ActionCount() const {
+ISC TReflexAgent::ActionCount() {
   return action_count_;
 }
 
 BOL TReflexAgent::AddRule(const IUC* condition, IUC action) {
-  if (condition == NILP || rule_count_ >= rule_cap_) {
+  if (condition == _NilP || rule_count_ >= rule_cap_) {
     return false;
   }
   for (ISC i = 0; i < percept_len_; ++i) {
@@ -182,7 +182,7 @@ TModelAgent::TModelAgent(ISC action_count, ISC state_slots)
 TModelAgent::~TModelAgent() {}
 
 void TModelAgent::OnPercept(const IUC* percept, ISC percept_len) {
-  if (percept == NILP) {
+  if (percept == _NilP) {
     return;
   }
   // Generic linear model update: accumulate percept words into the model's
@@ -215,7 +215,7 @@ IUC TModelAgent::Action() {
   return IUC(best);
 }
 
-const AgentState* TModelAgent::State() const {
+AgentState* TModelAgent::State() {
   return &state_;
 }
 
@@ -223,9 +223,9 @@ void TModelAgent::Reset() {
   state_.Clear();
 }
 
-ISC TModelAgent::ActionCount() const {
+ISC TModelAgent::ActionCount() {
   return action_count_;
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekAgentHXX

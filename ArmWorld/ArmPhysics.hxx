@@ -1,16 +1,16 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_ARMWORLD_PHYSICS_HXX
-#define CRABS_ARMWORLD_PHYSICS_HXX
+#ifndef _iGeekArmWorldPhysicsHXX
+#define _iGeekArmWorldPhysicsHXX
 #include "ArmPhysics.h"
 #include "../../CrabsTK/Math/Blas.h"
-#include <math.h>
-#if SEAM >= CRABS_ARMWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekArmWorldCore
 namespace iGeek {
 /* Arm dynamics row-major layout (2 x 2 inertia, 2-vector force). */
 enum { ArmMatSize = 2, ArmVecSize = 2 };
 /* Closed-form two-link forward kinematics from absolute joint angles. */
-void TArmFK(const TArmParams& params, FPD j1, FPD j2,
+void TArmFK(TArmParams& params, FPD j1, FPD j2,
            FPD& tip_x, FPD& tip_y) {
   FPD c1 = cos(j1), s1 = sin(j1), c2 = cos(j2), s2 = sin(j2);
   tip_x = params.length_1 * c1 + params.length_2 * c2;
@@ -20,7 +20,7 @@ void TArmFK(const TArmParams& params, FPD j1, FPD j2,
 I11 is constant; I12 = I12_base + (m2/4) l1 l2 (cos j1 + cos j2);
 Coriolis c12 = -(m2/2) l1 l2 sin(j1 - j2).
 @return false when inputs are invalid; forces are untouched. */
-BOL TArmForces(const TArmParams& params, const TArmState& state,
+BOL TArmForces(TArmParams& params, TArmState& state,
               TArmDynamicsTerms& forces) {
   if (!TArmParamsValid(params) || !TArmStateValid(state)) return false;
   FPD g = 9.81;
@@ -42,11 +42,11 @@ BOL TArmForces(const TArmParams& params, const TArmState& state,
 /* One dynamics evaluation: solve I(w) a = tau + C(w) w + g for a.
 Uses Math::GemmRR/GemvR (2 x 2) + explicit 2 x 2 inverse.
 @return false for invalid inputs; acc is untouched. */
-BOL TArmDynamics(const TArmParams& params, FPD j1, FPD j2, FPD w1, FPD w2,
+BOL TArmDynamics(TArmParams& params, FPD j1, FPD j2, FPD w1, FPD w2,
                 FPD tau_1, FPD tau_2, FPD* acc) {
   if (!TArmParamsValid(params)) return false;
-  if (!isfinite(j1) || !isfinite(j2) || !isfinite(w1) || !isfinite(w2) ||
-      !isfinite(tau_1) || !isfinite(tau_2)) return false;
+  if (!iGeek::IsFinite(j1) || !iGeek::IsFinite(j2) || !iGeek::IsFinite(w1) || !iGeek::IsFinite(w2) ||
+      !iGeek::IsFinite(tau_1) || !iGeek::IsFinite(tau_2)) return false;
   TArmDynamicsTerms forces = TArmDynamicsTerms();
   TArmState state;
   state.j1 = j1; state.j2 = j2; state.w1 = w1; state.w2 = w2;
@@ -61,42 +61,42 @@ BOL TArmDynamics(const TArmParams& params, FPD j1, FPD j2, FPD w1, FPD w2,
       tau_2 - forces.c12 * w1 * w1 - params.damping * w2 + forces.grav_2};
   FPD Iinv[ArmMatSize * ArmMatSize], a[ArmVecSize];
   FPD det = I[0] * I[3] - I[1] * I[2];
-  if (!isfinite(det) || fabs(det) < 1e-12) return false;
+  if (!iGeek::IsFinite(det) || Absolute(det) < 1e-12) return false;
   Iinv[0] = I[3] / det; Iinv[1] = -I[1] / det;
   Iinv[2] = -I[2] / det; Iinv[3] = I[0] / det;
-  Math::GemvR(1.0, Iinv, ArmMatSize, ArmMatSize, ArmMatSize, f, 0.0, a);
+  CTK::Math::GemvR(1.0, Iinv, ArmMatSize, ArmMatSize, ArmMatSize, f, 0.0, a);
   acc[0] = a[0]; acc[1] = a[1];
   return true;
 }
-BOL TArmParamsValid(const TArmParams& params) {
-  return isfinite(params.length_1) && params.length_1 > 0 &&
-      isfinite(params.length_2) && params.length_2 > 0 &&
-      isfinite(params.mass_1) && params.mass_1 > 0 &&
-      isfinite(params.mass_2) && params.mass_2 > 0 &&
-      isfinite(params.inertia_1) && params.inertia_1 > 0 &&
-      isfinite(params.inertia_2) && params.inertia_2 > 0 &&
-      isfinite(params.max_torque) && params.max_torque > 0 &&
-      isfinite(params.damping) && params.damping >= 0 &&
-      isfinite(params.dt) && params.dt > 0 && params.dt < 0.1 &&
-      isfinite(params.half_step) && params.half_step > 0 &&
+BOL TArmParamsValid(TArmParams& params) {
+  return iGeek::IsFinite(params.length_1) && params.length_1 > 0 &&
+      iGeek::IsFinite(params.length_2) && params.length_2 > 0 &&
+      iGeek::IsFinite(params.mass_1) && params.mass_1 > 0 &&
+      iGeek::IsFinite(params.mass_2) && params.mass_2 > 0 &&
+      iGeek::IsFinite(params.inertia_1) && params.inertia_1 > 0 &&
+      iGeek::IsFinite(params.inertia_2) && params.inertia_2 > 0 &&
+      iGeek::IsFinite(params.max_torque) && params.max_torque > 0 &&
+      iGeek::IsFinite(params.damping) && params.damping >= 0 &&
+      iGeek::IsFinite(params.dt) && params.dt > 0 && params.dt < 0.1 &&
+      iGeek::IsFinite(params.half_step) && params.half_step > 0 &&
       params.half_step < params.dt;
 }
-BOL TArmStateValid(const TArmState& state) {
+BOL TArmStateValid(TArmState& state) {
   FPD jmax = 1.5707963267948966;
-  return isfinite(state.j1) && isfinite(state.j2) &&
-      isfinite(state.w1) && isfinite(state.w2) &&
-      isfinite(state.time) && isfinite(state.tip_x) && isfinite(state.tip_y) &&
-      isfinite(state.reach) && fabs(state.w1) < 1e6 && fabs(state.w2) < 1e6 &&
+  return iGeek::IsFinite(state.j1) && iGeek::IsFinite(state.j2) &&
+      iGeek::IsFinite(state.w1) && iGeek::IsFinite(state.w2) &&
+      iGeek::IsFinite(state.time) && iGeek::IsFinite(state.tip_x) && iGeek::IsFinite(state.tip_y) &&
+      iGeek::IsFinite(state.reach) && Absolute(state.w1) < 1e6 && Absolute(state.w2) < 1e6 &&
       state.j1 >= -1e-9 && state.j1 <= jmax + 1e-9 &&
       state.j2 >= -1e-9 && state.j2 <= jmax + 1e-9;
 }
 /* One 0.02 s frame = four 0.01 s RK4 substeps of the torque model.
 Joint angles are clamped to [0, pi/2]; velocity zeros at the bound.
 @return false for invalid inputs; state is untouched. */
-BOL TArmStep(TArmState& state, const TArmParams& params,
-            const TArmControl& control) {
+BOL TArmStep(TArmState& state, TArmParams& params,
+            TArmControl& control) {
   if (!TArmParamsValid(params) || !TArmStateValid(state) ||
-      !isfinite(control.tau_1) || !isfinite(control.tau_2)) return false;
+      !iGeek::IsFinite(control.tau_1) || !iGeek::IsFinite(control.tau_2)) return false;
   FPD tau_1 = control.tau_1 > params.max_torque ? params.max_torque
       : control.tau_1 < -params.max_torque ? -params.max_torque : control.tau_1;
   FPD tau_2 = control.tau_2 > params.max_torque ? params.max_torque

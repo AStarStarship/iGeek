@@ -1,25 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// AUTO-GENERATED from __Seams.yaml (iGeek PacWorld).
-// PacWorld release seam unit: the final sown test pass. Gated on
-// IGEEK_PACWORLD_RELEASE (SEAM_N). Runs once all lower seams pass.
-#if SEAM >= IGEEK_PACWORLD_RELEASE
-#if SEAM == IGEEK_PACWORLD_RELEASE
+#if _Seam >= _iGeekPackWorldRelease
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-
-using namespace ::_;
 namespace PacWorldTest {
+using namespace ::_;
+using namespace iGeek;
 
 inline const CHA* Release(const CHA* args) {
-#if SEAM >= IGEEK_PACWORLD_RELEASE
-  A_TEST_BEGIN;
+#if _Seam >= _iGeekPackWorldRelease
+  _ATestBegin;
   // PacWorld release: runs the full sown tree. No checks of its own.
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace PacWorldTest

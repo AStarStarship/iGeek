@@ -1,13 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_MPC_H
-#define CRABS_CARWORLD_MPC_H
+#ifndef _iGeekCarWorldMPCH
+#define _iGeekCarWorldMPCH
 #include "CarPhysics.h"
 #include "BicycleModel.h"
 #include "CarPhysics.hxx"
 #include "../BikeWorld/VehicleRoute.h"
-#include <math.h>
-#if SEAM >= CRABS_CARWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 /** Model Predictive Control pilot (Course 1 w7, Course 4 w6-7).
  * Uses the kinematic bicycle model for rollout (fast, 4-dim).
@@ -33,11 +33,11 @@ class AMpcPilot
    * @param params    Car parameters (for steer limits).
    * @param cruise    Target speed (m/s).
    * @return TCarControl to apply this frame. */
-  TCarControl Control(const TileMap& map, const TVehicleRoute& route,
-      const TCarState& state, const TCarParams& params, FPD cruise) {
+  TCarControl Control(TileMap& map, TVehicleRoute& route,
+      TCarState& state, TCarParams& params, FPD cruise) {
     TCarControl fallback;
     if (route.count < 2 || route.count > VehicleRouteMax ||
-        !isfinite(cruise) || !TCarParamsValid(params) || !TCarStateValid(state)) {
+        !iGeek::IsFinite(cruise) || !TCarParamsValid(params) || !TCarStateValid(state)) {
       fallback.brake = 1; return fallback;
     }
     // Build the MPC state from the car state.
@@ -70,9 +70,9 @@ class AMpcPilot
         TCarCornerSpeed(route, state, lookahead, lateral_budget, stop_decel,
             TBikeClamp(best_target_v, 0, 12)));
     best_target_v = TBikeMin(best_target_v,
-        sqrt(lateral_budget / TBikeMax(fabs(guide.curvature), 0.001)));
+        SquareRoot(lateral_budget / TBikeMax(Absolute(guide.curvature), 0.001)));
     best_target_v = TBikeMin(best_target_v,
-        sqrt(2 * stop_decel * TBikeMax(guide.remaining - 0.7, 0)));
+        SquareRoot(2 * stop_decel * TBikeMax(guide.remaining - 0.7, 0)));
     // Longitudinal: drive/brake toward the MPC target speed.
     FPD dv = best_target_v - bike.speed;
     FPD throttle = 0, brake = 0;
@@ -94,8 +94,8 @@ class AMpcPilot
   FPD w_track_, w_speed_, w_smooth_;
   FPD max_accel_, max_decel_;
   /** Roll out the bicycle model and compute the tracking cost. */
-  FPD RolloutCost(const TBicycleState& start, FPD steer, FPD target_v,
-      FPD cruise, const TVehicleRoute& route, const TCarParams& params) {
+  FPD RolloutCost(TBicycleState& start, FPD steer, FPD target_v,
+      FPD cruise, TVehicleRoute& route, TCarParams& params) {
     FPD xs[Horizon + 1], ys[Horizon + 1], hs[Horizon + 1], vs[Horizon + 1];
     // Constant steer + constant accel toward target_v.
     FPD accel = TBikeClamp((target_v - start.speed) / 0.5, max_decel_, max_accel_);

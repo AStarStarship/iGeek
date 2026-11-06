@@ -1,8 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
 #include <_Config.h>
-#ifndef TILEWORLD_RANGEDWEAPON
-#define TILEWORLD_RANGEDWEAPON
+#ifndef _iGeekTileWorldRangedWeaponH
+#define _iGeekTileWorldRangedWeaponH
 #include "Item.h"
 class Item;
 

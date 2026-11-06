@@ -1,31 +1,31 @@
 // Copyright AStarship <https://astarship.net>.
 
 #include "Card.h"
-#if SEAM >= IGEEK_CARD
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
 /* Returns the suit name for the given suit index (1-4) and culture. */
 static const CHA* SuitNameFor(ISC suit, SuitCulture culture) {
   switch (culture) {
-    case SuitCulture::kGerman:
+    case SuitCulture::SCGerman:
       switch (suit) {
         case 1: return "Acorns";
         case 2: return "Bells";
         case 3: return "Hearts";
         default: return "Lieves";
       }
-    case SuitCulture::kSwissGerman:
+    case SuitCulture::SCSwissGerman:
       switch (suit) {
         case 1: return "Acorns";
         case 2: return "Bells";
         case 3: return "Roses";
         default: return "Shields";
       }
-    case SuitCulture::kPiacentine:
-    case SuitCulture::kNapoletane:
-    case SuitCulture::kSpagnole:
-    case SuitCulture::kBergamasche:
+    case SuitCulture::SCPiacentine:
+    case SuitCulture::SCNapoletane:
+    case SuitCulture::SCSpagnole:
+    case SuitCulture::SCBergamasche:
       switch (suit) {
         case 1: return "Clubs";
         case 2: return "Coins";
@@ -55,8 +55,8 @@ Card::Card()
       face_value_(1),
       point_value_(11),
       suit_value_(1),
-      suit_(CardSuit::kClub),
-      culture_(SuitCulture::kFrench),
+      suit_(CardSuit::CSClub),
+      culture_(SuitCulture::SCFrench),
       suit_name_("Clubs") {}
 
 Card::Card(ISC pip_value, ISC suit)
@@ -65,7 +65,7 @@ Card::Card(ISC pip_value, ISC suit)
       point_value_(PointValueFromPip(pip_value)),
       suit_value_(suit < 1 ? 1 : (suit > 4 ? 4 : suit)),
       suit_(static_cast<CardSuit>(suit < 1 ? 1 : suit)),
-      culture_(SuitCulture::kFrench),
+      culture_(SuitCulture::SCFrench),
       suit_name_("Clubs") {
   SetSuitName();
 }
@@ -82,7 +82,7 @@ Card::Card(ISC pip_value, ISC suit, ISC face_value, ISC point_value,
   SetSuitName();
 }
 
-ISC Card::Compare(const Card& other) const {
+ISC Card::Compare(Card& other) {
   if (pip_value_ > other.pip_value_) return 1;
   if (pip_value_ < other.pip_value_) return -1;
   if (suit_value_ > other.suit_value_) return 1;
@@ -90,11 +90,11 @@ ISC Card::Compare(const Card& other) const {
   return 0;
 }
 
-BOL Card::Equals(const Card& other) const { return Compare(other) == 0; }
+BOL Card::Equals(Card& other) { return Compare(other) == 0; }
 
 void Card::SetCulture(SuitCulture culture) {
-  if (culture < SuitCulture::kFrench ||
-      culture > SuitCulture::kBergamasche)
+  if (culture < SuitCulture::SCFrench ||
+      culture > SuitCulture::SCBergamasche)
     return;
   culture_ = culture;
   SetSuitName();

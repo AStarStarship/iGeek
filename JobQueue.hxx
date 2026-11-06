@@ -1,7 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_JOB_QUEUE_HXX
-#define IGEEK_JOB_QUEUE_HXX 1
 #include "JobQueue.h"
 namespace iGeek {
 
@@ -83,4 +81,3 @@ ISC JobQueueCountByStatus(const TJobQueue* queue, ISC status) {
 }
 
 }  //< namespace iGeek
-#endif
