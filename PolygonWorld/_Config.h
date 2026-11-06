@@ -1,34 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
+#ifndef _iGeekPolygonWorldConfigH
+#define _iGeekPolygonWorldConfigH
 
-#ifndef MODULE_CONFIG_HEADER
-#define MODULE_CONFIG_HEADER 1
+#include <ASCIICrabs/_ConfigHeader.inl>
 
-#include <Crabs/_ConfigHeader.inl>
+#define _Seam _CrabsList
 
-#define SEAM Crabs_LIST
-
-#define ASSEMBLY_TYPE ASSEMBLE_EXE 1
 #define Crabs_RUN_TESTS YES_0
 
-#define ALU_SIZE ALU_64_BIT
-#define CPU_ENDIAN CPU_ENDIAN_LITTLE
-
-#define USING_CONSOLE YES_0
-
-#define USING_UTF8 YES_0
-#define USING_UTF16 YES_0
-#define USING_UTF32 YES_0
-#define LARGEST_CHAR STRING_TYPE_1
-#define USING_STR STRING_TYPE_1
-
-#define USING_FP 8
-#define USING_FP4 YES_0
-#define USING_FP8 YES_0
-
-#define USING_16_BYTE_POD_TYPES NO_0
-
-#include <Crabs/_ConfigFooter.inl>
+#include <ASCIICrabs/_ConfigFooter.inl>
 
 #endif

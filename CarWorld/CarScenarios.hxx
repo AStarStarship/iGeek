@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_SCENARIOS_HXX
-#define CRABS_CARWORLD_SCENARIOS_HXX
+#ifndef _iGeekCarWorldScenariosHXX
+#define _iGeekCarWorldScenariosHXX
 #include "CarWorld2D.hxx"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 enum { CarStraight, CarCurves, CarObstacle, CarGravel, CarIce,
        CarUphill, CarDownhill, CarLaunch, CarIceCurves, CarScenarioCount };

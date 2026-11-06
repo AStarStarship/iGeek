@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_METRICS_DECL
-#define IGEEK_METRICS_DECL 1
+#ifndef _iGeekMetricsH
+#define _iGeekMetricsH 1
 #include "../ASCIICrabs/_Config.h"
 #include "AgentState.h"
 
@@ -50,11 +50,11 @@ struct BehaviorMetrics {
   void RecordTrial(BOL was_present, BOL did_report, ISC steps_to_report);
 
   /* Accuracy = correct / trials (FPC in [0,1]; 0 if no trials). */
-  FPC Accuracy() const;
+  FPC Accuracy();
   /* False-positive rate = false_positives / trials. */
-  FPC FalsePositiveRate() const;
+  FPC FalsePositiveRate();
   /* False-negative rate = false_negatives / trials. */
-  FPC FalseNegativeRate() const;
+  FPC FalseNegativeRate();
 };
 
 /* A single internal-state snapshot record: one agent's state vector at one
@@ -65,10 +65,10 @@ struct StateRecord {
   ISC label;       // context label (world-defined; 0/1 for presence).
   IUC* words;      // slots IUC words (owned).
 
-  StateRecord() : slots(0), label(0), words(NILP) {}
+  StateRecord() : slots(0), label(0), words(_NilP) {}
   ~StateRecord();
   /* Deep-copy a snapshot from an AgentState into this record. */
-  void Capture(const AgentState& state, ISC label);
+  void Capture(AgentState& state, ISC label);
   /* Deep-copy a raw word array. */
   void Capture(const IUC* words_in, ISC slots_in, ISC label);
 };
@@ -80,14 +80,14 @@ class StateRecordSet {
  public:
   explicit StateRecordSet(ISC cap);
   ~StateRecordSet();
-  StateRecordSet(const StateRecordSet&) = delete;
-  StateRecordSet& operator=(const StateRecordSet&) = delete;
+  StateRecordSet(StateRecordSet&) = delete;
+  StateRecordSet& operator=(StateRecordSet&) = delete;
 
   /* Append a captured record. Returns false if at capacity. */
-  BOL Push(const AgentState& state, ISC label);
-  ISC Count() const { return count_; }
-  const StateRecord& At(ISC i) const { return records_[i]; }
-  ISC Capacity() const { return cap_; }
+  BOL Push(AgentState& state, ISC label);
+  ISC Count() { return count_; }
+  StateRecord& At(ISC i) { return records_[i]; }
+  ISC Capacity() { return cap_; }
 
  private:
   ISC cap_;
@@ -108,22 +108,22 @@ class LinearProbe {
   /* @param feature_dim Number of feature words (== state slots). */
   explicit LinearProbe(ISC feature_dim);
   ~LinearProbe();
-  LinearProbe(const LinearProbe&) = delete;
-  LinearProbe& operator=(const LinearProbe&) = delete;
+  LinearProbe(LinearProbe&) = delete;
+  LinearProbe& operator=(LinearProbe&) = delete;
 
   /* Train for `epochs` full-batch gradient steps at learning rate `lr`.
   Returns the training accuracy after the final epoch (FPC in [0,1]). */
-  FPC Train(const StateRecordSet& data, ISC epochs, FPC lr);
+  FPC Train(StateRecordSet& data, ISC epochs, FPC lr);
 
   /* Predict the label (0/1) for a single state word array. */
-  ISC Predict(const IUC* words, ISC feature_dim) const;
+  ISC Predict(const IUC* words, ISC feature_dim);
 
   /* Accuracy over the (training) record set. */
-  FPC Accuracy(const StateRecordSet& data) const;
+  FPC Accuracy(StateRecordSet& data);
 
   /* The learned weight vector (feature_dim FPC) + bias, for inspection. */
-  FPC Weight(ISC i) const;
-  FPC Bias() const { return bias_; }
+  FPC Weight(ISC i);
+  FPC Bias() { return bias_; }
 
  private:
   ISC feature_dim_;

@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_PID_H
-#define CRABS_SPACEWORLD_PID_H
+#ifndef _iGeekSpaceWorldPidH
+#define _iGeekSpaceWorldPidH
 #include "SpaceConfig.h"
 #include "SpaceMath.h"
 #include "SpaceMath.hxx"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 /** 3-axis PID controller (vector form of PIDController.ts). Works on a
  * TSpaceVec error; integral clamped to maxIntegral, derivative low-pass
@@ -20,7 +20,7 @@ struct TSpacePid
   TSpaceVec last_error;
   TSpaceVec last_derivative;
   /** Compute control output for a new error. @return kp*e + ki*I + kd*D. */
-  TSpaceVec Update(const TSpaceVec& error, FPD dt) {
+  TSpaceVec Update(TSpaceVec& error, FPD dt) {
     TSpaceVec p_term = TSpaceVecScale(error, kp);
     TSpaceVec i_new = TSpaceVecAdd(integral, TSpaceVecScale(error, dt));
     FPD inorm = TSpaceVecLength(i_new);
@@ -44,5 +44,5 @@ struct TSpacePid
   }
 };
 } //< namespace iGeek
-#endif
-#endif
+#endif  //< _Seam >= _iGeekSpaceWorldCore
+#endif  //< _iGeekSpaceWorldPidH

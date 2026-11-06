@@ -2,17 +2,17 @@
 #include "TileMap.h"
 
 void TileMap::Clear() {
-  if (map_ != NILP) {
+  if (map_ != _NilP) {
     for (_::ISC x = 0; x < width_; x++) {
       for (_::ISC y = 0; y < height_; y++) {
-        if (map_[y * width_ + x] != NILP) {
+        if (map_[y * width_ + x] != _NilP) {
           delete map_[y * width_ + x];
-          map_[y * width_ + x] = NILP;
+          map_[y * width_ + x] = _NilP;
         }
       }
     }
     delete[] map_;
-    map_ = NILP;
+    map_ = _NilP;
   }
 }
 
@@ -28,7 +28,7 @@ TileMap::TileMap(_::FPC grid_size, _::ISC width, _::ISC height)
       max_size_world_grid_(width, height),
       max_size_world_f_(static_cast<_::FPC>(width) * grid_size,
                         static_cast<_::FPC>(height) * grid_size),
-      map_(NILP) {
+      map_(_NilP) {
   map_ = new Tile*[static_cast<_::IUD>(width) * static_cast<_::IUD>(height)]();
   if (!occlusion_.Init(width, height)) {
     // The occlusion grid failed to allocate; the map still functions
@@ -40,21 +40,21 @@ TileMap::~TileMap() {
   Clear();
 }
 
-const _::BOL TileMap::TileEmpty(const _::ISC x, const _::ISC y) const {
-  if (x >= 0 && x < width_ && y >= 0 && y < height_) return map_[y * width_ + x] == NILP;
+const _::BOL TileMap::TileEmpty(const _::ISC x, const _::ISC y) {
+  if (x >= 0 && x < width_ && y >= 0 && y < height_) return map_[y * width_ + x] == _NilP;
   return false;
 }
 
-const _::ISC TileMap::LayerSize(const _::ISC x, const _::ISC y) const {
+const _::ISC TileMap::LayerSize(const _::ISC x, const _::ISC y) {
   if (x >= 0 && x < width_) {
-    if (y >= 0 && y < height_) return map_[y * width_ + x] == NILP ? 0 : 1;
+    if (y >= 0 && y < height_) return map_[y * width_ + x] == _NilP ? 0 : 1;
   }
   return -1;
 }
 
-const _::TVec2I& TileMap::SizeGridMax() const { return max_size_world_grid_; }
+const _::TVec2I& TileMap::SizeGridMax() { return max_size_world_grid_; }
 
-const _::TVec2F& TileMap::SizeMaxF() const { return max_size_world_f_; }
+const _::FPC2& TileMap::SizeMaxF() { return max_size_world_f_; }
 
 // PORT-NOTE: the original pushed into map_[x][y][z] (a per-cell Tile array);
 // the headless grid stores at most one tile per cell (last write wins).
@@ -62,7 +62,7 @@ void TileMap::AddTile(const _::ISC x, const _::ISC y,
                       const _::TIntRect& texture_rect, const _::BOL collision,
                       const _::ISM type) {
   if (x < width_ && x >= 0 && y < height_ && y >= 0) {
-    if (map_[y * width_ + x] != NILP) delete map_[y * width_ + x];
+    if (map_[y * width_ + x] != _NilP) delete map_[y * width_ + x];
     map_[y * width_ + x] = new TileRegular(type, x, y, grid_size_f_, texture_rect,
                                            collision);
   }
@@ -73,7 +73,7 @@ void TileMap::AddSpawnerTile(const _::ISC x, const _::ISC y,
                              const _::ISC enemy_amount, const _::ISC enemy_tts,
                              const _::FPC enemy_md) {
   if (x < width_ && x >= 0 && y < height_ && y >= 0) {
-    if (map_[y * width_ + x] != NILP) delete map_[y * width_ + x];
+    if (map_[y * width_ + x] != _NilP) delete map_[y * width_ + x];
     map_[y * width_ + x] = new TileSpawner(x, y, grid_size_f_, texture_rect,
                                            enemy_type, enemy_amount, enemy_tts,
                                            enemy_md);
@@ -82,15 +82,15 @@ void TileMap::AddSpawnerTile(const _::ISC x, const _::ISC y,
 
 void TileMap::RemoveTile(const _::ISC x, const _::ISC y, const _::ISC type) {
   if (x < width_ && x >= 0 && y < height_ && y >= 0) {
-    if (map_[y * width_ + x] != NILP) {
+    if (map_[y * width_ + x] != _NilP) {
       if (type >= 0) {
         if (map_[y * width_ + x]->GetType() == type) {
           delete map_[y * width_ + x];
-          map_[y * width_ + x] = NILP;
+          map_[y * width_ + x] = _NilP;
         }
       } else {
         delete map_[y * width_ + x];
-        map_[y * width_ + x] = NILP;
+        map_[y * width_ + x] = _NilP;
       }
     }
   }
@@ -99,10 +99,10 @@ void TileMap::RemoveTile(const _::ISC x, const _::ISC y, const _::ISC type) {
 // PORT-NOTE: the original read map_[x][y][layer].back()->getType() with no
 // empty check; the headless version guards the empty cell.
 const _::BOL TileMap::CheckType(const _::ISC x, const _::ISC y,
-                                const _::ISM type) const {
+                                const _::ISM type) {
   if (x < 0 || x >= width_ || y < 0 || y >= height_) return false;
   Tile* t = map_[y * width_ + x];
-  return t != NILP && t->GetType() == type;
+  return t != _NilP && t->GetType() == type;
 }
 
 // --- Collision (ported 1:1 from the original, sprite-less) ----------------
@@ -117,7 +117,7 @@ void TileMap::Update(Entity* player, const _::FPC& dt, Entity** enemies,
 
     for (_::ISC e = 0; e < n; e++) {
       Entity* entity = all[e];
-      if (entity == NILP) continue;
+      if (entity == _NilP) continue;
       if (entity->Position().x < 0.f) {
         entity->PositionSet(0.f, entity->Position().y);
         entity->StopVelocityX();
@@ -165,7 +165,7 @@ void TileMap::Update(Entity* player, const _::FPC& dt, Entity** enemies,
       for (_::ISC x = from_x; x < to_x; x++) {
         for (_::ISC y = from_y; y < to_y; y++) {
           Tile* t = map_[y * width_ + x];
-          if (t == NILP) continue;
+          if (t == _NilP) continue;
           _::TFloatRect player_bounds = entity->GlobalBounds();
           _::TFloatRect wall_bounds = t->GlobalBounds();
           _::TFloatRect next_position_bounds = entity->NextPositionBounds(dt);
@@ -253,7 +253,7 @@ void TileMap::Update(Entity* player, const _::FPC& dt, Entity** enemies,
     for (_::ISC x = from_x; x < to_x; x++) {
       for (_::ISC y = from_y; y < to_y; y++) {
         Tile* t = map_[y * width_ + x];
-        if (t == NILP) continue;
+        if (t == _NilP) continue;
         t->Update();
         // Spawner tiles are present in the grid; the headless spine does not
         // spawn enemies from them (no EnemySystem in this pass).
@@ -274,28 +274,28 @@ void TileMap::RebuildOcclusion(Entity* player, Entity** enemies,
   for (_::ISC y = 0; y < height_; y++) {
     for (_::ISC x = 0; x < width_; x++) {
       Tile* t = map_[y * width_ + x];
-      occlusion_.SetOccluded(x, y, t != NILP && t->GetCollision());
+      occlusion_.SetOccluded(x, y, t != _NilP && t->GetCollision());
     }
   }
 
   // Layer B: entities flagged occlude_ (the player and any enemy).
-  if (player != NILP && player->Occlude()) MarkEntityOccluder(player);
+  if (player != _NilP && player->Occlude()) MarkEntityOccluder(player);
   for (_::ISC i = 0; i < enemy_count; i++) {
-    if (enemies[i] != NILP && enemies[i]->Occlude()) MarkEntityOccluder(enemies[i]);
+    if (enemies[i] != _NilP && enemies[i]->Occlude()) MarkEntityOccluder(enemies[i]);
   }
 
   // Observers: player = 0, enemies = 1..n (grid-cell-center positions).
   occlusion_.ClearObservers();
   obs_player_ = -1;
   obs_enemy_count_ = 0;
-  if (player != NILP) {
-    _::TVec2F c = player->Center();
+  if (player != _NilP) {
+    _::FPC2 c = player->Center();
     obs_player_ =
         occlusion_.AddObserver(c.x / grid_size_f_, c.y / grid_size_f_);
   }
   for (_::ISC i = 0; i < enemy_count && i < 7; i++) {
-    if (enemies[i] == NILP) continue;
-    _::TVec2F c = enemies[i]->Center();
+    if (enemies[i] == _NilP) continue;
+    _::FPC2 c = enemies[i]->Center();
     obs_enemy_[obs_enemy_count_++] =
         occlusion_.AddObserver(c.x / grid_size_f_, c.y / grid_size_f_);
   }
@@ -304,7 +304,7 @@ void TileMap::RebuildOcclusion(Entity* player, Entity** enemies,
 }
 
 // Mark every grid cell the entity's bounds cover as a dynamic occluder.
-void TileMap::MarkEntityOccluder(const Entity* e) {
+void TileMap::MarkEntityOccluder(Entity* e) {
   _::TFloatRect b = e->GlobalBounds();
   _::ISC x0 = static_cast<_::ISC>(b.Left() / grid_size_f_);
   _::ISC y0 = static_cast<_::ISC>(b.Top() / grid_size_f_);
@@ -314,18 +314,18 @@ void TileMap::MarkEntityOccluder(const Entity* e) {
     for (_::ISC y = y0; y <= y1; y++) occlusion_.SetOccluded(x, y, true);
 }
 
-_::BOL TileMap::PlayerSeesCell(const _::ISC cx, const _::ISC cy) const {
+_::BOL TileMap::PlayerSeesCell(const _::ISC cx, const _::ISC cy) {
   if (obs_player_ < 0) return false;
   return occlusion_.ObserverSees(obs_player_, cx, cy);
 }
 
-_::BOL TileMap::PlayerSees(const Entity* e) const {
-  if (e == NILP) return false;
-  _::TVec2I g = e->GridPosition(grid_size_f_);
+_::BOL TileMap::PlayerSees(Entity* e) {
+  if (e == _NilP) return false;
+  _::ISC2 g = e->GridPosition(grid_size_f_);
   return PlayerSeesCell(g.x, g.y);
 }
 
-_::BOL TileMap::PlayerSeesEnemy(const Entity* enemy, _::ISC i) const {
+_::BOL TileMap::PlayerSeesEnemy(Entity* enemy, _::ISC i) {
   (void)i;  // i is the observer index of the enemy; the query is player->enemy
   return PlayerSees(enemy);
 }

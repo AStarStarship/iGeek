@@ -1,0 +1,10 @@
+# Copyright AStarship <https://astarship.net>.
+seams:
+  - name: _iGeekTerminalWorldCore
+    depends: [_iGeekCore]
+    file: 01.Core.hxx
+    label: "Testing TerminalWorld core..."
+  - name: _iGeekTerminalWorldRelease
+    depends: [_iGeekTerminalWorldCore]
+    file: 02.Release.hxx
+    label: "Testing TerminalWorld release..."

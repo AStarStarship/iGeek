@@ -1,8 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_DECIDE_T
-#define IGEEK_CLASSICAL_DECIDE_T 1
-#include "../ASCIICrabs/_Config.h"
+#ifndef _iGeekClassicalDecideH
+#define _iGeekClassicalDecideH
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
 
@@ -38,5 +37,5 @@ function INFORMATION-GATHERING-AGENT(percept ) returns an action
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalDecideH

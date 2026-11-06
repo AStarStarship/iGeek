@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ROLLOUT_COMPARE_H
-#define IGEEK_ROLLOUT_COMPARE_H
+#ifndef _iGeekRolloutCompareH
+#define _iGeekRolloutCompareH
 #include <_Config.h>
-#if SEAM >= IGEEK_GYM_MANIFEST
+#if _Seam >= _iGeekEnvironmentManifest
 #include "Script.h"
 namespace iGeek {
 

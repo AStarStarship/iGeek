@@ -12,11 +12,11 @@
 // No C/C++ standard library (the legacy main.hxx used <cstdio>/fputs and a
 // hard-coded hrm.h include — both removed).
 #pragma once
-#ifndef CRABS_SUDOKUWORLD_HXX
-#define CRABS_SUDOKUWORLD_HXX
+#ifndef _iGeekSudokuWorldHXX
+#define _iGeekSudokuWorldHXX
 #include "SudokuWorld.h"
 #include "../Gym.h"
-#if SEAM >= CRABS_SUDOKUWORLD
+#if _Seam >= CRABS_SUDOKUWORLD
 
 namespace iGeek {
 
@@ -195,13 +195,13 @@ class ASudokuGym : public Gym {
     boards_ = new TBoard[env_count_];
     targets_ = new TBoard[env_count_];
     for (ISC b = 0; b < env_count_; ++b) ResetEnv(b);
-    CopyStr(manifest_.name, ManifestNameLen, "sudoku");
-    CopyStr(manifest_.version, ManifestVersionLen, "1.0");
+    TSPrint(manifest_.name, ISW(ManifestNameLen), "sudoku");
+    TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0");
     manifest_.kind = ManifestKindEnv;
     manifest_.domain = ManifestDomainGame;
-    CopyStr(manifest_.description, ManifestDescriptionLen,
-            "9x9 Sudoku puzzle solving");
-    CopyStr(manifest_.modality, ManifestModalityLen, "vector");
+    TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
+          "9x9 Sudoku puzzle solving");
+    TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
     manifest_.reward_low = FPC(0.0);
     manifest_.reward_high = FPC(1.0);
     manifest_.reward_higher_is_better = true;
@@ -209,9 +209,9 @@ class ASudokuGym : public Gym {
     manifest_.obs_count = obs_len_;
     manifest_.action_count = action_count_;
     manifest_.max_episode_steps = SudokuCells * 9;
-    manifest_.env_count_max = GymEnvMax;
-    CopyStr(manifest_.world_name, ManifestWorldLen, "SudokuWorld");
-    manifest_.seam_number = IGEEK_SUDOKUWORLD_CORE;
+    manifest_.environment_count_max = GymEnvMax;
+    TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "SudokuWorld");
+    manifest_.seam_number = _iGeekSudokuWorldCore;
     manifest_.manifest_version = ISC(1);
   }
   ~ASudokuGym() override {
@@ -223,8 +223,8 @@ class ASudokuGym : public Gym {
     delete[] boards_;
     delete[] targets_;
   }
-  ASudokuGym(const ASudokuGym&) = delete;
-  ASudokuGym& operator=(const ASudokuGym&) = delete;
+  ASudokuGym(ASudokuGym&) = delete;
+  ASudokuGym& operator=(ASudokuGym&) = delete;
 
   void ResetBatch() override {
     for (ISC b = 0; b < env_count_; ++b) ResetEnv(b);
@@ -232,14 +232,14 @@ class ASudokuGym : public Gym {
   void StepBatch() override {
     for (ISC b = 0; b < env_count_; ++b) StepEnv(b);
   }
-  ISC ActionCount() const { return action_count_; }
-  ISC ObsLength() const { return obs_len_; }
-  const TBoard& Board(ISC b) const { return boards_[b]; }
-  const TBoard& Target(ISC b) const { return targets_[b]; }
+  ISC ActionCount() { return action_count_; }
+  ISC ObsLength() { return obs_len_; }
+  TBoard& Board(ISC b) { return boards_[b]; }
+  TBoard& Target(ISC b) { return targets_[b]; }
 
  private:
-  TBoard* boards_ = NILP;
-  TBoard* targets_ = NILP;
+  TBoard* boards_ = _NilP;
+  TBoard* targets_ = _NilP;
   IUD seed_ = 7;
   ISC holes_ = 40;
 
@@ -290,4 +290,4 @@ class ASudokuGym : public Gym {
 
 } //< namespace iGeek
 #endif
-#endif  // CRABS_SUDOKUWORLD_HXX
+#endif  //< CRABS_SUDOKUWORLD_HXX

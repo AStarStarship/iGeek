@@ -1,0 +1,6 @@
+# _Seams.yaml — Gym module seams.
+seams:
+  - name: _iGeekEnvironmentManifest
+    depends: [_iGeekTypingWorldRelease]
+    file: 01.Manifest.hxx
+    label: "Testing Gym manifest..."

@@ -5,11 +5,11 @@
 // SFML port: the hitbox no longer wraps an sf::Sprite or owns an
 // sf::RectangleShape. It is pure bounds math: it stores only the offset
 // (offset_x, offset_y) and size (width, height) and computes its world bounds
-// from a passed-in entity position (_::TVec2F& or by value). Render() deleted
+// from a passed-in entity position (_::FPC2& or by value). Render() deleted
 // (headless). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
+#include <_Config.h>
+#include <Homotuples.h>
 
 #ifndef TILEWORLD_HITBOXCOMPONENT_DECL
 #define TILEWORLD_HITBOXCOMPONENT_DECL
@@ -27,15 +27,15 @@ class HitboxComponent {
   virtual ~HitboxComponent();
 
   // The hitbox's world position given the entity's current position.
-  const _::TVec2F Position(const _::TVec2F& entity_pos) const;
-  const _::TFloatRect GlobalBounds(const _::TVec2F& entity_pos) const;
+  const _::FPC2 Position(const _::FPC2& entity_pos);
+  const _::TFloatRect GlobalBounds(const _::FPC2& entity_pos);
   // Bounds after moving by velocity (for swept collision).
-  const _::TFloatRect& NextPosition(const _::TVec2F& entity_pos,
-                                    const _::TVec2F& velocity) const;
+  const _::TFloatRect& NextPosition(const _::FPC2& entity_pos,
+                                    const _::FPC2& velocity);
 
-  void PositionSet(const _::FPC x, const _::FPC y, _::TVec2F* entity_pos);
+  void PositionSet(const _::FPC x, const _::FPC y, _::FPC2* entity_pos);
 
-  bool Intersects(const _::TVec2F& entity_pos, const _::TFloatRect& frect) const;
+  bool Intersects(const _::FPC2& entity_pos, const _::TFloatRect& frect);
 };
 }  //< namespace TileWorld
 #endif

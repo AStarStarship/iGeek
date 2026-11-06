@@ -8,14 +8,12 @@
  *   one possible cell in a row/column/box, place it there.
  * - Halts when all cells are filled (solved) or max_steps is reached.
  *
- * I/O: COut/StdOut for output (ASCIICrabs). Puzzle input is a flat IUD
+ * I/O: ROut/RefOut for output (ASCIICrabs). Puzzle input is a flat IUD
  * array; the HRMReadPuzzle file path is not wired until the ASCIICrabs
  * File stack exposes a read side (see gap note below) — callers pass the
  * board directly, or fall back to a built-in sample.
  */
-
 #include "HRM.h"
-
 namespace iGeek {
 
 /* Default HRM configuration. */
@@ -208,9 +206,9 @@ BOL HRMReadPuzzle(const CHA* filename, IUD* puzzle) {
   return false;
 }
 
-/* Print a Sudoku board (formatted 9x9, dots for empty cells) to StdOut. */
+/* Print a Sudoku board (formatted 9x9, dots for empty cells) to RefOut. */
 void HRMPrintBoard(const IUD* board) {
-  COut& out = StdOut();
+  ROut& out = RefOut();
   for (ISC r = 0; r < 9; ++r) {
     for (ISC c = 0; c < 9; ++c) {
       IUD val = board[r * 9 + c];

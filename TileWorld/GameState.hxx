@@ -1,7 +1,6 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
+#include "Homotuples.h"
 #include "state_game.h"
-#include "stdafx.h"
 
 void GameState::initDeferredRender() {
   renderTexture.create(stateData->gfxSettings->resolution.width,

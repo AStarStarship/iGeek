@@ -1,0 +1,13 @@
+# _Seams.yaml — PacWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
+engine: ../../PacWorld/PacWorld.hxx
+seams:
+  - name: _iGeekPackWorldCore
+    depends: [_iGeekCore]
+    file: 01.Core.hxx
+    label: "Testing PacWorld core..."
+  - name: _iGeekPackWorldRelease
+    depends: [_iGeekPackWorldCore]
+    file: 02.Release.hxx
+    label: "Testing PacWorld release..."

@@ -1,14 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef PACWORLD_GAMESTATE
-#define PACWORLD_GAMESTATE
-
+#ifndef _iGeekPacWorldGameStateH
+#define _iGeekPacWorldGameStateH
 #include "Maze.h"
 #include "Pac.h"
 #include "Ghost.h"
-
 namespace PacWorld {
-
 class Game;
 
 /* A headless game state. The state machine: each state handles Update
@@ -21,7 +18,7 @@ class GameState {
  public:
   GameState(Game* game);
 
-  Game* GameRef() const { return game_; }
+  Game* GameRef() { return game_; }
 
   virtual ~GameState() {}
 
@@ -96,10 +93,10 @@ class StatePlaying : public GameState {
   void UpdateCameraPosition();
 
   /* Accessors (for testing + the display layer). */
-  ISC Score() const { return score_; }
-  ISC LifeCount() const { return life_count_; }
-  ISC Level() const { return level_; }
-  ISC DotsLeft() const { return maze_.DotCount(); }
+  ISC Score() { return score_; }
+  ISC LifeCount() { return life_count_; }
+  ISC Level() { return level_; }
+  ISC DotsLeft() { return maze_.DotCount(); }
 };
 
 /* Won state — advance to next level after a delay. */
@@ -135,5 +132,5 @@ class StateError : public GameState {
   void Update(FPC delta) override;
   void Draw() override;
 };
-}  // namespace PacWorld
+}  //< namespace PacWorld
 #endif

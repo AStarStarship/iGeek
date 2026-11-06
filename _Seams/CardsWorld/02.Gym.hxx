@@ -1,15 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
-// The card world's GYM seam unit: unit tests for the vectorized BlackjackGym
-// (vectorized-batch) and the TTensor ops it's built on. Gated on
-// IGEEK_CARDSWORLD_CORE so it runs with the default build (the first seam).
-
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-
-using namespace ::_;
+#if _Seam >= _iGeekCardsWorldCore
 namespace CardsWorldTest {
+using namespace ::_;
+using namespace iGeek; 
 
-namespace {
 // Separate fail counter for the Gym unit (CWFails is private to 00.Core.hxx).
 inline ISC& GYMFails() {
   static ISC count = 0;
@@ -19,7 +13,7 @@ inline ISC& GYMFails() {
 #define GYM_CHECK(cond)                                        \
   do {                                                         \
     if (!::_::Test(cond)) {                                    \
-      ::_::StdOut() << "\nFAILURE Gym at line:" << __LINE__    \
+      ::_::RefOut() << "\nFAILURE Gym at line:" << __LINE__    \
                     << " in \"" << __FILE__ << "\"\n";         \
       ++GYMFails();                                            \
     }                                                          \
@@ -28,7 +22,7 @@ inline ISC& GYMFails() {
 #define GYM_EQ(a, b)                                           \
   do {                                                         \
     if (!::_::TestEq(a, b)) {                                  \
-      ::_::StdOut() << "\nFAILURE Gym (expecting " << (a)      \
+      ::_::RefOut() << "\nFAILURE Gym (expecting " << (a)      \
                     << " found " << (b) << ") at line:"        \
                     << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
       ++GYMFails();                                            \
@@ -39,7 +33,7 @@ inline ISC& GYMFails() {
   do {                                                         \
     { FPC _d = (a) - (b); if (_d < 0) _d = -_d;               \
       if (!::_::Test(_d < 1e-3f)) {                           \
-        ::_::StdOut() << "\nFAILURE Gym (close " << (a)       \
+        ::_::RefOut() << "\nFAILURE Gym (close " << (a)       \
                       << " vs " << (b) << ") at line:"        \
                       << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
         ++GYMFails();                                          \
@@ -48,7 +42,7 @@ inline ISC& GYMFails() {
 #define GYM_PTR(p)                                             \
   do {                                                         \
     if (IsError(p)) {                                          \
-      ::_::StdOut() << "\nFAILURE Gym (nil ptr) at line:"     \
+      ::_::RefOut() << "\nFAILURE Gym (nil ptr) at line:"     \
                     << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
       ++GYMFails();                                            \
     }                                                          \
@@ -56,7 +50,7 @@ inline ISC& GYMFails() {
 
 // --- TTensor ops (M1) ---------------------------------------------------
 inline void TensorChecks() {
-  D_COUT("Gym: TTensor MatMul\n");
+  _DROut("Gym: TTensor MatMul\n");
   {
     TTensor A = TTensorAlloc(1, 2); A.At(0,0)=1.0f; A.At(0,1)=2.0f;
     TTensor B = TTensorAlloc(2, 1); B.At(0,0)=3.0f; B.At(1,0)=4.0f;
@@ -65,7 +59,7 @@ inline void TensorChecks() {
     GYM_CLOSE(C.At(0,0), 11.0f);  // 1*3 + 2*4
     TTensorFree(A); TTensorFree(B); TTensorFree(C);
   }
-  D_COUT("Gym: TTensor Softmax\n");
+  _DROut("Gym: TTensor Softmax\n");
   {
     TTensor X = TTensorAlloc(1,3); X.At(0,0)=1.0f; X.At(0,1)=2.0f; X.At(0,2)=3.0f;
     TTensorSoftmaxInPlace(X);
@@ -74,7 +68,7 @@ inline void TensorChecks() {
     GYM_CLOSE(s, 1.0f);
     TTensorFree(X);
   }
-  D_COUT("Gym: TTensor LayerNorm\n");
+  _DROut("Gym: TTensor LayerNorm\n");
   {
     TTensor X = TTensorAlloc(1,3); X.At(0,0)=1.0f; X.At(0,1)=2.0f; X.At(0,2)=3.0f;
     TTensorLayerNormInPlace(X);
@@ -83,7 +77,7 @@ inline void TensorChecks() {
     GYM_CLOSE(X.At(0,2), 1.22474f);
     TTensorFree(X);
   }
-  D_COUT("Gym: TTensor Relu/Add/Scale/LogSumExp\n");
+  _DROut("Gym: TTensor Relu/Add/Scale/LogSumExp\n");
   {
     TTensor X = TTensorAlloc(1,3); X.At(0,0)=-1.0f; X.At(0,1)=0.0f; X.At(0,2)=2.0f;
     TTensorReluInPlace(X);
@@ -108,7 +102,7 @@ inline void TensorChecks() {
 
 // --- BlackjackGym (M2) --------------------------------------------------
 inline void GymChecks() {
-  D_COUT("Gym: BlackjackGym constructs + resets (4 tables)\n");
+  _DROut("Gym: BlackjackGym constructs + resets (4 tables)\n");
   CardsWorld::BlackjackGym gym(4);
   GYM_EQ(gym.Tables(), 4);
   GYM_PTR(gym.Observations());
@@ -123,7 +117,7 @@ inline void GymChecks() {
     GYM_CHECK(pval >= 2.0f && pval <= 21.0f);
     GYM_CHECK(dup >= 1.0f && dup <= 10.0f);
   }
-  D_COUT("Gym: step the batch (always stand -> rounds settle)\n");
+  _DROut("Gym: step the batch (always stand -> rounds settle)\n");
   // Stand on every table: each round must settle (terminal) on this step.
   ISC stand[4] = {1, 1, 1, 1};
   gym.StepBatch(stand);
@@ -139,7 +133,7 @@ inline void GymChecks() {
     GYM_CLOSE(gym.Observations()[i * CardsWorld::BlackjackGym::ObsLength + 3],
               1.0f);
   }
-  D_COUT("Gym: reset re-deals (terminals back to 0 unless a natural)\n");
+  _DROut("Gym: reset re-deals (terminals back to 0 unless a natural)\n");
   gym.ResetBatch();
   for (ISC i = 0; i < 4; ++i) {
     // After a fresh deal, a table is only terminal if it dealt a natural.
@@ -150,7 +144,7 @@ inline void GymChecks() {
     FPC pval = gym.Observations()[i * CardsWorld::BlackjackGym::ObsLength + 0];
     GYM_CHECK(pval >= 2.0f && pval <= 21.0f);
   }
-  D_COUT("Gym: many steps stay in-bounds (no crash, obs bounded)\n");
+  _DROut("Gym: many steps stay in-bounds (no crash, obs bounded)\n");
   // Run 200 batch-steps with a hit-until-17-ish policy; assert no crash and
   // that player hand values stay in the valid range every step.
   for (ISC step = 0; step < 200; ++step) {
@@ -174,17 +168,15 @@ inline void GymChecks() {
   }
 }
 
-}  //< namespace
-
 inline const CHA* Gym(const CHA* args) {
-  A_TEST_BEGIN;
+  _ATestBegin;
   TensorChecks();
   GymChecks();
   if (GYMFails() != 0) {
-    D_COUT("\n" << GYMFails() << " Gym assertion(s) FAILED\n");
+    _DROut("\n" << GYMFails() << " Gym assertion(s) FAILED\n");
     return "cards_world_gym_test_failure";
   }
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace CardsWorldTest

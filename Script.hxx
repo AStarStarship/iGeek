@@ -1,9 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_SCRIPT_HXX
-#define IGEEK_SCRIPT_HXX 1
+#ifndef _iGeekScriptHXX
+#define _iGeekScriptHXX
 #include "Script.h"
 namespace iGeek {
+using namespace _;
+using namespace CTK;
+using namespace iGeek;
 
 void TScriptInit(TScript* script, IUD max_count) {
   if (!script) return;
@@ -100,4 +103,4 @@ void TScriptIterate(const TScript* script,
 }
 
 }  //< namespace iGeek
-#endif
+#endif  //< _iGeekScriptHXX

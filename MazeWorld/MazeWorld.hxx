@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 // MazeWorld.hxx — maze generation (recursive backtracker) + A* solver.
 // No-stdlib: no std containers, no exceptions, no heap (all fixed-size
-// arrays). The only "system" surface is COut for Print(), which is the
+// arrays). The only "system" surface is ROut for Print(), which is the
 // ASCIICrabs console primitive (see AGENTS.md no-stdlib rule).
 #include "MazeWorld.h"
-#include "../../ASCIICrabs/COut.h"
-#if SEAM >= IGEEK_MAZEWORLD
+#include "../../ASCIICrabs/ROut.h"
+#if _Seam >= _iGeekMazeWorldCore
 namespace iGeek {
 
 const ISC MazeWorld::Dx[DirCount] = {0, 0, -1, 1};
@@ -13,7 +13,7 @@ const ISC MazeWorld::Dy[DirCount] = {-1, 1, 0, 0};
 
 /* 64-bit LCG (Numerical Recipes constants). Deterministic per seed — the
    maze generator must not depend on std::random (see Random.hxx, which only
-   compiles under SEAM < CRABS_RANDOM). */
+   compiles under _Seam < CRABS_RANDOM). */
 IUD MazeWorld::NextRand() {
   rng_ = rng_ * 6364136223846793005ULL + 1442695040888963407ULL;
   return rng_;
@@ -35,7 +35,7 @@ MazeWorld::MazeWorld(ISC cols, ISC rows, IUD seed)
 
 MazeWorld::~MazeWorld() {}
 
-BOL MazeWorld::InBounds(ISC x, ISC y) const {
+BOL MazeWorld::InBounds(ISC x, ISC y) {
   return x >= 0 && y >= 0 && x < cols_ && y < rows_;
 }
 
@@ -179,8 +179,8 @@ ISC MazeWorld::Solve(ISC start_x, ISC start_y, ISC goal_x, ISC goal_y) {
   return 0;  // Unreachable.
 }
 
-void MazeWorld::Print(ISC player_x, ISC player_y) const {
-  COut o("\n");
+void MazeWorld::Print(ISC player_x, ISC player_y) {
+  ROut o("\n");
   for (ISC y = 0; y < rows_; ++y) {
     o << '+';
     for (ISC x = 0; x < cols_; ++x) {

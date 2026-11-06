@@ -1,34 +1,33 @@
 // Copyright AStarship <https://astarship.net>.
-
-#pragma once
-#ifndef IGEEK_CARDSCARD_DECL
-#define IGEEK_CARDSCARD_DECL
+  #pragma once
+#ifndef _iGeekCardsWorldCoreSCARD_DECL
+#define _iGeekCardsWorldCoreSCARD_DECL
 #include <_Config.h>
-#if SEAM >= IGEEK_CARD
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
 /* An enumerated list of the different playing card suits (French). */
 enum class CardSuit : ISC {
-  kClub = 1,
-  kDiamond = 2,
-  kHeart = 3,
-  kSpade = 4,
+  CSClub = 1,
+  CSDiamond = 2,
+  CSHeart = 3,
+  CSSpade = 4,
 };
 
 /* An enumerated list of the different suit cultures. */
 enum class SuitCulture : ISC {
-  kFrench = 1,
-  kGerman,
-  kSwissGerman,
-  kPiacentine,
-  kNapoletane,
-  kSpagnole,
-  kBergamasche,
+  SCFrench = 1,
+  SCGerman,
+  SCSwissGerman,
+  SCPiacentine,
+  SCNapoletane,
+  SCSpagnole,
+  SCBergamasche,
 };
 
 enum {
-  SuitCultureCount = static_cast<ISC>(SuitCulture::kBergamasche) + 1,
+  SuitCultureCount = static_cast<ISC>(SuitCulture::SCBergamasche) + 1,
   CardSuitCount = 4,
 };
 
@@ -54,25 +53,25 @@ struct Card {
        SuitCulture culture);
 
   /* Compare pip then suit. @return 0 equal, 1 greater, -1 less. */
-  ISC Compare(const Card& other) const;
+  ISC Compare(Card& other);
 
-  BOL Equals(const Card& other) const;
+  BOL Equals(Card& other);
 
-  ISC PipValue() const { return pip_value_; }
-  ISC FaceValue() const { return face_value_; }
-  ISC PointValue() const { return point_value_; }
+  ISC PipValue() { return pip_value_; }
+  ISC FaceValue() { return face_value_; }
+  ISC PointValue() { return point_value_; }
   void SetPointValue(ISC value) { point_value_ = value; }
-  ISC SuitValue() const { return suit_value_; }
-  CardSuit Suit() const { return suit_; }
-  SuitCulture Culture() const { return culture_; }
+  ISC SuitValue() { return suit_value_; }
+  CardSuit Suit() { return suit_; }
+  SuitCulture Culture() { return culture_; }
   void SetCulture(SuitCulture culture);
-  const CHA* SuitName() const { return suit_name_; }
+  const CHA* SuitName() { return suit_name_; }
 
   /* Sets the suit name string from the culture + suit. */
   void SetSuitName();
 };
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreSCARD_DECL

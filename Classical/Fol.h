@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_FOL_T
-#define IGEEK_CLASSICAL_FOL_T 1
+#ifndef _iGeekClassicalFolH
+#define _iGeekClassicalFolH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -175,7 +175,7 @@ struct FolKb {
   ISC pool_count_;
   BOL Init(ISC clause_cap, ISC var_count);
   BOL Tell(const FolTerm* premises, ISC premise_count, IUD conclusion_atom);
-  BOL Ask(IUD goal_atom, ISC max_depth) const;
+  BOL Ask(IUD goal_atom, ISC max_depth);
   FolKb();
   ~FolKb();
   /* Fig 9.3 NAIVE-ENTAILS: ground every clause over the domain of
@@ -185,7 +185,7 @@ struct FolKb {
   the point of the figure. Atom ids must be < 64; returns false when the
   grounding count exceeds 4096 (documented bound). */
   BOL NaiveEntails(const FolTerm* goal, const IUD* constants,
-                   ISC domain_size) const;
+                   ISC domain_size);
 };
 
 /* Fig 9.8 compiled Append: APPEND(ax, y, az, continuation). The compiled
@@ -197,5 +197,5 @@ BOL FolAppend(const IUD* ax, ISC ax_n, const IUD* y, ISC y_n,
               IUD* az, ISC az_cap, ISC* az_n);
 
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalFolH

@@ -1,12 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_VEHICLE_ROUTE_HXX
-#define CRABS_BIKEWORLD_VEHICLE_ROUTE_HXX
+#ifndef _iGeekBikeWorldVehicleRouteHXX
+#define _iGeekBikeWorldVehicleRouteHXX
 #include "VehicleRoute.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "VehicleMap.hxx"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
-TVehicleGuide TVehicleGuidance(const TVehicleRoute& route, FPD x, FPD y,
+TVehicleGuide TVehicleGuidance(TVehicleRoute& route, FPD x, FPD y,
     FPD heading, FPD lookahead) {
   TVehicleGuide guide;
   if (route.count < 2 || route.count > VehicleRouteMax) return guide;
@@ -47,7 +48,7 @@ TVehicleGuide TVehicleGuidance(const TVehicleRoute& route, FPD x, FPD y,
   guide.curvature = 2 * lateral / TBikeMax(dx * dx + dy * dy, 1.0);
   return guide;
 }
-BOL AVehiclePlanner::Earlier(ISC a, ISC b) const {
+BOL AVehiclePlanner::Earlier(ISC a, ISC b) {
   return priorities_[a] < priorities_[b] ||
       (priorities_[a] == priorities_[b] && a < b);
 }
@@ -80,14 +81,14 @@ ISC AVehiclePlanner::HeapPop() {
   heap_[index] = node; heap_positions_[node] = index;
   return result;
 }
-BOL AVehiclePlanner::Plan(const TileMap& map, FPD sx, FPD sy,
+BOL AVehiclePlanner::Plan(TileMap& map, FPD sx, FPD sy,
     FPD gx, FPD gy, FPD clearance, TVehicleRoute& route) {
   route.count = 0;
   ISC width = map.SizeGridMax().x, height = map.SizeGridMax().y;
   FPD cell = map.GridSize(), contact;
   if (width <= 0 || height <= 0 || IUD(width) * IUD(height) > VehicleCellMax ||
-      !isfinite(cell) || cell <= 0 || !isfinite(clearance) || clearance < 0 ||
-      !isfinite(sx) || !isfinite(sy) || !isfinite(gx) || !isfinite(gy) ||
+      !iGeek::IsFinite(cell) || cell <= 0 || !iGeek::IsFinite(clearance) || clearance < 0 ||
+      !iGeek::IsFinite(sx) || !iGeek::IsFinite(sy) || !iGeek::IsFinite(gx) || !iGeek::IsFinite(gy) ||
       sx < 0 || sy < 0 || gx < 0 || gy < 0 || sx >= width * cell ||
       gx >= width * cell || sy >= height * cell || gy >= height * cell ||
       TVehicleSweep(map, sx, sy, sx, sy, clearance, contact) ||
@@ -129,7 +130,7 @@ BOL AVehiclePlanner::Plan(const TileMap& map, FPD sx, FPD sy,
           (nx + 0.5) * cell, (ny + 0.5) * cell, clearance, contact)) continue;
       costs_[next] = costs_[node] + cell; parents_[next] = node;
       priorities_[next] = costs_[next] +
-          (fabs(nx - goal % width) + fabs(ny - goal / width)) * cell;
+          (Absolute(nx - goal % width) + Absolute(ny - goal / width)) * cell;
       states_[next] = 1; HeapRaise(next);
     }
   }
@@ -141,7 +142,7 @@ BOL AVehiclePlanner::Plan(const TileMap& map, FPD sx, FPD sy,
   route.count = 1;
   ISC cursor = length;
   while (cursor > 0) {
-    const TVehiclePoint& current = route.points[route.count - 1];
+    TVehiclePoint& current = route.points[route.count - 1];
     if (route.count >= VehicleRouteMax) { route.count = 0; return false; }
     if (!TVehicleSweep(map, current.x, current.y, gx, gy, clearance, contact)) {
       route.points[route.count++] = {gx, gy}; return true;

@@ -1,7 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ROLLOUT_COMPARE_HXX
-#define IGEEK_ROLLOUT_COMPARE_HXX 1
 #include "RolloutCompare.h"
 namespace iGeek {
 
@@ -80,4 +78,3 @@ void CompareRollout(const TScript* a, const TScript* b,
 }
 
 }  //< namespace iGeek
-#endif

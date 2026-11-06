@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_PHYSICS_H
-#define CRABS_SPACEWORLD_PHYSICS_H
+#ifndef _iGeekSpaceWorldPhysicsH
+#define _iGeekSpaceWorldPhysicsH
 #include "SpaceConfig.h"
 #include "SpaceMath.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 /** 6-DoF rigid spacecraft, zero-g, SI units, FP64. Pose is world frame
  * (position + quaternion), velocity is world linear + body angular.
@@ -47,12 +47,12 @@ void TSpaceInertia(TSpaceParams& params);
  * Deterministic. Clamps velocities to sanity bounds.
  * @return false for invalid inputs; state untouched.
  */
-BOL TSpaceStep(TSpaceState& state, const TSpaceParams& params,
-              const TSpaceControl& control);
+BOL TSpaceStep(TSpaceState& state, TSpaceParams& params,
+              TSpaceControl& control);
 /** True when all state fields are finite and orientation is near-unit. */
-BOL TSpaceStateValid(const TSpaceState& state);
+BOL TSpaceStateValid(TSpaceState& state);
 /** True when params are positive/finite and inertias are set. */
-BOL TSpaceParamsValid(const TSpaceParams& params);
+BOL TSpaceParamsValid(TSpaceParams& params);
 } //< namespace iGeek
-#endif
-#endif
+#endif  //< _Seam >= _iGeekSpaceWorldCore
+#endif  //< _iGeekSpaceWorldPhysicsH

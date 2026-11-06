@@ -1,6 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonTestH
+#define _iGeekPolygonWorldGeneticPolygonTestH
 #include <_Config.h>
 
 namespace iGeek {
@@ -12,4 +13,4 @@ class GeneticPolygonTest : public JApplet {
 };
 
 } //< namespace iGeek
-}
+#endif  //< _iGeekPolygonWorldGeneticPolygonTestH

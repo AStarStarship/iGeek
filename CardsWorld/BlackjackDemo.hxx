@@ -14,8 +14,11 @@
 #include "BlackjackEnv.hxx"
 #include "../Gym.hxx"
 #include "../PPO.hxx"
-#if SEAM >= CARDSWORLD_CORE
+#if _Seam >= _iGeekCardsWorldBlackjack
 namespace iGeek {
+namespace CardsWorld {
+using namespace ::_;
+
 /** Headless one-decision Blackjack adapter; owns flat batch buffers. */
 class TBlackjackDemoGym : public Gym {
  public:
@@ -56,12 +59,12 @@ class TBlackjackDemoGym : public Gym {
       env.Reset();
     } while (env.Done());
     for (ISC i = 0; i < Features; ++i) obs[row * Features + i] = 0;
-    const CardsWorld::Hand& hand = env.Game().PlayerHand();
+    CardsWorld::Hand hand = env.Game().PlayerHand();
     ISC total = env.Game().HandValue(hand), hard = 0;
     for (ISC i = 0; i < hand.CardCount(); ++i)
       hard += hand.PeekCard(i)->PipValue() == 1 ? 1 :
               hand.PeekCard(i)->PointValue();
-    const CardsWorld::Card* up_card = env.Game().DealerHand().PeekCard(0);
+    CardsWorld::Card* up_card = env.Game().DealerHand().PeekCard(0);
     ISC up = up_card->PipValue() == 1 ? 1 : up_card->PointValue();
     obs[row * Features + total - 4] = 1;
     obs[row * Features + 18 + up - 1] = 1;
@@ -86,9 +89,9 @@ struct TBlackjackDemoScore
 {
   ISC count = 0;
   FPD sum = 0, sum_sq = 0;
-  FPD Mean() const { return sum / FPD(count); }
-  FPD Error() const {
-    return sqrt((sum_sq / FPD(count) - Mean() * Mean()) / FPD(count - 1));
+  FPD Mean() { return sum / FPD(count); }
+  FPD Error() {
+    return SquareRoot((sum_sq / FPD(count) - Mean() * Mean()) / FPD(count - 1));
   }
 };
 /** @param mode 0 greedy policy, 1 uniform random, 2 hit-below-17. */
@@ -121,6 +124,8 @@ inline TBlackjackDemoScore TBlackjackDemoEval(TLinearPolicy& policy,
 inline void TBlackjackDemoTrain(TPPO& trainer, ISC updates) {
   for (ISC i = 0; i < updates; ++i) trainer.TrainStep();
 }
-} //< namespace iGeek
-#endif
-#endif
+  
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldBlackjackDemo
+#endif  //< _iGeekCardsWorldBlackjackDemoHXX

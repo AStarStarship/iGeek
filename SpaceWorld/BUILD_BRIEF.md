@@ -9,9 +9,9 @@
 // togglable ON/OFF, and the user (RL policy / operator) can take over with
 // manual controls at any time.
 //
-// STYLE: follow ArmWorld exactly (same dir, /home/astar/AStarStarship/iGeek/ArmWorld).
+// STYLE: follow ArmWorld exactly (same dir, ArmWorld/).
 // Chimera+ naming, namespace _, no stdlib, functional casts IUD()/ISC()/FPD(),
-// #if SEAM >= CRABS_SPACEWORLD, AStarship copyright header, #pragma once + guard.
+// #if SEAM >= _iGeekSpaceWorldCore, AStarship copyright header, #pragma once + guard.
 // Math via CrabsTK/Math (Blas.h: GemvR, GemmRR) where useful; scalar math is fine.
 //
 // VERIFIED PHYSICS (do not change): SpacePhysics.h/.hxx + SpaceMath.h/.hxx are
@@ -137,7 +137,7 @@
 // once w_world is computed correctly.
 //
 // BUILD (verify before done):
-//   cd /home/astar/AStarStarship/iGeek
+//   cd <iGeek-root>
 //   cmake -S SpaceWorld -B SpaceWorld/build -DCMAKE_BUILD_TYPE=Release
 //   cmake --build SpaceWorld/build -j4
 //   ./SpaceWorld/build/spaceworld_tests   (must pass 100%)

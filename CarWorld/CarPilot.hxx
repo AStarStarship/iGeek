@@ -1,14 +1,15 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_PILOT_HXX
-#define CRABS_CARWORLD_PILOT_HXX
+#ifndef _iGeekCarWorldPilotHXX
+#define _iGeekCarWorldPilotHXX
 #include "CarPilot.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarPhysics.hxx"
 #include "../BikeWorld/VehicleRoute.hxx"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
-inline TCarContacts TCarSampleContacts(const TileMap& map,
-    const TCarState& car, const TCarParams& p) {
+inline TCarContacts TCarSampleContacts(TileMap& map,
+    TCarState& car, TCarParams& p) {
   TCarContacts contacts;
   FPD ch = cos(car.heading), sh = sin(car.heading);
   for (ISC i = 0; i < CarWheelCount; ++i) {
@@ -23,7 +24,7 @@ inline TCarContacts TCarSampleContacts(const TileMap& map,
  * Corner curvature models the follower's lookahead rounding, not exact road
  * curvature. The braking envelope uses distance along the planned route.
  */
-inline FPD TCarCornerSpeed(const TVehicleRoute& route, const TCarState& s,
+inline FPD TCarCornerSpeed(TVehicleRoute& route, TCarState& s,
     FPD lookahead, FPD lateral_budget, FPD decel, FPD speed) {
   FPD nearest = 1e100, progress = 0, length_before = 0;
   for (ISC i = 1; i < route.count; ++i) {
@@ -46,20 +47,20 @@ inline FPD TCarCornerSpeed(const TVehicleRoute& route, const TCarState& s,
     corner_at += hypot(ax, ay);
     FPD ahead = corner_at - progress;
     if (ahead < -lookahead) continue;
-    FPD turn = fabs(atan2(ax * by - ay * bx, ax * bx + ay * by));
+    FPD turn = Absolute(atan2(ax * by - ay * bx, ax * bx + ay * by));
     FPD curvature = 2 * sin(0.5 * turn) / lookahead;
     if (curvature < 1e-4) continue;
     FPD corner_speed2 = lateral_budget / curvature;
-    speed = TBikeMin(speed, sqrt(corner_speed2 +
+    speed = TBikeMin(speed, SquareRoot(corner_speed2 +
         2 * decel * TBikeMax(ahead - lookahead, 0)));
   }
   return speed;
 }
-TCarControl ACarPilot::Control(const TileMap& map, const TVehicleRoute& route,
-    const TCarState& s, const TCarParams& p, FPD cruise_speed) {
+TCarControl ACarPilot::Control(TileMap& map, TVehicleRoute& route,
+    TCarState& s, TCarParams& p, FPD cruise_speed) {
   TCarControl control;
   if (route.count < 2 || route.count > VehicleRouteMax ||
-      !isfinite(cruise_speed) || !TCarParamsValid(p) || !TCarStateValid(s)) {
+      !iGeek::IsFinite(cruise_speed) || !TCarParamsValid(p) || !TCarStateValid(s)) {
     target_speed_ = 0; control.brake = 1; return control;
   }
   FPD lookahead = 4.0 + 0.7 * s.forward;
@@ -67,7 +68,7 @@ TCarControl ACarPilot::Control(const TileMap& map, const TVehicleRoute& route,
   guide_ = TVehicleGuidance(route, s.x, s.y, motion_angle, lookahead);
   TCarContacts contacts = TCarSampleContacts(map, s, p);
   FPD friction = 2, rolling = 0, slope_x = 0, slope_y = 0;
-  for (const TVehicleSurface& surface : contacts.wheels) {
+  for (TVehicleSurface& surface : contacts.wheels) {
     friction = TBikeMin(friction, surface.friction);
     rolling += surface.rolling * 0.25;
     slope_x += surface.slope_x * 0.25; slope_y += surface.slope_y * 0.25;
@@ -82,14 +83,14 @@ TCarControl ACarPilot::Control(const TileMap& map, const TVehicleRoute& route,
   target_speed_ = TCarCornerSpeed(route, s, lookahead, lateral_budget,
                                  stop_decel, TBikeClamp(cruise_speed, 0, 12));
   target_speed_ = TBikeMin(target_speed_,
-      sqrt(lateral_budget / TBikeMax(fabs(guide_.curvature), 0.001)));
+      SquareRoot(lateral_budget / TBikeMax(Absolute(guide_.curvature), 0.001)));
   target_speed_ = TBikeMin(target_speed_,
-      sqrt(2 * stop_decel * TBikeMax(guide_.remaining - 0.7, 0)));
+      SquareRoot(2 * stop_decel * TBikeMax(guide_.remaining - 0.7, 0)));
   FPD contact;
   TVehicleSweep(map, s.x, s.y, s.x + horizon * cos(motion_angle),
       s.y + horizon * sin(motion_angle), p.body_radius, contact);
   target_speed_ = TBikeMin(target_speed_,
-      sqrt(2 * stop_decel * TBikeMax(horizon * contact - 2.0, 0)));
+      SquareRoot(2 * stop_decel * TBikeMax(horizon * contact - 2.0, 0)));
   FPD length = p.front_arm + p.rear_arm;
   FPD understeer = p.mass / length *
       (p.rear_arm / p.front_stiffness - p.front_arm / p.rear_stiffness);

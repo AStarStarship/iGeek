@@ -1,5 +1,4 @@
 // Copyright AStarship <https://astarship.net>.
-#pragma once
 #ifndef CRABS_IGEOK_SEAMS_PACKAGE_HXX
 #define CRABS_IGEOK_SEAMS_PACKAGE_HXX
 // The _Seams tree's package rollup. Each world's _Tests.hxx pulls this for the

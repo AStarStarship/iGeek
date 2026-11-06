@@ -1,11 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
+#ifndef _iGeekTensorHXX
+#define _iGeekTensorHXX
+
 #include "Tensor.h"
-#include <math.h>
+#include "../CrabsTK/Math/Blas.h"
+using namespace _;
 
 namespace iGeek {
-
-/* --- Allocation -------------------------------------------------------- */
 
 TTensor TTensorAlloc(ISC rows, ISC cols) {
   TTensor t;
@@ -13,30 +15,30 @@ TTensor TTensorAlloc(ISC rows, ISC cols) {
   t.cols_ = cols;
   t.dtype_ = 0;
   ISC n = rows * cols;
-  t.data_ = (n > 0) ? new FPC[n]() : NILP;  // () zero-initializes.
+  t.data_ = (n > 0) ? new FPC[n]() : _NilP;  // () zero-initializes.
   return t;
 }
 
 void TTensorFree(TTensor& t) {
-  if (t.data_ == NILP) {
+  if (t.data_ == _NilP) {
     return;  // safe double-free.
   }
   delete[] t.data_;
-  t.data_ = NILP;
+  t.data_ = _NilP;
   t.rows_ = 0;
   t.cols_ = 0;
 }
 
 /* --- Elementwise / linear ops (CPU FPC) -------------------------------- */
 
-void TTensorMatMul(const TTensor& A, const TTensor& B, TTensor& C) {
+void TTensorMatMul(TTensor A, TTensor B, TTensor& C) {
   // A: r x k, B: k x c, C: r x c.
   ISC r = A.rows_, k = A.cols_, c = B.cols_;
   for (ISC i = 0; i < r; ++i) {
     for (ISC j = 0; j < c; ++j) {
       FPC sum = 0.0f;
       for (ISC m = 0; m < k; ++m) {
-        sum += A.AtC(i, m) * B.AtC(m, j);
+        sum += A.At(i, m) * B.At(m, j);
       }
       C.At(i, j) = sum;
     }
@@ -63,7 +65,7 @@ void TTensorSoftmaxInPlace(TTensor& X) {
 }
 
 void TTensorLayerNormInPlace(TTensor& X) {
-  // Row-wise: x = (x - mean) / sqrt(var + eps). eps = 1e-5.
+  // Row-wise: x = (x - mean) / SquareRoot(var + eps). eps = 1e-5.
   const FPC eps = 1e-5f;
   for (ISC i = 0; i < X.rows_; ++i) {
     FPC mean = 0.0f;
@@ -75,7 +77,7 @@ void TTensorLayerNormInPlace(TTensor& X) {
       var += d * d;
     }
     var /= FPC(X.cols_);
-    FPC inv = 1.0f / FPC(sqrt(var + eps));
+    FPC inv = 1.0f / FPC(SquareRoot(var + eps));
     for (ISC j = 0; j < X.cols_; ++j) X.At(i, j) = (X.At(i, j) - mean) * inv;
   }
 }
@@ -89,45 +91,46 @@ void TTensorReluInPlace(TTensor& X) {
   }
 }
 
-void TTensorAdd(const TTensor& A, const TTensor& B, TTensor& C) {
+void TTensorAdd(TTensor A, TTensor B, TTensor& C) {
   for (ISC i = 0; i < A.rows_; ++i) {
     for (ISC j = 0; j < A.cols_; ++j) {
-      C.At(i, j) = A.AtC(i, j) + B.AtC(i, j);
+      C.At(i, j) = A.At(i, j) + B.At(i, j);
     }
   }
 }
 
-void TTensorAddBiasInPlace(TTensor& X, const TTensor& bias) {
+void TTensorAddBiasInPlace(TTensor& X, TTensor bias) {
   // X: [B, K], bias: [K, 1]. X[i, j] += bias[j, 0].
   ISC B = X.rows_, K = X.cols_;
   for (ISC i = 0; i < B; ++i) {
     for (ISC j = 0; j < K; ++j) {
-      X.At(i, j) += bias.AtC(j, 0);
+      X.At(i, j) += bias.At(j, 0);
     }
   }
 }
 
-void TTensorScale(const TTensor& A, FPC s, TTensor& C) {
+void TTensorScale(TTensor A, FPC s, TTensor& C) {
   for (ISC i = 0; i < A.rows_; ++i) {
     for (ISC j = 0; j < A.cols_; ++j) {
-      C.At(i, j) = A.AtC(i, j) * s;
+      C.At(i, j) = A.At(i, j) * s;
     }
   }
 }
 
-void TTensorRowLogSumExp(const TTensor& A, TTensor& out) {
+void TTensorRowLogSumExp(TTensor A, TTensor& out) {
   // out[i, 0] = log(sum_j exp(A[i, j])), stable (subtract row max).
   for (ISC i = 0; i < A.rows_; ++i) {
-    FPC maxv = A.AtC(i, 0);
+    FPC maxv = A.At(i, 0);
     for (ISC j = 1; j < A.cols_; ++j) {
-      if (A.AtC(i, j) > maxv) maxv = A.AtC(i, j);
+      if (A.At(i, j) > maxv) maxv = A.At(i, j);
     }
     FPC sum = 0.0f;
     for (ISC j = 0; j < A.cols_; ++j) {
-      sum += FPC(exp(A.AtC(i, j) - maxv));
+      sum += FPC(exp(A.At(i, j) - maxv));
     }
     out.At(i, 0) = maxv + FPC(log(sum));
   }
 }
 
 } //< namespace iGeek
+#endif  //< _iGeekTensorHXX

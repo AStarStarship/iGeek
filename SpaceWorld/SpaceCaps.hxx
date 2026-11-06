@@ -1,18 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_CAPS_HXX
-#define CRABS_SPACEWORLD_CAPS_HXX
+#ifndef _iGeekSpaceWorldCapsHXX
+#define _iGeekSpaceWorldCapsHXX
 #include "SpaceCaps.h"
-#include <math.h>
-#if SEAM >= CRABS_SPACEWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
-FPD TSpaceCapsInertiaAxis(FPD mass, const TSpaceHalf& half, ISC a) {
+FPD TSpaceCapsInertiaAxis(FPD mass, TSpaceHalf& half, ISC a) {
   FPD hx2 = half.x * half.x, hy2 = half.y * half.y, hz2 = half.z * half.z;
   if (a == 0) return mass / 12 * (hy2 + hz2);
   if (a == 1) return mass / 12 * (hx2 + hz2);
   return mass / 12 * (hx2 + hy2);
 }
-FPD TSpaceCapsEffInertia(const TSpaceCaps& caps, const TSpaceVec& dir) {
+FPD TSpaceCapsEffInertia(TSpaceCaps& caps, TSpaceVec& dir) {
   TSpaceVec d = TSpaceVecNormalize(dir);
   FPD nx = d.x, ny = d.y, nz = d.z;
   return caps.inertia.x * nx * nx + caps.inertia.y * ny * ny +
@@ -39,7 +39,7 @@ static FPD TSpaceCapsGroupForce(const FPD thrust_max[SpaceRcsTotal],
     s += thrust_max[idx[i]] > 0 ? thrust_max[idx[i]] : 1;
   return s;
 }
-void TSpaceCapsCompute(TSpaceCaps& caps, FPD mass, const TSpaceHalf& half,
+void TSpaceCapsCompute(TSpaceCaps& caps, FPD mass, TSpaceHalf& half,
                        const TSpaceThruster thr[SpaceRcsTotal],
                        const FPD thrust_max[SpaceRcsTotal]) {
   TSpaceGroups g;
@@ -71,14 +71,14 @@ void TSpaceCapsCompute(TSpaceCaps& caps, FPD mass, const TSpaceHalf& half,
   caps.ang_accel.y = caps.ang_torque.y / (caps.inertia.y > 1e-6 ? caps.inertia.y : 1e-6);
   caps.ang_accel.z = caps.ang_torque.z / (caps.inertia.z > 1e-6 ? caps.inertia.z : 1e-6);
 }
-void TSpaceCapsAngCap(const TSpaceCaps& caps, FPD max_angular_accel,
+void TSpaceCapsAngCap(TSpaceCaps& caps, FPD max_angular_accel,
                       FPD max_angular_velocity, FPD& alpha_max,
                       FPD& omega_max) {
   FPD a_min = TSpaceMin(TSpaceMin(caps.ang_accel.x, caps.ang_accel.y),
                         caps.ang_accel.z);
   FPD alpha_dyn = TSpaceMax(1e-4, a_min) * 0.6;
   alpha_max = TSpaceMin(max_angular_accel, alpha_dyn);
-  FPD omega_from_alpha = sqrt(2 * alpha_max * 0.5);
+  FPD omega_from_alpha = SquareRoot(2 * alpha_max * 0.5);
   omega_max = TSpaceMin(max_angular_velocity,
                         TSpaceMax(0.2, omega_from_alpha));
 }

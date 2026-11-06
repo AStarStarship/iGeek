@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldPathTrailH
+#define _iGeekPolygonWorldPathTrailH
 namespace iGeek {
 
 class PathTrail
@@ -46,3 +48,5 @@ class PathTrail
 };
 
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldPathTrailH

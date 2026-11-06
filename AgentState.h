@@ -1,10 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_AGENTSTATE_DECL
-#define IGEEK_AGENTSTATE_DECL 1
+#ifndef _iGeekAgentStateH
+#define _iGeekAgentStateH 1
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
+using ::_::Autoject;
+using ::_::ObjectFactoryHeap;
+using ::_::ObjectFactoryStack;
 
 /* AgentState — the internal-state memory model for iGeek agents.
  *
@@ -39,14 +42,14 @@ class AgentState {
 
   /* Copy is disabled: the buffer is heap-owned by the Autoject. Use
   Snapshot() to copy a word array out. */
-  AgentState(const AgentState&) = delete;
-  AgentState& operator=(const AgentState&) = delete;
+  AgentState(AgentState&) = delete;
+  AgentState& operator=(AgentState&) = delete;
 
   /* Number of IUC state slots. Immutable after construction. */
-  ISC SlotCount() const { return slot_count_; }
+  ISC SlotCount() { return slot_count_; }
 
   /* Read/write slot i (0..slot_count_-1). @pre 0 <= i < SlotCount(). */
-  IUC Get(ISC i) const;
+  IUC Get(ISC i);
   void Set(ISC i, IUC value);
 
   /* Zero all slots (used to reset an agent's internal state). */
@@ -55,20 +58,20 @@ class AgentState {
   /* Snapshot: copy the slot_count_ IUC slots into out (must have at least
   slot_count_ elements). This is the "snapshot = copy the buffer bytes"
   mechanism from the plan — the caller stores these words in a Crabs record.
-  @param out      Destination, at least SlotCount() IUC words. May be NILP
+  @param out      Destination, at least SlotCount() IUC words. May be _NilP
                   (then only the byte count is computed).
   @return         Number of IUC words copied. */
-  ISC Snapshot(IUC* out) const;
+  ISC Snapshot(IUC* out);
 
   /* Restore slot_count_ slots from in (at least slot_count_ elements). */
   void Restore(const IUC* in);
 
   /* Byte size of the underlying word-aligned buffer (for records/debug). */
-  IUD ByteSize() const;
+  IUD ByteSize();
 
   /* Raw word pointer (for direct probing). Do not retain; the Autoject owns
   it and it is invalidated by destruction. */
-  const IUC* Words() const { return words_; }
+  const IUC* Words() { return words_; }
 
  private:
 

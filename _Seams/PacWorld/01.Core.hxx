@@ -1,23 +1,17 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// AUTO-GENERATED from __Seams.yaml (iGeek PacWorld).
-// PacWorld core seam unit: the unit tests for the deterministic parts of the
-// PacWorld engine. Gated on IGEEK_PACWORLD_CORE (the first / default seam).
-#if SEAM >= IGEEK_PACWORLD_CORE
-#if SEAM == IGEEK_PACWORLD_CORE
+#if _Seam >= _iGeekPackWorldCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
-#endif
 #endif
 namespace PacWorldTest {
 using namespace ::_;
 using namespace iGeek;
 
-static void Say(const char* s) {
-  unsigned long n = 0; while (s[n]) ++n;
-  write(1, s, n);
+static void Say(const CHA* s) {
+  RefOut() << s;
 }
+
 // Print a float as "SSSS.d" (1 decimal) — clean, no UB, no stdlib.
 static void SayFPC(FPC v) {
   ISC neg = v < 0.0f ? 1 : 0;
@@ -37,7 +31,7 @@ static void SayFPC(FPC v) {
 template <class POL>
 static FPC GreedyReward(PacWorldGym& gym, POL& pol) {
   gym.ResetBatch();
-  ISC B = gym.EnvCount();
+  ISC B = gym.EnvironmentCount();
   TTensor obs = TTensorAlloc(B, PacWorldEnv::ObsLength);
   for (ISC i = 0; i < B; ++i)
     for (ISC j = 0; j < PacWorldEnv::ObsLength; ++j)
@@ -47,9 +41,9 @@ static FPC GreedyReward(PacWorldGym& gym, POL& pol) {
   pol.Forward(obs, logits, values);
   FPC total = 0.0f;
   for (ISC i = 0; i < B; ++i) {
-    ISC best = 0; FPC bv = logits.AtC(i, 0);
+    ISC best = 0; FPC bv = logits.At(i, 0);
     for (ISC a = 1; a < PacWorldEnv::ActionCount; ++a)
-      if (logits.AtC(i, a) > bv) { bv = logits.AtC(i, a); best = a; }
+      if (logits.At(i, a) > bv) { bv = logits.At(i, a); best = a; }
     gym.Actions()[i] = best;
   }
   gym.StepBatch();
@@ -58,9 +52,9 @@ static FPC GreedyReward(PacWorldGym& gym, POL& pol) {
   return total / (FPC)B;
 }
 inline const CHA* Core(const CHA* args) {
-#if SEAM >= IGEEK_PACWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing PacWorld (maze + ghosts + pellets)..."));
+#if _Seam >= _iGeekPackWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing PacWorld (maze + ghosts + pellets)..."));
 
   int fails = 0;
 
@@ -103,7 +97,7 @@ inline const CHA* Core(const CHA* args) {
   Say(fails == 0 ? "VERIFY_TRAIN_PASS\n" : "VERIFY_TRAIN_FAILED\n");
 
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace PacWorldTest

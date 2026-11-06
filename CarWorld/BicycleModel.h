@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_BICYCLE_H
-#define CRABS_CARWORLD_BICYCLE_H
+#ifndef _iGeekCarWorldBicycleH
+#define _iGeekCarWorldBicycleH
 #include "CarPhysics.h"
 #include "../BikeWorld/BikePhysics.hxx"
-#include <math.h>
-#if SEAM >= CRABS_CARWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 /** Kinematic bicycle model (Course 1 w4). 4-dim state for MPC rollout.
  * dx/dt = V cos(psi), dy/dt = V sin(psi), dpsi/dt = V/L tan(delta).
@@ -17,21 +17,21 @@ struct TBicycleState
 };
 /** One bicycle step. @pre dt in (0, 0.1]; speed >= 0; |steer| <= 1.2. */
 inline BOL TBicycleStep(TBicycleState& b, FPD steer, FPD accel, FPD dt, FPD wheelbase) {
-  if (!isfinite(b.x) || !isfinite(b.y) || !isfinite(b.heading) ||
-      !isfinite(b.speed) || b.speed < 0 || !isfinite(steer) ||
-      !isfinite(accel) || !isfinite(dt) || dt <= 0 || dt > 0.1 ||
-      wheelbase <= 0 || !isfinite(wheelbase)) return false;
+  if (!iGeek::IsFinite(b.x) || !iGeek::IsFinite(b.y) || !iGeek::IsFinite(b.heading) ||
+      !iGeek::IsFinite(b.speed) || b.speed < 0 || !iGeek::IsFinite(steer) ||
+      !iGeek::IsFinite(accel) || !iGeek::IsFinite(dt) || dt <= 0 || dt > 0.1 ||
+      wheelbase <= 0 || !iGeek::IsFinite(wheelbase)) return false;
   b.speed = TBikeMax(0, b.speed + accel * dt);
   FPD ch = cos(b.heading), sh = sin(b.heading);
   FPD old_x = b.x, old_y = b.y;
   b.x += b.speed * ch * dt;
   b.y += b.speed * sh * dt;
   b.heading = TBikeAngle(b.heading + b.speed / wheelbase * tan(TBikeClamp(steer, -1.2, 1.2)) * dt);
-  if (!isfinite(b.x) || !isfinite(b.y) || !isfinite(b.heading)) return false;
+  if (!iGeek::IsFinite(b.x) || !iGeek::IsFinite(b.y) || !iGeek::IsFinite(b.heading)) return false;
   return true;
 }
 /** Roll out N bicycle steps. @pre N in [1, 64]; buffers sized [N+1]. */
-inline BOL TBicycleRollout(const TBicycleState& start, const FPD* steer,
+inline BOL TBicycleRollout(TBicycleState& start, const FPD* steer,
     const FPD* accel, ISC n, FPD wheelbase, FPD* xs, FPD* ys,
     FPD* headings, FPD* speeds) {
   if (n < 1 || n > 64 || wheelbase <= 0) return false;

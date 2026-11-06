@@ -1,17 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_PILOT_HXX
-#define CRABS_BIKEWORLD_PILOT_HXX
+#ifndef _iGeekBikeWorldPilotHXX
+#define _iGeekBikeWorldPilotHXX
 #include "BikePilot.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "VehicleRoute.hxx"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
-TBikeControl ABikePilot::Control(const TileMap& map,
-    const TVehicleRoute& route, const TBikeState& s, const TBikeParams& p,
+TBikeControl ABikePilot::Control(TileMap& map,
+    TVehicleRoute& route, TBikeState& s, TBikeParams& p,
     FPD cruise_speed, FPD dt) {
   TBikeControl control; control.foot_down = true;
   if (route.count < 2 || route.count > VehicleRouteMax ||
-      !isfinite(cruise_speed) || !isfinite(dt) || dt <= 0) {
+      !iGeek::IsFinite(cruise_speed) || !iGeek::IsFinite(dt) || dt <= 0) {
     control.brake = 1; return control;
   }
   FPD lookahead = 3.5 + 0.8 * s.forward;
@@ -24,12 +25,12 @@ TBikeControl ABikePilot::Control(const TileMap& map,
   FPD friction = TBikeMin(sf.friction, sr.friction);
   FPD lateral_budget = TBikeMin(2.0, 0.4 * friction * BikeGravity);
   target_speed_ = TBikeClamp(cruise_speed, 0, 5.0);
-  target_speed_ = TBikeMin(target_speed_, sqrt(lateral_budget /
-      TBikeMax(fabs(guide_.curvature), 0.001)));
+  target_speed_ = TBikeMin(target_speed_, SquareRoot(lateral_budget /
+      TBikeMax(Absolute(guide_.curvature), 0.001)));
   // Taper speed for a supported halt 0.5 m before the final waypoint.
   FPD stop_decel = TBikeMin(1.2, 0.4 * friction * BikeGravity);
   target_speed_ = TBikeMin(target_speed_,
-      sqrt(2 * stop_decel * TBikeMax(guide_.remaining - 0.5, 0)));
+      SquareRoot(2 * stop_decel * TBikeMax(guide_.remaining - 0.5, 0)));
   // Emergency braking uses an inflated swept envelope, not a point ray.
   FPD horizon = 14, contact;
   FPD motion_angle = s.heading + atan2(s.lateral, TBikeMax(s.forward, 0.5));
@@ -37,7 +38,7 @@ TBikeControl ABikePilot::Control(const TileMap& map,
       s.y + horizon * sin(motion_angle), 0.8, contact);
   FPD gap = horizon * contact;
   target_speed_ = TBikeMin(target_speed_,
-      sqrt(2 * stop_decel * TBikeMax(gap - 1.5, 0)));
+      SquareRoot(2 * stop_decel * TBikeMax(gap - 1.5, 0)));
   FPD requested_ay = TBikeClamp(s.forward * s.forward * guide_.curvature,
                               -lateral_budget, lateral_budget);
   FPD desired_roll = atan2(requested_ay, BikeGravity);

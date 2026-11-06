@@ -43,7 +43,7 @@ struct Transition {
 };
 
 // Compute Euclidean length using TSpaceVecLength (project-provided)
-FPD vec_length(const TSpaceVec& v) {
+FPD vec_length(TSpaceVec& v) {
   return TSpaceVecLength(v);
 }
 
@@ -72,19 +72,19 @@ ISC action_from_obs(const FPD obs[ObsLength]) {
 }
 
 // PPO update (single step simplified)
-void ppo_update(Transition* batch, ISC batch_size, const PPOConfig& cfg) {
+void ppo_update(Transition* batch, ISC batch_size, PPOConfig& cfg) {
   // In a real implementation, this would compute gradients and update weights
   // For this smoke test, just compute advantages and print stats
-  D_COUT("PPO update: batch_size=" << batch_size << ", lr=" << cfg.learning_rate << ", clip=" << cfg.clip_epsilon << "\n");
+  _DROut("PPO update: batch_size=" << batch_size << ", lr=" << cfg.learning_rate << ", clip=" << cfg.clip_epsilon << "\n");
 }
 
 // Main training loop
-int main() {
+ISC main() {
   init_policy();
 
   PPOConfig cfg;
-  D_COUT("=== SpaceWorld PPO Training Smoke Test ===\n");
-  D_COUT("Episodes: " << cfg.num_episodes << ", Steps/episode: " << cfg.steps_per_episode << "\n");
+  _DROut("=== SpaceWorld PPO Training Smoke Test ===\n");
+  _DROut("Episodes: " << cfg.num_episodes << ", Steps/episode: " << cfg.steps_per_episode << "\n");
 
   for (ISC ep = 0; ep < cfg.num_episodes; ++ep) {
     // Reset environment
@@ -191,12 +191,12 @@ int main() {
       t.done = (s == cfg.steps_per_episode - 1);
 
       // (In real PPO: store transition, compute advantage, update policy)
-      if (s % 100 == 0) D_COUT("Episode " << ep << ", Step " << s << ": dist=%.2f, reward=%.2f, action=" << dist << "\n");
+      if (s % 100 == 0) _DROut("Episode " << ep << ", Step " << s << ": dist=%.2f, reward=%.2f, action=" << dist << "\n");
     }
 
-    D_COUT("Episode " << ep << " total reward: %.2f\n");
+    _DROut("Episode " << ep << " total reward: %.2f\n");
   }
 
-  D_COUT("=== PPO Training Complete ===\n");
+  _DROut("=== PPO Training Complete ===\n");
   return 0;
 }

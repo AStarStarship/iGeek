@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_BAYES_IMPL
-#define IGEEK_CLASSICAL_BAYES_IMPL 1
+#ifndef _iGeekClassicalBayesHXX
+#define _iGeekClassicalBayesHXX
 #include "Bayes.h"
 #include "../ASCIICrabs/Autoject.hxx"
 namespace iGeek {
@@ -10,7 +10,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 
 static inline IUW* BayesFree(IUW* origin) {
@@ -19,7 +19,7 @@ static inline IUW* BayesFree(IUW* origin) {
 
 static inline void BayesWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -45,21 +45,21 @@ struct BaysVarRec {
 };
 
 static char* BayesRecEndNC(const BaysNet* bn) {
-  return TPtr<char>(bn->mem_.origin) +
+  return TRef<char>(bn->mem_.origin) +
          IUD(bn->var_count_) * IUD(sizeof(BaysVarRec));
 }
 
 static ISC* BayesParentsNC(const BaysNet* bn) {
-  return TPtr<ISC>(BayesRecEndNC(bn));
+  return TRef<ISC>(BayesRecEndNC(bn));
 }
 
 static FPC* BayesPptsNC(const BaysNet* bn) {
-  return TPtr<FPC>(
+  return TRef<FPC>(
       BayesRecEndNC(bn) + IUD(bn->parent_cap_) * IUD(sizeof(ISC)));
 }
 
 BaysNet::BaysNet()
-    : mem_(NILP, &ObjectFactoryHeap), var_count_(0), parent_cap_(0),
+    : mem_(_NilP, &ObjectFactoryHeap), var_count_(0), parent_cap_(0),
       ppt_cap_(0), parent_count_(0), ppt_count_(0) {}
 
 BaysNet::~BaysNet() {
@@ -72,7 +72,7 @@ BOL BaysNet::Init(ISC var_count, ISC parent_cap, ISC ppt_cap) {
   }
   IUD bytes = IUD(var_count) * IUD(sizeof(BaysVarRec)) +
               IUD(parent_cap) * IUD(sizeof(ISC)) + IUD(ppt_cap) * IUD(sizeof(FPC));
-  mem_.origin = ObjectFactoryHeap(NILP, bytes);
+  mem_.origin = ObjectFactoryHeap(_NilP, bytes);
   if (IsError(mem_.origin)) {
     return false;
   }
@@ -87,8 +87,8 @@ BOL BaysNet::Init(ISC var_count, ISC parent_cap, ISC ppt_cap) {
 
 BOL BaysNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
                        const FPC* ppt) {
-  if (var < 0 || var >= var_count_ || ppt == NILP || parent_count < 0 ||
-      parent_count > 8 || (parents == NILP && parent_count > 0)) {
+  if (var < 0 || var >= var_count_ || ppt == _NilP || parent_count < 0 ||
+      parent_count > 8 || (parents == _NilP && parent_count > 0)) {
     return false;
   }
   IUD rows = IUD(1) << IUD(parent_count);
@@ -96,7 +96,7 @@ BOL BaysNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
       ppt_count_ + rows > IUD(ppt_cap_)) {
     return false;
   }
-  BaysVarRec* recs = TPtr<BaysVarRec>(mem_.origin);
+  BaysVarRec* recs = TRef<BaysVarRec>(mem_.origin);
   ISC* parents_pool = BayesParentsNC(this);
   FPC* ppt_pool = BayesPptsNC(this);
   recs[var].parent_start = parent_count_;
@@ -116,8 +116,8 @@ BOL BaysNet::TellVar(ISC var, const ISC* parents, ISC parent_count,
   return true;
 }
 
-FPC BaysNet::P(ISC var, IUC value, const IUC* parent_values) const {
-  BaysVarRec* recs = TPtr<BaysVarRec>(mem_.origin);
+FPC BaysNet::P(ISC var, IUC value, const IUC* parent_values) {
+  BaysVarRec* recs = TRef<BaysVarRec>(mem_.origin);
   const BaysVarRec* r = &recs[var];
   FPC* ppt = BayesPptsNC(this);
   IUD row = 0;
@@ -131,7 +131,7 @@ FPC BaysNet::P(ISC var, IUC value, const IUC* parent_values) const {
 // --- evidence helpers ------------------------------------------------------
 
 /* ev_map[var] = 0 unseen, 1 evidence value 0, 2 evidence value 1. */
-static BOL BayesEvMapNC(const BaysNet& bn, const BaysEv* ev, ISC ev_n,
+static BOL BayesEvMapNC(BaysNet& bn, const BaysEv* ev, ISC ev_n,
                         IUC* ev_map, ISC ev_map_cap) {
   for (ISC i = 0; i < ev_map_cap; ++i) {
     ev_map[i] = 0;
@@ -183,11 +183,11 @@ static IUD BayesExpandNC(const ISC* bits, ISC n, IUD r) {
 
 // --- Fig 14.9 ENUMERATION-ASK ----------------------------------------------
 
-static FPC BayesEnumerateAllNC(const BaysNet& bn, ISC idx, IUC* ev_map) {
+static FPC BayesEnumerateAllNC(BaysNet& bn, ISC idx, IUC* ev_map) {
   if (idx == bn.var_count_) {
     return FPC(1.0f);
   }
-  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TRef<BaysVarRec>(bn.mem_.origin);
   const BaysVarRec* r = &recs[idx];
   const ISC* parents = BayesParentsNC(&bn) + r->parent_start;
   IUC pv[8];
@@ -212,7 +212,7 @@ static FPC BayesEnumerateAllNC(const BaysNet& bn, ISC idx, IUC* ev_map) {
   return acc;
 }
 
-FPC BaysEnumerate(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysEnumerate(BaysNet& bn, ISC query_var, const BaysEv* ev,
                     ISC ev_n) {
   if (query_var < 0 || query_var >= bn.var_count_) {
     return FPC(0.0f);
@@ -234,7 +234,7 @@ FPC BaysEnumerate(const BaysNet& bn, ISC query_var, const BaysEv* ev,
 // --- Fig 14.11 ELIMINATION-ASK ---------------------------------------------
 
 BayesInfer::BayesInfer()
-    : scope_mem_(NILP, &ObjectFactoryHeap), val_mem_(NILP, &ObjectFactoryHeap),
+    : scope_mem_(_NilP, &ObjectFactoryHeap), val_mem_(_NilP, &ObjectFactoryHeap),
       cells_used_(0), cells_cap_(0), var_count_(0) {}
 
 BayesInfer::~BayesInfer() {
@@ -247,7 +247,7 @@ BOL BayesInfer::Init(ISC var_count, IUD cells_cap) {
     return false;
   }
   var_count_ = var_count;
-  val_mem_.origin = ObjectFactoryHeap(NILP, cells_cap * IUD(sizeof(FPC)));
+  val_mem_.origin = ObjectFactoryHeap(_NilP, cells_cap * IUD(sizeof(FPC)));
   if (IsError(val_mem_.origin)) {
     val_mem_.origin = BayesFree(val_mem_.origin);
     return false;
@@ -258,7 +258,7 @@ BOL BayesInfer::Init(ISC var_count, IUD cells_cap) {
   return true;
 }
 
-FPC BayesInfer::Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BayesInfer::Ask(BaysNet& bn, ISC query_var, const BaysEv* ev,
                      ISC ev_n) {
   if (query_var < 0 || query_var >= var_count_) {
     return FPC(0.0f);
@@ -267,14 +267,14 @@ FPC BayesInfer::Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev,
   if (!BayesEvMapNC(bn, ev, ev_n, ev_map, 16)) {
     return FPC(0.0f);
   }
-  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TRef<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   const FPC* ppt_pool = BayesPptsNC(&bn);
 
   // Running factor: unit. The pool cursor only ever moves forward: every
   // factor (m, j, so) gets a fresh non-aliasing block, and live factors
   // stay intact until the destructor (documented).
-  FPC* pool = TPtr<FPC>(val_mem_.origin);
+  FPC* pool = TRef<FPC>(val_mem_.origin);
   IUD off = 1;
   IUD run_scope = 0;
   IUD run_cells = 1;
@@ -383,8 +383,8 @@ FPC BayesInfer::Ask(const BaysNet& bn, ISC query_var, const BaysEv* ev,
 
 // --- Fig 14.13 PRIOR-SAMPLE ------------------------------------------------
 
-static BOL BayesSampleNC(const BaysNet& bn, IUD* rnd, IUC* x) {
-  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+static BOL BayesSampleNC(BaysNet& bn, IUD* rnd, IUC* x) {
+  BaysVarRec* recs = TRef<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   for (ISC i = 0; i < bn.var_count_; ++i) {
     const BaysVarRec* r = &recs[i];
@@ -398,8 +398,8 @@ static BOL BayesSampleNC(const BaysNet& bn, IUD* rnd, IUC* x) {
   return true;
 }
 
-FPC BaysSample(const BaysNet& bn, IUD seed, IUC* out_event) {
-  if (out_event == NILP || seed == 0) {
+FPC BaysSample(BaysNet& bn, IUD seed, IUC* out_event) {
+  if (out_event == _NilP || seed == 0) {
     return FPC(0.0f);
   }
   IUD rnd = seed;
@@ -418,7 +418,7 @@ static BOL BayesConsistentNC(const IUC* x, const BaysEv* ev, ISC ev_n) {
 
 // --- Fig 14.14 REJECTION-SAMPLING ------------------------------------------
 
-FPC BaysReject(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysReject(BaysNet& bn, ISC query_var, const BaysEv* ev,
                  ISC ev_n, ISC n_samples, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_samples < 1 ||
       seed == 0) {
@@ -443,7 +443,7 @@ FPC BaysReject(const BaysNet& bn, ISC query_var, const BaysEv* ev,
 
 // --- Fig 14.15 LIKELIHOOD-WEIGHTING ----------------------------------------
 
-FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysLw(BaysNet& bn, ISC query_var, const BaysEv* ev,
              ISC ev_n, ISC n_samples, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_samples < 1 ||
       seed == 0) {
@@ -456,7 +456,7 @@ FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
   FPC w0 = FPC(0.0f), w1 = FPC(0.0f);
   IUC x[16];
   IUD rnd = seed;
-  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TRef<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   for (ISC j = 0; j < n_samples; ++j) {
     FPC w = FPC(1.0f);
@@ -500,9 +500,9 @@ FPC BaysLw(const BaysNet& bn, ISC query_var, const BaysEv* ev,
  * the product of the children's likelihoods at their current values.
  * Children are found by scanning the parent lists (fine for the documented
  * small-net scope). */
-static FPC BayesGibbsCondNC(const BaysNet& bn, ISC z, IUC value,
+static FPC BayesGibbsCondNC(BaysNet& bn, ISC z, IUC value,
                             const IUC* x) {
-  BaysVarRec* recs = TPtr<BaysVarRec>(bn.mem_.origin);
+  BaysVarRec* recs = TRef<BaysVarRec>(bn.mem_.origin);
   const ISC* parents_pool = BayesParentsNC(&bn);
   const FPC* ppt_pool = BayesPptsNC(&bn);
   const BaysVarRec* rz = &recs[z];
@@ -539,7 +539,7 @@ static FPC BayesGibbsCondNC(const BaysNet& bn, ISC z, IUC value,
   return acc;
 }
 
-FPC BaysGibbs(const BaysNet& bn, ISC query_var, const BaysEv* ev,
+FPC BaysGibbs(BaysNet& bn, ISC query_var, const BaysEv* ev,
                 ISC ev_n, ISC n_cycles, IUD seed) {
   if (query_var < 0 || query_var >= bn.var_count_ || n_cycles < 1 ||
       seed == 0) {
@@ -583,5 +583,5 @@ FPC BaysGibbs(const BaysNet& bn, ISC query_var, const BaysEv* ev,
   return total ? FPC(d1) / FPC(total) : FPC(0.0f);
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalBayesHXX

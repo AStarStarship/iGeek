@@ -1,25 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// AUTO-GENERATED from __Seams.yaml (iGeek SpaceWorld).
-// SpaceWorld release seam unit: the final sown test pass. Gated on
-// IGEEK_SPACEWORLD_RELEASE (SEAM_N). Runs once all lower seams pass.
-#if SEAM >= IGEEK_SPACEWORLD_RELEASE
-#if SEAM == IGEEK_SPACEWORLD_RELEASE
+#if _Seam >= _iGeekSpaceWorldRelease
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-
-using namespace ::_;
 namespace SpaceWorldTest {
+using namespace ::_;
+using namespace iGeek;
 
 inline const CHA* Release(const CHA* args) {
-#if SEAM >= IGEEK_SPACEWORLD_RELEASE
-  A_TEST_BEGIN;
+#if _Seam >= _iGeekSpaceWorldRelease
+  _ATestBegin;
   // SpaceWorld release: runs the full sown tree. No checks of its own.
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace SpaceWorldTest

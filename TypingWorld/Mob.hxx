@@ -377,4 +377,3 @@ class Parrot {
 };
 
 }  //< namespace TypingWorld
-#endif

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ANIMATOR_HXX
-#define IGEEK_ANIMATOR_HXX
+#ifndef _iGeekAnimatorHXX
+#define _iGeekAnimatorHXX
 #include "Animator.h"
 
 using namespace PacWorld;
@@ -26,7 +26,7 @@ void Animator::Play(FPC duration, BOL loop) {
   loop_ = loop;
 }
 
-BOL Animator::IsPlaying() const { return is_playing_; }
+BOL Animator::IsPlaying() { return is_playing_; }
 
 void Animator::Update(FPC delta) {
   if (!is_playing_ || frame_count_ == 0) return;
@@ -44,4 +44,4 @@ void Animator::Update(FPC delta) {
   }
 }
 
-#endif  // IGEEK_ANIMATOR_HXX
+#endif  //< _iGeekAnimatorHXX

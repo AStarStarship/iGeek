@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #ifndef TILEWORLD_PLAYERGUI
 #define TILEWORLD_PLAYERGUI
 #include <_Config.h>
@@ -36,7 +36,7 @@ class PlayerGUI {
   void UpdateLevelBar();
   void UpdateExpBar();
   void UpdateHPBar();
-  void Update(const FPC& dt);
+  void Update(FPC& dt);
 
   void RenderLevelBar(sf::RenderTarget& target);
   void RenderExpBar(sf::RenderTarget& target);

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_STOCHASTIC_IMPL
-#define IGEEK_CLASSICAL_STOCHASTIC_IMPL
+#ifndef _iGeekClassicalStochasticHXX
+#define _iGeekClassicalStochasticHXX
 #include "Stochastic.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 //
 // No libm either: the SA acceptance ratio uses a local exp (StoExpNC) via
@@ -23,7 +23,7 @@ static inline IUW* StoFree(IUW* origin) {
 
 static inline void StoWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -86,17 +86,17 @@ static IUD StoStateHashNC(const IUC* state, ISC state_words) {
 
 BOL SearchSA(const Problem* problem, ISC iters, FPC T0, IUD seed,
              FPC (*Value)(const IUC* state, ISC state_words), IUC* out_state) {
-  if (problem == NILP || problem->Actions == NILP || problem->Result == NILP ||
-      Value == NILP || iters < 1 || problem->state_words < 1 ||
+  if (problem == _NilP || problem->Actions == _NilP || problem->Result == _NilP ||
+      Value == _NilP || iters < 1 || problem->state_words < 1 ||
       problem->state_words > kStoStateWords) {
     return false;
   }
   ISC w = problem->state_words;
-  IUW* mem = ObjectFactoryHeap(NILP, 2 * IUD(w) * IUD(sizeof(IUC)));
+  IUW* mem = ObjectFactoryHeap(_NilP, 2 * IUD(w) * IUD(sizeof(IUC)));
   if (IsError(mem)) {
     return false;
   }
-  IUC* cur = TPtr<IUC>(mem);
+  IUC* cur = TRef<IUC>(mem);
   IUC* nxt = cur + w;
   for (ISC i = 0; i < w; ++i) {
     cur[i] = problem->initial[i];
@@ -142,22 +142,22 @@ BOL SearchGA(const Problem* problem, const IUC* population, ISC pop_size,
              ISC generations, FPC p_crossover, FPC p_mutate, IUD seed,
              FPC (*Fitness)(const IUC* state, ISC state_words),
              IUC* out_state) {
-  if (problem == NILP || population == NILP || Fitness == NILP ||
+  if (problem == _NilP || population == _NilP || Fitness == _NilP ||
       pop_size < 2 || generations < 1 || problem->state_words < 1 ||
       problem->state_words > kStoStateWords) {
     return false;
   }
   ISC w = problem->state_words;
   IUD bytes = IUD(pop_size) * IUD(w) * IUD(sizeof(IUC));
-  IUW* mem_a = ObjectFactoryHeap(NILP, bytes);
-  IUW* mem_b = ObjectFactoryHeap(NILP, bytes);
+  IUW* mem_a = ObjectFactoryHeap(_NilP, bytes);
+  IUW* mem_b = ObjectFactoryHeap(_NilP, bytes);
   if (IsError(mem_a) || IsError(mem_b)) {
     mem_a = StoFree(mem_a);
     mem_b = StoFree(mem_b);
     return false;
   }
-  IUC* pop = TPtr<IUC>(mem_a);
-  IUC* fresh = TPtr<IUC>(mem_b);
+  IUC* pop = TRef<IUC>(mem_a);
+  IUC* fresh = TRef<IUC>(mem_b);
   for (ISC i = 0; i < pop_size * w; ++i) {
     pop[i] = population[i];
   }
@@ -228,7 +228,7 @@ SearchAndOrPlan::~SearchAndOrPlan() {
 /* Grow the plan node pool so that `need` nodes fit (plan ids run
  * 1..node_count; 0 = kPlanEmpty). */
 static BOL StoPlanEnsureNodes(SearchAndOrPlan* plan, ISC need) {
-  if (plan->node_mem_.origin != NILP && need <= plan->node_cap_) {
+  if (plan->node_mem_.origin != _NilP && need <= plan->node_cap_) {
     return true;
   }
   ISC cap = plan->node_cap_;
@@ -238,13 +238,13 @@ static BOL StoPlanEnsureNodes(SearchAndOrPlan* plan, ISC need) {
   while (cap < need) {
     cap *= 2;
   }
-  IUW* nm = ObjectFactoryHeap(NILP, IUD(cap) * IUD(sizeof(AndOrNode)));
+  IUW* nm = ObjectFactoryHeap(_NilP, IUD(cap) * IUD(sizeof(AndOrNode)));
   if (IsError(nm)) {
     return false;
   }
-  if (plan->node_mem_.origin != NILP) {
-    AndOrNode* nn = TPtr<AndOrNode>(nm);
-    const AndOrNode* on = TPtr<AndOrNode>(plan->node_mem_.origin);
+  if (plan->node_mem_.origin != _NilP) {
+    AndOrNode* nn = TRef<AndOrNode>(nm);
+    const AndOrNode* on = TRef<AndOrNode>(plan->node_mem_.origin);
     for (ISC i = 0; i < plan->node_count; ++i) {
       nn[i] = on[i];
     }
@@ -264,13 +264,13 @@ static BOL StoPoolGrowStatesNC(SearchAndOrPlan* plan) {
     cap *= 2;
   }
   IUD bytes = IUD(cap) * IUD(plan->state_words) * IUD(sizeof(IUC));
-  IUW* nm = ObjectFactoryHeap(NILP, bytes);
+  IUW* nm = ObjectFactoryHeap(_NilP, bytes);
   if (IsError(nm)) {
     return false;
   }
-  if (plan->state_mem_.origin != NILP) {
-    IUC* ns = TPtr<IUC>(nm);
-    const IUC* os = TPtr<IUC>(plan->state_mem_.origin);
+  if (plan->state_mem_.origin != _NilP) {
+    IUC* ns = TRef<IUC>(nm);
+    const IUC* os = TRef<IUC>(plan->state_mem_.origin);
     for (IUD i = 0; i < IUD(plan->state_count) * IUD(plan->state_words); ++i) {
       ns[i] = os[i];
     }
@@ -303,7 +303,7 @@ static BOL StoPoolStateNC(const NondetProblem* problem, const IUC* state,
       !StoPoolGrowStatesNC(plan)) {
     return false;
   }
-  IUC* s = TPtr<IUC>(plan->state_mem_.origin) +
+  IUC* s = TRef<IUC>(plan->state_mem_.origin) +
            IUD(plan->state_count) * IUD(w);
   for (ISC i = 0; i < w; ++i) {
     s[i] = state[i];
@@ -370,7 +370,7 @@ static IUD StoOrSearchNC(const NondetProblem* problem, const IUC* state,
     if (!StoPlanEnsureNodes(plan, plan->node_count + 1)) {
       return kPlanFail;
     }
-    TPtr<AndOrNode>(plan->node_mem_.origin)[plan->node_count] = node;
+    TRef<AndOrNode>(plan->node_mem_.origin)[plan->node_count] = node;
     plan->node_count++;
     return IUD(plan->node_count);
   }
@@ -379,25 +379,25 @@ static IUD StoOrSearchNC(const NondetProblem* problem, const IUC* state,
 
 BOL SearchAndOrGraph(const NondetProblem* problem, ISC max_depth,
                      SearchAndOrPlan* plan, IUD* out_root) {
-  if (problem == NILP || problem->GoalTest == NILP || problem->Actions == NILP ||
-      problem->Outcomes == NILP || max_depth < 1 ||
+  if (problem == _NilP || problem->GoalTest == _NilP || problem->Actions == _NilP ||
+      problem->Outcomes == _NilP || max_depth < 1 ||
       problem->state_words < 1 || problem->state_words > kStoStateWords ||
-      plan == NILP) {
+      plan == _NilP) {
     return false;
   }
-  plan->node_mem_.origin = NILP;
-  plan->state_mem_.origin = NILP;
+  plan->node_mem_.origin = _NilP;
+  plan->state_mem_.origin = _NilP;
   plan->node_count = 0;
   plan->node_cap_ = 0;
   plan->state_count = 0;
   plan->state_cap_ = 0;
   plan->state_words = problem->state_words;
   IUW* path_mem =
-      ObjectFactoryHeap(NILP, IUD(max_depth) * IUD(sizeof(IUD)));
+      ObjectFactoryHeap(_NilP, IUD(max_depth) * IUD(sizeof(IUD)));
   if (IsError(path_mem)) {
     return false;
   }
-  IUD* path = TPtr<IUD>(path_mem);
+  IUD* path = TRef<IUD>(path_mem);
   IUD root = StoOrSearchNC(problem, problem->initial, path, 0, plan);
   path_mem = StoFree(path_mem);
   if (root == kPlanFail) {
@@ -425,7 +425,7 @@ struct StoStateEntry {
  * RAMFactory block that grows x2 at 70% load. */
 static BOL StoTableEnsureNC(IUW** mem, ISC* cap, ISC* count,
                             const IUC* state, ISC w, ISC* slot_out) {
-  const StoStateEntry* entries = TPtr<StoStateEntry>(*mem);
+  const StoStateEntry* entries = TRef<StoStateEntry>(*mem);
   IUD h = StoStateHashNC(state, w);
   ISC empty = -1;
   for (ISC i = 0; i < *cap; ++i) {
@@ -462,13 +462,13 @@ static BOL StoTableInsertNC(IUW** mem, ISC* cap, ISC* count,
                             const IUC* state, ISC w, ISC slot) {
   if (IUD(*count + 1) * 10 >= IUD(*cap) * 7) {
     ISC nc = *cap * 2;
-    IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(sizeof(StoStateEntry)));
+    IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(sizeof(StoStateEntry)));
     if (IsError(nm)) {
       return false;
     }
-    StoStateEntry* ne = TPtr<StoStateEntry>(nm);
+    StoStateEntry* ne = TRef<StoStateEntry>(nm);
     StoWipe(nm, IUD(nc) * IUD(sizeof(StoStateEntry)));
-    const StoStateEntry* oe = TPtr<StoStateEntry>(*mem);
+    const StoStateEntry* oe = TRef<StoStateEntry>(*mem);
     for (ISC i = 0; i < *cap; ++i) {
       if (!oe[i].used) {
         continue;
@@ -485,7 +485,7 @@ static BOL StoTableInsertNC(IUW** mem, ISC* cap, ISC* count,
     *mem = nm;
     *cap = nc;
   }
-  StoStateEntry* e = &TPtr<StoStateEntry>(*mem)[slot];
+  StoStateEntry* e = &TRef<StoStateEntry>(*mem)[slot];
   e->used = true;
   e->hash = StoStateHashNC(state, w);
   for (ISC j = 0; j < w; ++j) {
@@ -500,15 +500,15 @@ static BOL StoTableInsertNC(IUW** mem, ISC* cap, ISC* count,
 
 static BOL StoDataGrowNC(IUW** mem, ISC* cap, ISC stride) {
   ISC nc = *cap == 0 ? 16 : *cap * 2;
-  IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(stride));
+  IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(stride));
   if (IsError(nm)) {
     return false;
   }
-  if (*mem != NILP) {
+  if (*mem != _NilP) {
     IUD old_bytes = IUD(*cap) * IUD(stride);
     IUD new_bytes = IUD(nc) * IUD(stride);
-    IUW* np = TPtr<IUW>(nm);
-    IUW* op = TPtr<IUW>(*mem);
+    IUW* np = TRef<IUW>(nm);
+    IUW* op = TRef<IUW>(*mem);
     for (IUD i = 0; i < old_bytes >> ACPUBytesLog2; ++i) {
       np[i] = op[i];
     }
@@ -532,8 +532,8 @@ struct OnlineData {
 };
 
 OnlineDfsAgent::OnlineDfsAgent()
-    : table_mem_(NILP, &ObjectFactoryHeap),
-      data_mem_(NILP, &ObjectFactoryHeap), problem_(NILP), cap_(0),
+    : table_mem_(_NilP, &ObjectFactoryHeap),
+      data_mem_(_NilP, &ObjectFactoryHeap), problem_(_NilP), cap_(0),
       state_count_(0), data_cap_(0), s_id_(-1), a_prev_(0) {}
 
 OnlineDfsAgent::~OnlineDfsAgent() {
@@ -548,7 +548,7 @@ BOL OnlineDfsAgent::Init(const Problem* problem) {
   data_cap_ = 0;
   s_id_ = -1;
   a_prev_ = 0;
-  return problem != NILP && problem->state_words >= 1 &&
+  return problem != _NilP && problem->state_words >= 1 &&
          problem->state_words <= kStoStateWords;
 }
 
@@ -556,19 +556,19 @@ IUC OnlineDfsAgent::Percept(const IUC* s_next) {
   const Problem* p = problem_;
   ISC w = p->state_words;
   // Lazy RAMFactory allocation of the tables on first percept.
-  if (table_mem_.origin == NILP) {
+  if (table_mem_.origin == _NilP) {
     table_mem_.origin =
-        ObjectFactoryHeap(NILP, IUD(16) * IUD(sizeof(StoStateEntry)));
+        ObjectFactoryHeap(_NilP, IUD(16) * IUD(sizeof(StoStateEntry)));
     if (IsError(table_mem_.origin)) {
       return kStochasticStop;
     }
     StoWipe(table_mem_.origin, IUD(16) * IUD(sizeof(StoStateEntry)));
     cap_ = 16;
     data_mem_.origin =
-        ObjectFactoryHeap(NILP, IUD(16) * IUD(sizeof(OnlineData)));
+        ObjectFactoryHeap(_NilP, IUD(16) * IUD(sizeof(OnlineData)));
     if (IsError(data_mem_.origin)) {
       table_mem_.origin = StoFree(table_mem_.origin);
-      table_mem_.origin = NILP;
+      table_mem_.origin = _NilP;
       cap_ = 0;
       return kStochasticStop;
     }
@@ -584,7 +584,7 @@ IUC OnlineDfsAgent::Percept(const IUC* s_next) {
   if (!found) {
     return kStochasticStop;
   }
-  BOL is_new = (TPtr<StoStateEntry>(table_mem_.origin)[slot].used == false);
+  BOL is_new = (TRef<StoStateEntry>(table_mem_.origin)[slot].used == false);
   if (is_new) {
     if (state_count_ >= data_cap_) {
       if (!StoDataGrowNC(&data_mem_.origin, &data_cap_,
@@ -597,7 +597,7 @@ IUC OnlineDfsAgent::Percept(const IUC* s_next) {
       return kStochasticStop;
     }
   }
-  OnlineData* d = TPtr<OnlineData>(data_mem_.origin) + slot;
+  OnlineData* d = TRef<OnlineData>(data_mem_.origin) + slot;
   // if s' is a new state (not in untried) then untried[s'] <- ACTIONS(s')
   if (!d->init_done) {
     d->init_done = true;
@@ -613,7 +613,7 @@ IUC OnlineDfsAgent::Percept(const IUC* s_next) {
   }
   if (s_id_ != -1) {
     // result[s, a] <- s'
-    OnlineData* ds = TPtr<OnlineData>(data_mem_.origin) + s_id_;
+    OnlineData* ds = TRef<OnlineData>(data_mem_.origin) + s_id_;
     if (a_prev_ < kStoMaxActions) {
       ds->result_state[a_prev_] = IUD(slot);
     }
@@ -643,10 +643,10 @@ IUC OnlineDfsAgent::Percept(const IUC* s_next) {
 }
 
 void OnlineDfsAgent::Reset() {
-  if (table_mem_.origin != NILP) {
+  if (table_mem_.origin != _NilP) {
     StoWipe(table_mem_.origin, IUD(cap_) * IUD(sizeof(StoStateEntry)));
   }
-  if (data_mem_.origin != NILP) {
+  if (data_mem_.origin != _NilP) {
     StoWipe(data_mem_.origin, IUD(data_cap_) * IUD(sizeof(OnlineData)));
   }
   state_count_ = 0;
@@ -663,8 +663,8 @@ struct LrtaData {
 };
 
 LrtaStarAgent::LrtaStarAgent()
-    : table_mem_(NILP, &ObjectFactoryHeap),
-      data_mem_(NILP, &ObjectFactoryHeap), problem_(NILP), cap_(0),
+    : table_mem_(_NilP, &ObjectFactoryHeap),
+      data_mem_(_NilP, &ObjectFactoryHeap), problem_(_NilP), cap_(0),
       state_count_(0), data_cap_(0), s_id_(-1), a_prev_(0) {}
 
 LrtaStarAgent::~LrtaStarAgent() {
@@ -679,19 +679,19 @@ BOL LrtaStarAgent::Init(const Problem* problem) {
   data_cap_ = 0;
   s_id_ = -1;
   a_prev_ = 0;
-  return problem != NILP && problem->state_words >= 1 &&
+  return problem != _NilP && problem->state_words >= 1 &&
          problem->state_words <= kStoStateWords;
 }
 
 static FPC StoStepCostNC(const Problem* p, const IUC* s, ISC w, IUC a) {
-  if (p->StepCost == NILP) {
+  if (p->StepCost == _NilP) {
     return FPC(1.0f);
   }
   return p->StepCost(s, w, a);
 }
 
 static FPC StoHeuristicNC(const Problem* p, const IUC* s, ISC w) {
-  if (p->Heuristic == NILP) {
+  if (p->Heuristic == _NilP) {
     return FPC(1.0f);
   }
   return p->Heuristic(s, w);
@@ -700,19 +700,19 @@ static FPC StoHeuristicNC(const Problem* p, const IUC* s, ISC w) {
 IUC LrtaStarAgent::Percept(const IUC* s_next) {
   const Problem* p = problem_;
   ISC w = p->state_words;
-  if (table_mem_.origin == NILP) {
+  if (table_mem_.origin == _NilP) {
     table_mem_.origin =
-        ObjectFactoryHeap(NILP, IUD(16) * IUD(sizeof(StoStateEntry)));
+        ObjectFactoryHeap(_NilP, IUD(16) * IUD(sizeof(StoStateEntry)));
     if (IsError(table_mem_.origin)) {
       return kStochasticStop;
     }
     StoWipe(table_mem_.origin, IUD(16) * IUD(sizeof(StoStateEntry)));
     cap_ = 16;
     data_mem_.origin =
-        ObjectFactoryHeap(NILP, IUD(16) * IUD(sizeof(LrtaData)));
+        ObjectFactoryHeap(_NilP, IUD(16) * IUD(sizeof(LrtaData)));
     if (IsError(data_mem_.origin)) {
       table_mem_.origin = StoFree(table_mem_.origin);
-      table_mem_.origin = NILP;
+      table_mem_.origin = _NilP;
       cap_ = 0;
       return kStochasticStop;
     }
@@ -728,7 +728,7 @@ IUC LrtaStarAgent::Percept(const IUC* s_next) {
   if (!found) {
     return kStochasticStop;
   }
-  BOL is_new = (TPtr<StoStateEntry>(table_mem_.origin)[slot].used == false);
+  BOL is_new = (TRef<StoStateEntry>(table_mem_.origin)[slot].used == false);
   if (is_new) {
     if (state_count_ >= data_cap_) {
       if (!StoDataGrowNC(&data_mem_.origin, &data_cap_,
@@ -741,8 +741,8 @@ IUC LrtaStarAgent::Percept(const IUC* s_next) {
       return kStochasticStop;
     }
   }
-  const StoStateEntry* entries = TPtr<StoStateEntry>(table_mem_.origin);
-  LrtaData* data = TPtr<LrtaData>(data_mem_.origin);
+  const StoStateEntry* entries = TRef<StoStateEntry>(table_mem_.origin);
+  LrtaData* data = TRef<LrtaData>(data_mem_.origin);
   LrtaData* d = data + slot;
   // if s' is a new state (not in H) then H[s'] <- h(s')
   if (!d->seen) {
@@ -796,19 +796,19 @@ IUC LrtaStarAgent::Percept(const IUC* s_next) {
   return action;
 }
 
-FPC LrtaStarAgent::Cost(ISC state_id) const {
-  if (data_mem_.origin == NILP || state_id < 0 ||
+FPC LrtaStarAgent::Cost(ISC state_id) {
+  if (data_mem_.origin == _NilP || state_id < 0 ||
       state_id >= state_count_) {
     return FPC(-1.0f);  // sentinel: unseen
   }
-  return TPtr<LrtaData>(data_mem_.origin)[state_id].h;
+  return TRef<LrtaData>(data_mem_.origin)[state_id].h;
 }
 
 void LrtaStarAgent::Reset() {
-  if (table_mem_.origin != NILP) {
+  if (table_mem_.origin != _NilP) {
     StoWipe(table_mem_.origin, IUD(cap_) * IUD(sizeof(StoStateEntry)));
   }
-  if (data_mem_.origin != NILP) {
+  if (data_mem_.origin != _NilP) {
     StoWipe(data_mem_.origin, IUD(data_cap_) * IUD(sizeof(LrtaData)));
   }
   state_count_ = 0;

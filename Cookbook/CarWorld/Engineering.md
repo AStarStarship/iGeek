@@ -88,7 +88,7 @@ open-loop collision and obstruction-stop negative controls.
 ### Known upstream diagnostic-printer issue
 
 While validating this chapter's example, adding
-`StdOut() << room.Reply().frames` produced a UBSan alignment error in
+`RefOut() << room.Reply().frames` produced a UBSan alignment error in
 `ASCIICrabs/Puff.hpp::SPrintCharPair` (line 110 in the inspected revision).
 The fallback stores through an IUB pointer that may point at an odd byte
 address. The example reached CarGoal before the numeric print failed;

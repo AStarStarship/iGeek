@@ -133,7 +133,7 @@ ISN main() {
     command.control = {0, 0, 0.2};
     if (!room.SetCommand(command) || room.Star('t', NILP) != NILP) return 2;
   }
-  StdOut() << "CarWorld Room status=" << TCarStatusName(room.Reply().status)
+  RefOut() << "CarWorld Room status=" << TCarStatusName(room.Reply().status)
            << '\n';
   return room.Reply().status == CarGoal ? 0 : 1;
 }
@@ -149,7 +149,7 @@ g++ -std=c++2b -O2 -I. -IBikeWorld -I../ASCIICrabs \
 The five manual braking frames are an example of source switching, not a
 validated emergency fallback or a graphical driving demo. Time and pose
 continue across both transitions; only an explicit reset starts over.
-The example returns zero only on CarGoal. ASCIICrabs StdOut currently writes
+The example returns zero only on CarGoal. ASCIICrabs RefOut currently writes
 its diagnostic through stderr, despite its name; capture both streams when
 checking its printed status.
 This example deliberately prints no numeric fields: the current upstream

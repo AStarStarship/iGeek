@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #ifndef TILEWORLD_GUI
 #define TILEWORLD_GUI
 #include <_Config.h>
@@ -48,9 +48,9 @@ class Button {
          short unsigned id = 0);
   ~Button();
 
-  const bool IsPressed() const;
-  const _::AString Text() const;
-  const short unsigned& Id() const;
+  const bool IsPressed();
+  const _::AString Text();
+  const short unsigned& Id();
 
   // Modifiers
   void setText(const _::AString text);
@@ -76,12 +76,12 @@ class DropDownList {
                unsigned default_index = 0);
   ~DropDownList();
 
-  const unsigned short& GetActiveElementId() const;
+  const unsigned short& GetActiveElementId();
 
   const bool KeyTime();
 
-  void UpdateKeyTime(const FPC& dt);
-  void Update(const _::ISC2& mouse_pos_window, const FPC& dt);
+  void UpdateKeyTime(FPC& dt);
+  void Update(const _::ISC2& mouse_pos_window, FPC& dt);
   void Render(sf::RenderTarget& target);
 };
 
@@ -104,12 +104,12 @@ class TextureSelector {
                   _::AString text);
   ~TextureSelector();
 
-  const bool& getActive() const;
-  const _::ISC4& getTextureRect() const;
+  const bool& getActive();
+  const _::ISC4& getTextureRect();
 
   const bool KeyTime();
-  void UpdateKeyTime(const FPC& dt);
-  void Update(const _::ISC2& mouse_pos_window, const FPC& dt);
+  void UpdateKeyTime(FPC& dt);
+  void Update(const _::ISC2& mouse_pos_window, FPC& dt);
   void Render(sf::RenderTarget& target);
 };
 

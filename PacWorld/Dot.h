@@ -1,10 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef PACWORLD_DOT
-#define PACWORLD_DOT
-
-#include "Maze.h"  // brings in _Config.h (IUN) + TVec.h
-
+#ifndef _iGeekPacWorldDotH
+#define _iGeekPacWorldDotH
+#include "Maze.h"
 namespace PacWorld {
 
 /* A headless dot (or super-dot) — the render data (radius + packed color).
@@ -25,5 +23,5 @@ TDot Dot();
 /* A super-dot (larger, white — triggers the weak-ghost state). */
 TDot SuperDot();
 
-}  // namespace PacWorld
+}  //< namespace PacWorld
 #endif

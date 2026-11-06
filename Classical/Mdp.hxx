@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_MDP_IMPL
-#define IGEEK_CLASSICAL_MDP_IMPL
+#ifndef _iGeekClassicalMdpHXX
+#define _iGeekClassicalMdpHXX
 #include "Mdp.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete).  No naked new/delete/malloc in this folder.
 
 /* Equation (17.8): delta < eps * (1 - gamma) / (1 + gamma). */
@@ -41,9 +41,9 @@ struct MdpScratch {
   Autoject succ_;
   Autoject prob_;
   MdpScratch()
-      : succ_(NILP, &ObjectFactoryHeap), prob_(NILP, &ObjectFactoryHeap) {}
-  MdpScratch(const MdpScratch&) = delete;
-  MdpScratch& operator=(const MdpScratch&) = delete;
+      : succ_(_NilP, &ObjectFactoryHeap), prob_(_NilP, &ObjectFactoryHeap) {}
+  MdpScratch(MdpScratch&) = delete;
+  MdpScratch& operator=(MdpScratch&) = delete;
   ~MdpScratch() {
     Free();
   }
@@ -51,19 +51,19 @@ struct MdpScratch {
   BOL Init(ISC s_count) {
     Free();
     ISW bytes = IUD(s_count) * IUD(sizeof(ISC));
-    succ_.origin = ObjectFactoryHeap(NILP, bytes);
-    prob_.origin = ObjectFactoryHeap(NILP, bytes);
+    succ_.origin = ObjectFactoryHeap(_NilP, bytes);
+    prob_.origin = ObjectFactoryHeap(_NilP, bytes);
     return !IsError(succ_.origin) && !IsError(prob_.origin);
   }
   void Free() {
     succ_.origin = ObjectFactoryHeap(succ_.origin, RAMFactoryDelete);
     prob_.origin = ObjectFactoryHeap(prob_.origin, RAMFactoryDelete);
   }
-  ISC* Succ() const {
-    return TPtr<ISC>(succ_.origin);
+  ISC* Succ() {
+    return TRef<ISC>(succ_.origin);
   }
-  FPC* Prob() const {
-    return TPtr<FPC>(prob_.origin);
+  FPC* Prob() {
+    return TRef<FPC>(prob_.origin);
   }
 };
 
@@ -189,5 +189,5 @@ ISC PolicyIteration(const MDP* mdp, FPC* V, FPC* policy, ISC max_iters) {
   return ran;
 }
 
-} //< namespace iGeek
-#endif
+}     //< namespace iGeek
+#endif  //< _iGeekClassicalMdpHXX

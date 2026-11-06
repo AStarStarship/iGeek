@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 // TypingWorld.hxx — implementation of the deterministic typing-mine engine.
 // No-stdlib: fixed arrays, a seeded 64-bit LCG, no heap, no std containers.
-// The only "system" surface is COut for Print() (the ASCIICrabs console
+// The only "system" surface is ROut for Print() (the ASCIICrabs console
 // primitive, matching MazeWorld's no-stdlib convention).
 #include "TypingWorld.h"
-#include "../../ASCIICrabs/COut.h"
-#if SEAM >= IGEEK_TYPINGWORLD
+#include "../../ASCIICrabs/ROut.h"
+#if _Seam >= _iGeekTypingWorldCore
 namespace iGeek {
 
 /* Small fixed vocabulary for block words. Kept short and printable so the
@@ -97,17 +97,17 @@ BOL TypingWorld::PressKey(CHA ch) {
   return false;
 }
 
-ISC TypingWorld::TargetIndex() const {
+ISC TypingWorld::TargetIndex() {
   return target_;
 }
 
-const TypingWorldBlock* TypingWorld::Target() const {
-  if (target_ < 0) return NILP;
+const TypingWorldBlock* TypingWorld::Target() {
+  if (target_ < 0) return _NilP;
   return &blocks_[target_];
 }
 
-ISC TypingWorld::TargetTyped(CHA* out) const {
-  if (out == NILP) return 0;
+ISC TypingWorld::TargetTyped(CHA* out) {
+  if (out == _NilP) return 0;
   if (target_ < 0) {
     out[0] = '\0';
     return 0;
@@ -119,31 +119,31 @@ ISC TypingWorld::TargetTyped(CHA* out) const {
   return n;
 }
 
-BOL TypingWorld::Done() const {
+BOL TypingWorld::Done() {
   return target_ < 0;
 }
 
-ISC TypingWorld::MinedCount() const {
+ISC TypingWorld::MinedCount() {
   return mined_;
 }
 
-ISC TypingWorld::Remaining() const {
+ISC TypingWorld::Remaining() {
   return BlockCount - mined_;
 }
 
-ISC TypingWorld::KeysPressed() const {
+ISC TypingWorld::KeysPressed() {
   return keys_;
 }
 
-ISC TypingWorld::KeysCorrect() const {
+ISC TypingWorld::KeysCorrect() {
   return correct_;
 }
 
-ISC TypingWorld::KeysMissed() const {
+ISC TypingWorld::KeysMissed() {
   return missed_;
 }
 
-ISC TypingWorld::NextUnmined(ISC i) const {
+ISC TypingWorld::NextUnmined(ISC i) {
   for (ISC step = 0; step < BlockCount; ++step) {
     ISC idx = (i + step) % BlockCount;
     if (!blocks_[idx].mined) return idx;
@@ -151,28 +151,28 @@ ISC TypingWorld::NextUnmined(ISC i) const {
   return -1;
 }
 
-void TypingWorld::Print() const {
-  ::_::StdOut() << Headingf("TypingWorld (typing mine)");
+void TypingWorld::Print() {
+  ::_::RefOut() << Headingf("TypingWorld (typing mine)");
   for (ISC y = 0; y < GridHeight; ++y) {
-    ::_::StdOut() << ' ';
+    ::_::RefOut() << ' ';
     for (ISC x = 0; x < GridWidth; ++x) {
       ISC b = y * GridWidth + x;
       CHA c = blocks_[b].mined ? '.' : '#';
       if (b == target_) c = '@';
-      ::_::StdOut() << c << ' ';
+      ::_::RefOut() << c << ' ';
     }
-    ::_::StdOut() << "\n";
+    ::_::RefOut() << "\n";
   }
-  ::_::StdOut() << "mined: " << mined_ << "/" << BlockCount
+  ::_::RefOut() << "mined: " << mined_ << "/" << BlockCount
                 << "  keys: " << keys_
                 << "  ok: " << correct_
                 << "  miss: " << missed_;
   if (target_ >= 0) {
     CHA buf[TypingWorldBlock::BlockWordMax + 1];
     TargetTyped(buf);
-    ::_::StdOut() << "  target: " << buf;
+    ::_::RefOut() << "  target: " << buf;
   }
-  ::_::StdOut() << "\n";
+  ::_::RefOut() << "\n";
 }
 
 } //< namespace iGeek

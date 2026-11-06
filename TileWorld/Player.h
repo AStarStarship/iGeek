@@ -7,8 +7,8 @@
 // the hitbox (12, 10, 40x54) and movement (200, 1600, 1000) from the original
 // ctor. Render() deleted (headless). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
+#include <_Config.h>
+#include <Homotuples.h>
 
 #ifndef TILEWORLD_PLAYER
 #define TILEWORLD_PLAYER

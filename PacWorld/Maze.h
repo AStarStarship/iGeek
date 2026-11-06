@@ -1,16 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef PACWORLD_MAZE
-#define PACWORLD_MAZE
-
+#ifndef _iGeekPacWorldMazeH
+#define _iGeekPacWorldMazeH
 #include "../../ASCIICrabs/_Config.h"
-#include "../../ASCIICrabs/TVec.h"
-
+#include "../../ASCIICrabs/Homotuples.h"
 namespace PacWorld {
 
 // The homotuple types (VHT) live in namespace _ (ASCIICrabs TVec.h). Bring
 // the 4 common ones into PacWorld so game-logic code can use ISC2/FPC2/
-// ISC4/FPC4 unqualified (matching the codebase's _::TVec2F convention,
+// ISC4/FPC4 unqualified (matching the codebase's _::FPC2 convention,
 // just scoped to PacWorld).
 using _::ISC2;
 using _::FPC2;
@@ -18,8 +16,8 @@ using _::ISC4;
 using _::FPC4;
 
 /* A headless maze grid. The grid is a fixed-size CellData array (standard
-   Pac-Man 28x31). No SFML, no stdlib — pure data + queries. The grid is
-   loaded from a raw CellData buffer (data-driven), not a texture. */
+  Pac-Man 28x31). No SFML, no stdlib — pure data + queries. The grid is
+  loaded from a raw CellData buffer (data-driven), not a texture. */
 class Maze {
   enum CellData {
     kEmpty = 0,
@@ -48,39 +46,40 @@ class Maze {
 
   Maze();
 
-  ISC2 Size() const;
+  ISC2 Size();
 
   /* Load a level from a raw grid buffer (data-driven). `data` is a
-     w*h CellData buffer (row-major). Colors map: kWall/kDot/kSuperDot/
-     kEmpty/kBonus are set directly in the buffer by the caller.
-     @return kSuccess on success, or an Error code. */
+  w*h CellData buffer (row-major). Colors map: kWall/kDot/kSuperDot/
+  kEmpty/kBonus are set directly in the buffer by the caller.
+  @return kSuccess on success, or an Error code. */
   Error LoadLevel(const ISC* data, ISC w, ISC h);
 
-  ISC2 PacPosition() const;
+  ISC2 PacPosition();
 
-  ISC GhostCount() const;
-  ISC2 GhostPosition(ISC i) const;
+  ISC GhostCount();
+  ISC2 GhostPosition(ISC i);
 
-  inline ISC PositionToIndex(ISC2 position) const;
+  inline ISC PositionToIndex(ISC2 position);
 
-  inline ISC2 IndexToPosition(ISC index) const;
+  inline ISC2 IndexToPosition(ISC index);
 
   /* Convert pixel coords to cell coords (explicit integer math, no floor). */
-  ISC2 PixelToCell(FPC2 pixel) const;
+  ISC2 PixelToCell(FPC2 pixel);
 
   /* Convert cell coords to pixel coords (cell center). */
-  FPC2 CellToPixel(ISC2 cell) const;
+  FPC2 CellToPixel(ISC2 cell);
 
-  bool IsWall(ISC2 position) const;
-  bool IsDot(ISC2 position) const;
-  bool IsSuperDot(ISC2 position) const;
-  bool IsBonus(ISC2 position) const;
+  bool IsWall(ISC2 position);
+  bool IsDot(ISC2 position);
+  bool IsSuperDot(ISC2 position);
+  bool IsBonus(ISC2 position);
 
   /* Clear a picked object (dot/superdot/bonus) at the given cell. */
   void PickObject(ISC2 position);
 
   /* Number of dots + superdots remaining. */
-  ISC DotCount() const;
+  ISC DotCount();
 };
-}  // namespace PacWorld
+}  //< namespace PacWorld
+#define _iGeekPacWorldMazeH 
 #endif

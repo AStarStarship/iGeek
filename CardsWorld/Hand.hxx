@@ -1,7 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekCardsWorldCoreHandHXX
+#define _iGeekCardsWorldCoreHandHXX
 #include "Hand.h"
-#if SEAM >= IGEEK_HAND
+#if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
 namespace CardsWorld {
 
@@ -17,15 +19,15 @@ ISC Hand::DealTwoCards(CardStack& stock) {
   return 0;
 }
 
-const CHA* Hand::Describe(CHA* buffer, ISC buffer_size) const {
-  if (buffer == NILP || buffer_size <= 0) return "";
+const CHA* Hand::Describe(CHA* buffer, ISC buffer_size) {
+  if (buffer == _NilP || buffer_size <= 0) return "";
   buffer[0] = 0;
   // Build a short description like "A c 2 d" (ASCII suit chars: c/d/h/s).
   CHA* cursor = buffer;
   CHA* stop = buffer + buffer_size - 1;
   for (ISC i = 0; i < CardCount() && cursor < stop; ++i) {
-    const Card* c = PeekCard(i);
-    if (c == NILP) break;
+    Card* c = PeekCard(i);
+    if (c == _NilP) break;
     CHA pip_char = '0';
     switch (c->PipValue()) {
       case 1: pip_char = 'A'; break;
@@ -51,6 +53,7 @@ const CHA* Hand::Describe(CHA* buffer, ISC buffer_size) const {
   return buffer;
 }
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsWorldCoreHandHXX

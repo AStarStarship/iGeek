@@ -3,10 +3,11 @@
 // concrete vectorized behavior lives in subclasses (BlackjackGym is
 // standalone, TToyGym overrides both). These base stubs satisfy the vtable
 // (StepBatch/ResetBatch are virtual) and do nothing — a bare Gym has no envs.
-#include "Gym.h"
 #pragma once
-#ifndef IGEEK_GYM_HXX
-#define IGEEK_GYM_HXX
+#ifndef _iGeekGymHXX
+#define _iGeekGymHXX
+#include "Gym.h"
+#include <_Config.h>
 
 namespace iGeek {
 
@@ -18,8 +19,8 @@ void Gym::ResetBatch() {
   // Base does nothing; subclasses override.
 }
 
-void Gym::AddEnv(Env* env) {
-  if (env == NILP || env_count_ >= GymEnvMax) {
+void Gym::AddEnv(Environment* env) {
+  if (env == _NilP || env_count_ >= GymEnvMax) {
     return;
   }
   envs_[env_count_++] = env;
@@ -31,4 +32,4 @@ BOL Gym::LoadDLL(const CHA* library) {
 }
 
 } //< namespace iGeek
-#endif
+#endif  //< _iGeekGymHXX

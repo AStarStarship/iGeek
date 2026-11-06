@@ -1,7 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
-#include "bow.h"
+#include "Bow.h"
 
 Bow::Bow() { std::cout << "\nBow"; }
 

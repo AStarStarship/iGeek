@@ -1,6 +1,8 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonPanelH
+#define _iGeekPolygonWorldGeneticPolygonPanelH
+
 #include <_Config.h>
 
 namespace iGeek {
@@ -25,4 +27,4 @@ class GeneticPolygonPanel : public JPanel {
 };
 
 } //< namespace iGeek
-}
+#endif  //< _iGeekPolygonWorldGeneticPolygonPanelH

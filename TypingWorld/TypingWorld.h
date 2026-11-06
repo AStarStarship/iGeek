@@ -17,7 +17,7 @@
 //
 // No-stdlib: fixed-size arrays, a seeded 64-bit LCG (same seed -> same world),
 // no std containers, no exceptions, no heap. Rendering is a separate concern
-// (Print via COut) so the simulator never depends on a terminal.
+// (Print via ROut) so the simulator never depends on a terminal.
 #pragma once
 #ifndef TYPINGWORLD_TYPINGWORLD_DECL
 #define TYPINGWORLD_TYPINGWORLD_DECL
@@ -65,42 +65,42 @@ struct TypingWorld {
   BOL PressKey(CHA ch);
 
   /* The index (0..BlockCount-1) of the block currently being typed. */
-  ISC TargetIndex() const;
+  ISC TargetIndex();
 
-  /* The block currently being typed (NILP when all blocks are mined). */
-  const TypingWorldBlock* Target() const;
+  /* The block currently being typed (_NilP when all blocks are mined). */
+  const TypingWorldBlock* Target();
 
   /* The current block's word so far (what the player has typed correctly).
      @param out Buffer of at least BlockWordMax+1 (NUL-terminated on write).
      @return The number of correct characters typed so far. */
-  ISC TargetTyped(CHA* out) const;
+  ISC TargetTyped(CHA* out);
 
   /* True when every block in the world has been mined. */
-  BOL Done() const;
+  BOL Done();
 
   /* The number of blocks mined so far. */
-  ISC MinedCount() const;
+  ISC MinedCount();
 
   /* The number of blocks still unmined. */
-  ISC Remaining() const;
+  ISC Remaining();
 
   /* Total keystrokes processed this episode. */
-  ISC KeysPressed() const;
+  ISC KeysPressed();
 
   /* Total correct keystrokes (each one advanced a block by one hit). */
-  ISC KeysCorrect() const;
+  ISC KeysCorrect();
 
   /* Total misses (wrong or non-printable keystrokes). */
-  ISC KeysMissed() const;
+  ISC KeysMissed();
 
   /* The index (0..BlockCount-1) of the next unmined block after i, wrapping
      the grid; -1 when none remain. Used by the mining order. */
-  ISC NextUnmined(ISC i) const;
+  ISC NextUnmined(ISC i);
 
-  /* Renders the world to the console (COut). Grid of blocks: '#' unmined,
+  /* Renders the world to the console (ROut). Grid of blocks: '#' unmined,
      '.' mined, '@' the current target; the typed-so-far string and stats.
-     Pure COut — the engine itself does not require a terminal. */
-  void Print() const;
+     Pure ROut — the engine itself does not require a terminal. */
+  void Print();
 
  private:
   /* (Re)generates the world from seed_: assigns a word to every block and

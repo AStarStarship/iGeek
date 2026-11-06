@@ -1,11 +1,11 @@
 /// Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_PRISONERWORLD_H
-#define CRABS_PRISONERWORLD_H
+#ifndef _iGeekPrisonerWorldH
+#define _iGeekPrisonerWorldH
 
-#include "Env.h"
-#include "EnvGoal.h"
-#if SEAM >= CRABS_PRISONERWORLD
+#include "Environment.h"
+#include "EnvironmentGoal.h"
+#if _Seam >= _iGeekPrisonerWorldCore
 namespace iGeek {
 /* Prisoner's Dilemma repeated-game environment for iGeek.
  * Two agents simultaneously choose Cooperate (0) or Defect (1).
@@ -17,24 +17,24 @@ namespace iGeek {
  *   - ComputeReward() is an interface hook that returns the last computed reward.
  *   - achieved_goal/desired_goal are set by Step() as IUD datums (0=C, 1=D).
  */
-class PrisonerEnv : public Env {
+class PrisonerEnvironment : public Environment {
  public:
   enum { NumAgents = 2, MaxHistory = 64 };
 
-  PrisonerEnv(const CHA* env_name = "prisoner", ISC state_count = 2)
-      : Env(env_name, state_count),
+  PrisonerEnvironment(const CHA* env_name = "prisoner", ISC state_count = 2)
+      : Environment(env_name, state_count),
         round_(0),
         payoff_T_(5), payoff_R_(3), payoff_P_(1), payoff_S_(0),
         step_reward_(0) {}
 
   /* Get the scalar reward for this step.
-   * @param crabs       The Crabs to read/write the reward to. May be NILP.
+   * @param crabs       The Crabs to read/write the reward to. May be _NilP.
    * @param achieved    What the agent actually did this step (IUD: 0=Cooperate, 1=Defect).
    * @param desired     What we want the agent to do (IUD: 0=Cooperate, 1=Defect).
-   * @param info        Human-readable info string. May be NILP.
+   * @param info        Human-readable info string. May be _NilP.
    * @return            The scalar reward for this step (FPC). */
-  FPC ComputeReward(Crabs* crabs, EnvGoal achieved_goal,
-                    EnvGoal desired_goal, const CHA* info) override {
+  FPC ComputeReward(Crabs* crabs, EnvironmentGoal achieved_goal,
+                    EnvironmentGoal desired_goal, const CHA* info) override {
     // Interface hook: return the last step's reward
     (void)crabs; (void)achieved_goal; (void)desired_goal; (void)info;
     return step_reward_;
@@ -92,10 +92,10 @@ class PrisonerEnv : public Env {
   }
 
   /* Get the current round number. */
-  ISC Round() const { return round_; }
+  ISC Round() { return round_; }
 
   /* Get the total number of agents. */
-  ISC AgentCount() const { return NumAgents; }
+  ISC AgentCount() { return NumAgents; }
 
  private:
   ISC round_;
@@ -107,10 +107,10 @@ class PrisonerEnv : public Env {
 
 /* Exported symbol: the one-and-only Prisoner environment instance.
  * Defined in PrisonerWorld.cpp. Other translation units can access it
- * as a variable: PrisonerEnvPtr.
+ * as a variable: PrisonerEnvironmentironmentPtr.
  */
-extern PrisonerEnv* PrisonerEnvPtr;
+extern PrisonerEnvironment* PrisonerEnvironmentironmentPtr;
 
 } //< namespace iGeek
-#endif  // SEAM >= CRABS_PRISONERWORLD
-#endif  // CRABS_PRISONERWORLD_H
+#endif  //< _Seam >= _iGeekPrisonerWorldCore
+#endif  //< _iGeekPrisonerWorldH

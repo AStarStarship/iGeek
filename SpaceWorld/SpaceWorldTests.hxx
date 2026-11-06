@@ -4,6 +4,7 @@
 // autopilot on cancels), target draw, gym batch + determinism, PPO smoke (few envs).
 
 #include "SpaceConfig.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "SpaceMath.h"
 #include "SpaceMath.hxx"
 #include "SpacePhysics.h"
@@ -47,9 +48,9 @@ void test_spin_physics() {
   }
   // After 1s with 5 N on 1 kg, vx should be ~5 m/s
   FPD vx = state.vx;
-  D_COUT("(label)");
-  assert(fabs(vx - 5.0) < 0.5 && "Spin physics verification FAILED");
-  D_COUT("(label)");
+  _DROut("(label)");
+  assert(Absolute(vx - 5.0) < 0.5 && "Spin physics verification FAILED");
+  _DROut("(label)");
 }
 
 // ============ RCS caps verification ============
@@ -63,9 +64,9 @@ void test_rcs_caps() {
   TSpaceCaps caps;
   TSpaceCapsCompute(caps, mass, half, thrusters, thrust_max);
 
-  D_COUT("(label)");
-  D_COUT("(label)");
-  D_COUT("(label)");
+  _DROut("(label)");
+  _DROut("(label)");
+  _DROut("(label)");
 }
 
 // ============ Autopilot on/off verification ============
@@ -91,16 +92,16 @@ void test_autopilot_on_off() {
     TSpaceVec L = {0, 0, state1.wz};
     TSpaceVec err = {-L.x, -L.y, -L.z};
     // Clamp to max
-    if (fabs(err.x) > 2.0) err.x = (err.x > 0) ? 2.0 : -2.0;
-    if (fabs(err.y) > 2.0) err.y = (err.y > 0) ? 2.0 : -2.0;
-    if (fabs(err.z) > 2.0) err.z = (err.z > 0) ? 2.0 : -2.0;
+    if (Absolute(err.x) > 2.0) err.x = (err.x > 0) ? 2.0 : -2.0;
+    if (Absolute(err.y) > 2.0) err.y = (err.y > 0) ? 2.0 : -2.0;
+    if (Absolute(err.z) > 2.0) err.z = (err.z > 0) ? 2.0 : -2.0;
     // PID
     static TSpacePid pid = {25, 0, 3};
     TSpaceVec torque = pid.Update(err, 1.0/60.0);
     TSpaceControl control = {0, 0, 0, torque.x, torque.y, torque.z};
     TSpaceStep(state1, (TSpaceParams){mass, half, 0, 1.0/60.0, 10.0, 1000.0}, control);
   }
-  D_COUT("(label)");
+  _DROut("(label)");
 
   // Now turn autopilot off and apply manual force
   TSpaceState state2 = state1;  // copy state after autopilot dampened spin
@@ -109,18 +110,18 @@ void test_autopilot_on_off() {
     TSpaceControl control = {0, 0, 0, 0, 0, 0};
     TSpaceStep(state2, (TSpaceParams){mass, half, 0, 1.0/60.0, 10.0, 1000.0}, control);
   }
-  D_COUT("(label)");
+  _DROut("(label)");
 
-  D_COUT("(label)");
+  _DROut("(label)");
 }
 
 // ============ Main ============
 
-int main() {
-  D_COUT("(label)");
+ISC main() {
+  _DROut("(label)");
   test_spin_physics();
   test_rcs_caps();
   test_autopilot_on_off();
-  D_COUT("(label)");
+  _DROut("(label)");
   return 0;
 }

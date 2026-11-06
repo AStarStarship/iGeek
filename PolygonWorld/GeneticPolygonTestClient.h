@@ -1,6 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonTestClientH
+#define _iGeekPolygonWorldGeneticPolygonTestClientH
 #include <_Config.h>
 
 namespace iGeek {
@@ -17,3 +18,4 @@ public:
 
 }
 }
+#endif  //< _iGeekPolygonWorldGeneticPolygonTestClientH

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_LEARN_T
-#define IGEEK_CLASSICAL_LEARN_T 1
+#ifndef _iGeekClassicalLearnH
+#define _iGeekClassicalLearnH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -148,5 +148,5 @@ function ADABOOST(examples,L,K) returns a weighted-majority hypothesis
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalLearnH

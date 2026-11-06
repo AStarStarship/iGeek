@@ -1,12 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 
 #pragma once
-#ifndef IGEEK_CARDSBLACKJACKENV_DECL
-#define IGEEK_CARDSBLACKJACKENV_DECL
+#ifndef _iGeekCardsWorldBlackjackEnvH
+#define _iGeekCardsWorldBlackjackEnvH
 #include <_Config.h>
-#if SEAM >= IGEEK_BLACKJACKENV
+#if _Seam >= _iGeekCardsWorldBlackjackEnv
 #include "Blackjack.h"
 namespace iGeek {
+namespace CardsWorld {
+using namespace ::_;
 
 /* A Blackjack environment for training agents.
 A BlackjackEnv wraps the CardsWorld::Blackjack game engine and exposes the
@@ -56,16 +58,16 @@ class BlackjackEnv {
   ISC Step(ISC action);
 
   /* Returns true if the current round is over. */
-  BOL Done() const;
+  BOL Done();
 
   /* Returns the last round's outcome. */
-  CardsWorld::Outcome LastOutcome() const;
+  CardsWorld::Outcome LastOutcome();
 
   /* Access the underlying game for diagnostics. */
   CardsWorld::Blackjack& Game() { return *game_; }
 
   /* The agent's credit balance. */
-  ISC Credit() const;
+  ISC Credit();
 
   /* Plays N rounds with the given agent policy.
   @param policy A function pointer: (const CHA* percept) -> action code.
@@ -82,6 +84,7 @@ class BlackjackEnv {
   BOL on_;                         //< Whether the env is running.
 };
 
-} //< namespace iGeek
-#endif
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _iGeekCardsWorldBlackjackEnvH
+#endif  //< _Seam >= _iGeekCardsWorldBlackjackEnvH

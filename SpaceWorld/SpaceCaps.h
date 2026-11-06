@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_CAPS_H
-#define CRABS_SPACEWORLD_CAPS_H
+#ifndef _iGeekSpaceWorldCapsH
+#define _iGeekSpaceWorldCapsH
 #include "SpaceConfig.h"
 #include "SpaceMath.h"
 #include "SpaceRcs.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 /** Per-axis dynamic capabilities of a spacecraft (CapabilityCalculator.ts).
  * lin_force/lin_accel per axis, ang_torque/ang_accel per axis, and the
@@ -23,17 +23,17 @@ struct TSpaceCaps
  * layout `thr` (SpaceRcsTotal thrusters) and per-thruster max `thrust_max`.
  * @pre mass > 0, half finite/positive, thrust_max[i] >= 0.
  */
-void TSpaceCapsCompute(TSpaceCaps& caps, FPD mass, const TSpaceHalf& half,
+void TSpaceCapsCompute(TSpaceCaps& caps, FPD mass, TSpaceHalf& half,
                        const TSpaceThruster thr[SpaceRcsTotal],
                        const FPD thrust_max[SpaceRcsTotal]);
 /** Principal inertia about body axis a (0=x,1=y,2=z) of a solid box. */
-FPD TSpaceCapsInertiaAxis(FPD mass, const TSpaceHalf& half, ISC a);
+FPD TSpaceCapsInertiaAxis(FPD mass, TSpaceHalf& half, ISC a);
 /** Effective inertia along a unit direction (box inertia tensor projection). */
-FPD TSpaceCapsEffInertia(const TSpaceCaps& caps, const TSpaceVec& dir);
+FPD TSpaceCapsEffInertia(TSpaceCaps& caps, TSpaceVec& dir);
 /** Dynamic angular accel cap (AutopilotMode.getDynamicAngularAccelCap). */
-void TSpaceCapsAngCap(const TSpaceCaps& caps, FPD max_angular_accel,
+void TSpaceCapsAngCap(TSpaceCaps& caps, FPD max_angular_accel,
                       FPD max_angular_velocity, FPD& alpha_max,
                       FPD& omega_max);
 } //< namespace iGeek
-#endif
-#endif
+#endif  //< _Seam >= _iGeekSpaceWorldCore
+#endif  //< _iGeekSpaceWorldCapsH

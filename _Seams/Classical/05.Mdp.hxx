@@ -1,18 +1,15 @@
 // Copyright AStarship <https://astarship.net>.
-//
 // Classical Mdp seam unit: value iteration + policy iteration.
-// Gated on IGEEK_CLASSICAL_MDP.
-#if SEAM >= IGEEK_CLASSICAL_CORE
-#if SEAM >= IGEEK_CLASSICAL_CORE
+#if _Seam >= _iGeekClassicalMDPH
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-#include "Mdp.hxx"
-#include <cstdio>
-#include <cmath>
+#include "../../Classical/Mdp.hxx"
+#include "../../CrabsTK/Math/Blas.h"
 namespace iGeek {
+using namespace ::_;
+using namespace iGeek; 
 
 static int m_pass = 0;
 static int m_fail = 0;
@@ -20,20 +17,20 @@ static int m_fail = 0;
 static void MCHECK(const char* name, BOL ok) {
   if (ok) {
     m_pass++;
-    D_COUT("PASS " << name << '\n');
+    _DROut("PASS " << name << '\n');
   } else {
     m_fail++;
-    D_COUT("FAIL " << name << '\n');
+    _DROut("FAIL " << name << '\n');
   }
 }
 
 static void MFLOAT(const char* name, FPC got, FPC want, FPC tol) {
   if (std::abs(got - want) <= tol) {
     m_pass++;
-    D_COUT("PASS " << name << " got=" << got << '\n');
+    _DROut("PASS " << name << " got=" << got << '\n');
   } else {
     m_fail++;
-    D_COUT("FAIL " << name << " got=" << got << " want=" << want << '\n');
+    _DROut("FAIL " << name << " got=" << got << " want=" << want << '\n');
   }
 }
 
@@ -75,9 +72,9 @@ static ISC MTransitions(ISC state, IUC action, ISC* out_states, ISC cap,
 }
 
 inline const CHA* Mdp(const CHA* args) {
-#if SEAM >= IGEEK_CLASSICAL_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing Classical Mdp (ValueIteration/PolicyIteration)..."));
+#if _Seam >= _iGeekClassicalCore
+  _ATestBegin;
+  _DROut(Headingf("Testing Classical Mdp (ValueIteration/PolicyIteration)..."));
 
   MDP mdp;
   mdp.state_count = 3;
@@ -115,11 +112,11 @@ inline const CHA* Mdp(const CHA* args) {
     MCHECK("PolicyIteration: policy(1)=0", IUC(policy[1]) == 0);
   }
 
-  D_COUT("m_pass=" << m_pass << " m_fail=" << m_fail << '\n');
-  return m_fail ? "CLASSICAL_MDP_FAIL: " : NILP;
+  _DROut("m_pass=" << m_pass << " m_fail=" << m_fail << '\n');
+  return m_fail ? "CLASSICAL_MDP_FAIL: " : _NilP;
 
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace iGeek

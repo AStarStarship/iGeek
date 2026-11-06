@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #include <_Config.h>
 
 #ifndef TILEWORLD_ENEMYEDITORMODE
@@ -26,9 +26,9 @@ class ModeEditorEnemy : public ModeEditor {
                   EditorStateData* editor_state_data);
   virtual ~ModeEditorEnemy();
 
-  void UpdateInput(const FPC& dt);
-  void UpdateGUI(const FPC& dt);
-  void Update(const FPC& dt);
+  void UpdateInput(FPC& dt);
+  void UpdateGUI(FPC& dt);
+  void Update(FPC& dt);
 
   void RenderGUI(sf::RenderTarget& target);
   void Render(sf::RenderTarget& target);

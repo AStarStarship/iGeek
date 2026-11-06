@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldTaskH
+#define _iGeekPolygonWorldTaskH
 namespace iGeek {
 
 /* A AI Task.
@@ -17,3 +19,5 @@ class AITask {
   // AITaskOutput out;
 };
 } //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldTaskH

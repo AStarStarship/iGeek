@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 
-#ifndef STB_TILEMAP_INCLUDE_STB_TILEMAP_EDITOR_H
-#define STB_TILEMAP_INCLUDE_STB_TILEMAP_EDITOR_H
+#ifndef _iGeekTileMapEditorH
+#define _iGeekTileMapEditorH
 
 #ifdef _WIN32
 #ifndef _CRT_SECURE_NO_WARNINGS
@@ -324,7 +324,7 @@ static char *stbte__color_names[] = {
     "panel c2", "scollbar", "map button",  "layer", "hide",
     "lock",     "solo",     "category",
 };
-#endif  // STBTE__COLORPICKER
+#endif  //< STBTE__COLORPICKER
 
 // idle,    over,     down,    over&down, selected, sel&over, disabled
 static ISN stbte__color_table[STBTE__num_color_modes][STBTE__num_color_aspects]
@@ -3639,25 +3639,25 @@ static ISN stbte__cp_mode, stbte__cp_aspect, stbte__cp_state, stbte__cp_index,
 #ifdef STBTE__COLORPICKER
 static void stbte__dump_colorstate(void) {
   ISN i, j, k;
-  D_COUT(
+  _DROut(
       "stbte__color_table[STBTE__num_color_modes][STBTE__num_color_aspects]["
       "STBTE__num_color_states] =\n");
-  D_COUT();
-  D_COUT();
+  _DROut();
+  _DROut();
   for (k = 0; k < STBTE__num_color_modes; ++k) {
     for (j = 0; j < STBTE__num_color_aspects; ++j) {
-      D_COUT();
+      _DROut();
       for (i = 0; i < STBTE__num_color_states; ++i) {
-        D_COUT();
+        _DROut();
       }
-      D_COUT();
+      _DROut();
     }
     if (k + 1 < STBTE__num_color_modes)
-      D_COUT();
+      _DROut();
     else
-      D_COUT();
+      _DROut();
   }
-  D_COUT();
+  _DROut();
 }
 
 static void stbte__colorpicker(ISN x0, ISN y0, ISN w, ISN h) {
@@ -4198,7 +4198,7 @@ void stbte_mouse_sdl(stbte_TileMap *tm, const void *sdl_event, FPC xs,
 #endif
 }
 
-#endif  // STB_TILEMAP_EDITOR_IMPLEMENTATION
+#endif  //< STB_TILEMAP_EDITOR_IMPLEMENTATION
 
 /*
 ------------------------------------------------------------------------------

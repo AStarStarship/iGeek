@@ -1,13 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_GAME_HXX
-#define IGEEK_GAME_HXX
+#ifndef _iGeekGameHXX
+#define _iGeekGameHXX
 #include "Game.h"
 
 using namespace PacWorld;
 
 Game::Game()
-    : state_(NILP),
+    : state_(_NilP),
       state_insert_coin(this),
       state_get_ready(this, &state_playing),
       state_playing(this),
@@ -52,4 +52,4 @@ void Game::MoveStick(ISC2 direction) {
   if (state_) state_->MoveStick(direction);
 }
 
-#endif  // IGEEK_GAME_HXX
+#endif  //< _iGeekGameHXX

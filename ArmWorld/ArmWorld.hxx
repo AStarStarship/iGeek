@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_ARMWORLD_HXX
-#define CRABS_ARMWORLD_HXX
+#ifndef _iGeekArmWorldHXX
+#define _iGeekArmWorldHXX
 #include "ArmWorld.h"
 #include "ArmPhysics.hxx"
-#include <math.h>
-#if SEAM >= CRABS_ARMWORLD
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekArmWorldCore
 namespace iGeek {
 const CHA* TArmStatusName(ISC status) {
   const CHA* names[] = {"running", "reach", "timeout", "invalid"};
@@ -17,7 +17,7 @@ static IUD TArmHash(IUD x) {
   x = x * 0xC2B2AE3D27D4EB4Full; x ^= x >> 27;
   return x;
 }
-AArmEnv::AArmEnv(const TArmParams& params, IUD seed)
+AArmEnv::AArmEnv(TArmParams& params, IUD seed)
     : params_(params), seed_(seed) { Reset(); }
 void AArmEnv::DrawTarget() {
   IUD h = TArmHash(seed_ + 0x5851F42D4C957F2Dull);
@@ -73,10 +73,10 @@ FPC AArmEnv::Step(ISC action) {
   }
   return StepControl(control);
 }
-FPC AArmEnv::StepControl(const TArmControl& control) {
+FPC AArmEnv::StepControl(TArmControl& control) {
   if (Done()) return 0;
-  if (!TArmParamsValid(params_) || !isfinite(control.tau_1) ||
-      !isfinite(control.tau_2)) {
+  if (!TArmParamsValid(params_) || !iGeek::IsFinite(control.tau_1) ||
+      !iGeek::IsFinite(control.tau_2)) {
     status_ = ArmInvalid;
     Observe();
     return -10;
@@ -95,7 +95,7 @@ FPC AArmEnv::StepControl(const TArmControl& control) {
       ? tip_speed : metrics_.max_tip_speed;
   tip_error_ = hypot(arm_.tip_x - target_x_, arm_.tip_y - target_y_);
   metrics_.reach_error_squared += tip_error_ * tip_error_;
-  FPD util = fabs(control.tau_1) + fabs(control.tau_2);
+  FPD util = Absolute(control.tau_1) + Absolute(control.tau_2);
   util /= 2 * params_.max_torque;
   metrics_.max_torque_util = util > metrics_.max_torque_util ? util : metrics_.max_torque_util;
   FPD reward;

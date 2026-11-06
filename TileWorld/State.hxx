@@ -1,6 +1,6 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
-#include "state.h"
+#include "Homotuples.h"
+#include "State.h"
 
 State::State(StateData* state_data) {
   state_data_ = state_data;
@@ -16,7 +16,7 @@ State::State(StateData* state_data) {
 
 State::~State() {}
 
-const bool& State::GetQuit() const { return quit_; }
+const bool& State::GetQuit() { return quit_; }
 
 const bool State::KeyTime() {
   if (keytime_ >= key_press_time_max_) {

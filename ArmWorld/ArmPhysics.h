@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_ARMWORLD_PHYSICS_H
-#define CRABS_ARMWORLD_PHYSICS_H
+#ifndef _iGeekArmWorldPhysicsH
+#define _iGeekArmWorldPhysicsH
 #include "ArmConfig.h"
-#if SEAM >= CRABS_ARMWORLD
+#if _Seam >= _iGeekArmWorldCore
 namespace iGeek {
 /* Two-link planar arm, SI units, FP64. Joint angles are absolute (rad), clamped to [0, pi/2] at the physics layer so the policy cannot escape the declared workspace. Torques are clamped to |tau| <= max_torque. */
 struct TArmParams
@@ -35,21 +35,21 @@ struct TArmDynamicsTerms {
   FPD grav_1 = 0, grav_2 = 0;
 };
 /* Closed-form two-link forward kinematics from absolute joint angles. */
-void TArmFK(const TArmParams& params, FPD j1, FPD j2,
+void TArmFK(TArmParams& params, FPD j1, FPD j2,
            FPD& tip_x, FPD& tip_y);
 /* Inertia (I11, I12, I22), Coriolis c12 and gravity terms of the model.
 @return false for invalid inputs; forces are untouched. */
-BOL TArmForces(const TArmParams& params, const TArmState& state,
+BOL TArmForces(TArmParams& params, TArmState& state,
               TArmDynamicsTerms& forces);
 /* One 0.02 s frame = four 0.01 s RK4 substeps of the torque model.
 Joint angles are clamped to [0, pi/2]; velocity zeros at the bound.
 @return false for invalid inputs; state is untouched. */
-BOL TArmStep(TArmState& state, const TArmParams& params,
-            const TArmControl& control);
+BOL TArmStep(TArmState& state, TArmParams& params,
+            TArmControl& control);
 /* True when all fields are finite and angles are within [0, pi/2]. */
-BOL TArmStateValid(const TArmState& state);
+BOL TArmStateValid(TArmState& state);
 /* True when params are positive and finite. */
-BOL TArmParamsValid(const TArmParams& params);
+BOL TArmParamsValid(TArmParams& params);
 } //< namespace iGeek
 #endif
 #endif

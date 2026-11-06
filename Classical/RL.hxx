@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_RL_IMPL
-#define IGEEK_CLASSICAL_RL_IMPL
+#ifndef _iGeekClassicalRlHXX
+#define _iGeekClassicalRlHXX
 #include "RL.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 //
 // "s_prev_ == -1" plays the book's role for s = null (no previous state).
@@ -22,7 +22,7 @@ static inline IUW* RlFree(IUW* origin) {
 
 static inline void RlWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -36,10 +36,10 @@ static inline IUD RlLcgStep(IUD s) {
 // --- PassiveTDAgent (Fig 21.4) --------------------------------------------
 
 PassiveTDAgent::PassiveTDAgent()
-    : u_mem_(NILP, &ObjectFactoryHeap),
-      n_mem_(NILP, &ObjectFactoryHeap), state_count_(0), action_count_(0),
-      gamma_(FPC(0.0f)), alpha_(FPC(0.0f)), IsTerminal_(NILP),
-      Policy_(NILP), s_prev_(-1), a_prev_(0), r_prev_(FPC(0.0f)) {}
+    : u_mem_(_NilP, &ObjectFactoryHeap),
+      n_mem_(_NilP, &ObjectFactoryHeap), state_count_(0), action_count_(0),
+      gamma_(FPC(0.0f)), alpha_(FPC(0.0f)), IsTerminal_(_NilP),
+      Policy_(_NilP), s_prev_(-1), a_prev_(0), r_prev_(FPC(0.0f)) {}
 
 PassiveTDAgent::~PassiveTDAgent() {
   u_mem_.origin = RlFree(u_mem_.origin);
@@ -49,12 +49,12 @@ PassiveTDAgent::~PassiveTDAgent() {
 BOL PassiveTDAgent::Init(ISC state_count, ISC action_count, FPC gamma,
                           FPC alpha, BOL (*IsTerminal)(ISC state),
                           IUC (*Policy)(ISC state)) {
-  if (state_count < 1 || action_count < 1 || IsTerminal == NILP ||
-      Policy == NILP) {
+  if (state_count < 1 || action_count < 1 || IsTerminal == _NilP ||
+      Policy == _NilP) {
     return false;
   }
-  u_mem_.origin = ObjectFactoryHeap(NILP, IUD(state_count) * IUD(sizeof(FPC)));
-  n_mem_.origin = ObjectFactoryHeap(NILP, IUD(state_count) * IUD(sizeof(IUD)));
+  u_mem_.origin = ObjectFactoryHeap(_NilP, IUD(state_count) * IUD(sizeof(FPC)));
+  n_mem_.origin = ObjectFactoryHeap(_NilP, IUD(state_count) * IUD(sizeof(IUD)));
   if (IsError(u_mem_.origin) || IsError(n_mem_.origin)) {
     u_mem_.origin = RlFree(u_mem_.origin);
     n_mem_.origin = RlFree(n_mem_.origin);
@@ -74,13 +74,13 @@ BOL PassiveTDAgent::Init(ISC state_count, ISC action_count, FPC gamma,
   return true;
 }
 
-FPC PassiveTDAgent::Utility(ISC state) const {
-  return TPtr<FPC>(u_mem_.origin)[state];
+FPC PassiveTDAgent::Utility(ISC state) {
+  return TRef<FPC>(u_mem_.origin)[state];
 }
 
 IUC PassiveTDAgent::Percept(ISC s_next, FPC r) {
-  FPC* u = TPtr<FPC>(u_mem_.origin);
-  IUD* n = TPtr<IUD>(n_mem_.origin);
+  FPC* u = TRef<FPC>(u_mem_.origin);
+  IUD* n = TRef<IUD>(n_mem_.origin);
   if (n[s_next] == 0) {
     u[s_next] = r;  // s' is new
   }
@@ -110,9 +110,9 @@ void PassiveTDAgent::Reset() {
 // --- QAgent (Fig 21.8) -----------------------------------------------------
 
 QAgent::QAgent()
-    : q_mem_(NILP, &ObjectFactoryHeap), n_mem_(NILP, &ObjectFactoryHeap),
+    : q_mem_(_NilP, &ObjectFactoryHeap), n_mem_(_NilP, &ObjectFactoryHeap),
       state_count_(0), action_count_(0), gamma_(FPC(0.0f)),
-      alpha_(FPC(0.0f)), eps_(FPC(0.0f)), IsTerminal_(NILP),
+      alpha_(FPC(0.0f)), eps_(FPC(0.0f)), IsTerminal_(_NilP),
       rnd_state_(1442695040888963407ULL), s_prev_(-1), a_prev_(0),
       r_prev_(FPC(0.0f)) {}
 
@@ -123,12 +123,12 @@ QAgent::~QAgent() {
 
 BOL QAgent::Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
                   FPC eps, BOL (*IsTerminal)(ISC state), IUD seed) {
-  if (state_count < 1 || action_count < 1 || IsTerminal == NILP) {
+  if (state_count < 1 || action_count < 1 || IsTerminal == _NilP) {
     return false;
   }
   IUD cells = IUD(state_count) * IUD(action_count);
-  q_mem_.origin = ObjectFactoryHeap(NILP, cells * IUD(sizeof(FPC)));
-  n_mem_.origin = ObjectFactoryHeap(NILP, cells * IUD(sizeof(IUD)));
+  q_mem_.origin = ObjectFactoryHeap(_NilP, cells * IUD(sizeof(FPC)));
+  n_mem_.origin = ObjectFactoryHeap(_NilP, cells * IUD(sizeof(IUD)));
   if (IsError(q_mem_.origin) || IsError(n_mem_.origin)) {
     q_mem_.origin = RlFree(q_mem_.origin);
     n_mem_.origin = RlFree(n_mem_.origin);
@@ -149,13 +149,13 @@ BOL QAgent::Init(ISC state_count, ISC action_count, FPC gamma, FPC alpha,
   return true;
 }
 
-FPC QAgent::Q(ISC state, IUC action) const {
-  return TPtr<FPC>(q_mem_.origin)[IUD(state) * IUD(action_count_) + action];
+FPC QAgent::Q(ISC state, IUC action) {
+  return TRef<FPC>(q_mem_.origin)[IUD(state) * IUD(action_count_) + action];
 }
 
 IUC QAgent::Percept(ISC s_next, FPC r) {
-  FPC* q = TPtr<FPC>(q_mem_.origin);
-  IUD* n = TPtr<IUD>(n_mem_.origin);
+  FPC* q = TRef<FPC>(q_mem_.origin);
+  IUD* n = TRef<IUD>(n_mem_.origin);
   if (s_prev_ != -1) {
     IUD cell = IUD(s_prev_) * IUD(action_count_) + IUD(a_prev_);
     n[cell]++;
@@ -226,11 +226,11 @@ void QAgent::Reset() {
 // --- PassiveADPAgent (Fig 21.2) --------------------------------------------
 
 PassiveADPAgent::PassiveADPAgent()
-    : u_mem_(NILP, &ObjectFactoryHeap), r_mem_(NILP, &ObjectFactoryHeap),
-      nsa_mem_(NILP, &ObjectFactoryHeap), np_mem_(NILP, &ObjectFactoryHeap),
-      p_mem_(NILP, &ObjectFactoryHeap), u_work_(NILP, &ObjectFactoryHeap),
+    : u_mem_(_NilP, &ObjectFactoryHeap), r_mem_(_NilP, &ObjectFactoryHeap),
+      nsa_mem_(_NilP, &ObjectFactoryHeap), np_mem_(_NilP, &ObjectFactoryHeap),
+      p_mem_(_NilP, &ObjectFactoryHeap), u_work_(_NilP, &ObjectFactoryHeap),
       state_count_(0), action_count_(0), gamma_(FPC(0.0f)),
-      tol_(FPC(0.0f)), IsTerminal_(NILP), Policy_(NILP), s_prev_(-1),
+      tol_(FPC(0.0f)), IsTerminal_(_NilP), Policy_(_NilP), s_prev_(-1),
       a_prev_(0), r_prev_(FPC(0.0f)) {}
 
 PassiveADPAgent::~PassiveADPAgent() {
@@ -245,21 +245,21 @@ PassiveADPAgent::~PassiveADPAgent() {
 BOL PassiveADPAgent::Init(ISC state_count, ISC action_count, FPC gamma,
                            FPC tol, BOL (*IsTerminal)(ISC state),
                            IUC (*Policy)(ISC state)) {
-  if (state_count < 1 || action_count < 1 || IsTerminal == NILP ||
-      Policy == NILP) {
+  if (state_count < 1 || action_count < 1 || IsTerminal == _NilP ||
+      Policy == _NilP) {
     return false;
   }
   IUD cells = IUD(state_count) * IUD(action_count);
   IUD tcells = cells * IUD(state_count);
   u_mem_.origin =
-      ObjectFactoryHeap(NILP, IUD(state_count) * IUD(sizeof(FPC)));
+      ObjectFactoryHeap(_NilP, IUD(state_count) * IUD(sizeof(FPC)));
   r_mem_.origin =
-      ObjectFactoryHeap(NILP, IUD(state_count) * IUD(sizeof(FPC)));
-  nsa_mem_.origin = ObjectFactoryHeap(NILP, cells * IUD(sizeof(IUD)));
-  np_mem_.origin = ObjectFactoryHeap(NILP, tcells * IUD(sizeof(IUD)));
-  p_mem_.origin = ObjectFactoryHeap(NILP, tcells * IUD(sizeof(FPC)));
+      ObjectFactoryHeap(_NilP, IUD(state_count) * IUD(sizeof(FPC)));
+  nsa_mem_.origin = ObjectFactoryHeap(_NilP, cells * IUD(sizeof(IUD)));
+  np_mem_.origin = ObjectFactoryHeap(_NilP, tcells * IUD(sizeof(IUD)));
+  p_mem_.origin = ObjectFactoryHeap(_NilP, tcells * IUD(sizeof(FPC)));
   u_work_.origin =
-      ObjectFactoryHeap(NILP, IUD(state_count) * IUD(sizeof(FPC)));
+      ObjectFactoryHeap(_NilP, IUD(state_count) * IUD(sizeof(FPC)));
   if (IsError(u_mem_.origin) || IsError(r_mem_.origin) ||
       IsError(nsa_mem_.origin) || IsError(np_mem_.origin) ||
       IsError(p_mem_.origin) || IsError(u_work_.origin)) {
@@ -288,17 +288,17 @@ BOL PassiveADPAgent::Init(ISC state_count, ISC action_count, FPC gamma,
   return true;
 }
 
-FPC PassiveADPAgent::Utility(ISC state) const {
-  return TPtr<FPC>(u_mem_.origin)[state];
+FPC PassiveADPAgent::Utility(ISC state) {
+  return TRef<FPC>(u_mem_.origin)[state];
 }
 
 /* POLICY-EVALUATION(π, U, mdp): sweep the fixed-policy Bellman equations
 U(s) = R(s) + γ Σ_t P(t | s, π(s)) U(t) until the maximum change over a
 sweep drops below tol (terminals keep R). */
 static void RlPolicyEvalNC(const PassiveADPAgent* agent, FPC* u) {
-  FPC* un = TPtr<FPC>(agent->u_work_.origin);
-  const FPC* p = TPtr<FPC>(agent->p_mem_.origin);
-  const FPC* r = TPtr<FPC>(agent->r_mem_.origin);
+  FPC* un = TRef<FPC>(agent->u_work_.origin);
+  const FPC* p = TRef<FPC>(agent->p_mem_.origin);
+  const FPC* r = TRef<FPC>(agent->r_mem_.origin);
   for (;;) {
     FPC delta = FPC(0.0f);
     for (ISC s = 0; s < agent->state_count_; ++s) {
@@ -335,10 +335,10 @@ static void RlPolicyEvalNC(const PassiveADPAgent* agent, FPC* u) {
 }
 
 IUC PassiveADPAgent::Percept(ISC s_next, FPC r) {
-  FPC* u = TPtr<FPC>(u_mem_.origin);
-  FPC* rr = TPtr<FPC>(r_mem_.origin);
-  IUD* nsa = TPtr<IUD>(nsa_mem_.origin);
-  IUD* np = TPtr<IUD>(np_mem_.origin);
+  FPC* u = TRef<FPC>(u_mem_.origin);
+  FPC* rr = TRef<FPC>(r_mem_.origin);
+  IUD* nsa = TRef<IUD>(nsa_mem_.origin);
+  IUD* np = TRef<IUD>(np_mem_.origin);
   {
     // "s' is new" detection: Nsa[s', a] == 0 for every action. The book
     // lists no per-state count for ADP; this is equivalent on first sight
@@ -363,7 +363,7 @@ IUC PassiveADPAgent::Percept(ISC s_next, FPC r) {
     rr[s_prev_] += (r_prev_ - rr[s_prev_]) / FPC(nsa[cell]);
     np[cell * IUD(state_count_) + s_next]++;
     // Re-derive P(t | s_prev_, a_prev_) from the counts.
-    FPC* prow = TPtr<FPC>(p_mem_.origin) + cell * IUD(state_count_);
+    FPC* prow = TRef<FPC>(p_mem_.origin) + cell * IUD(state_count_);
     for (ISC t = 0; t < state_count_; ++t) {
       IUD cnt = np[cell * IUD(state_count_) + t];
       prow[t] = cnt == 0 ? FPC(0.0f) : FPC(cnt) / FPC(nsa[cell]);
@@ -394,5 +394,5 @@ void PassiveADPAgent::Reset() {
   r_prev_ = FPC(0.0f);
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalRlHXX

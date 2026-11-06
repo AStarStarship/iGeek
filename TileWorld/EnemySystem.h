@@ -7,8 +7,8 @@
 // The headless version owns a fixed-capacity array of Enemy* and a CreateEnemy
 // factory (only the RAT type exists in the spine). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
+#include <_Config.h>
+#include <Homotuples.h>
 
 #ifndef TILEWORLD_ENEMYSYSTEM_DECL
 #define TILEWORLD_ENEMYSYSTEM_DECL
@@ -30,9 +30,9 @@ class EnemySystem {
   // Create an enemy of the given type at (xPos, yPos); returns its index or
   // -1 (unknown type / full).
   _::ISC CreateEnemy(const _::ISM type, const _::FPC xPos, const _::FPC yPos);
-  _::ISC Count() const { return count_; }
-  TileWorld::Enemy* Get(_::ISC i) const {
-    return (i >= 0 && i < count_) ? enemies_[i] : NILP;
+  _::ISC Count() { return count_; }
+  TileWorld::Enemy* Get(_::ISC i) {
+    return (i >= 0 && i < count_) ? enemies_[i] : _NilP;
   }
 
   void Update(const _::FPC& dt);

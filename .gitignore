@@ -3,11 +3,12 @@
 ## popular Visual Studio add-ons.
 
 # Agent files
-Agents/
+_Agent/
 
 # Build files
 _Seams/build/
 _Seams/cmake_install.cmake
+_Seams/iGeek
 
 # User-specific files
 *.suo

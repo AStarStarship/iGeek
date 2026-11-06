@@ -23,10 +23,10 @@ class SkillComponent {
 
     ~Skill() {}
 
-    inline const ISN& getType() const { return type_; }
-    inline const ISN& getLevel() const { return level_; }
-    inline const ISN& getExp() const { return exp_; }
-    inline const ISN& getExpNext() const { return next_exp_; }
+    inline ISN& getType() { return type_; }
+    inline ISN& getLevel() { return level_; }
+    inline ISN& getExp() { return exp_; }
+    inline ISN& getExpNext() { return next_exp_; }
 
     // Modifiers
     void setLevel(const ISN level) { level_ = level; }
@@ -74,7 +74,7 @@ class SkillComponent {
   SkillComponent();
   virtual ~SkillComponent();
 
-  const ISN GetSkill(const ISN skill) const;
+  const ISN GetSkill(const ISN skill);
   const void GainExp(const ISN skill, const ISN exp);
 };
 }  //< namespace TileWorld

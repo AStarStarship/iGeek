@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_SAT_IMPL
-#define IGEEK_CLASSICAL_SAT_IMPL
+#ifndef _iGeekClassicalSatHXX
+#define _iGeekClassicalSatHXX
 #include "Sat.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -12,7 +12,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 
 static inline IUW* SatFree(IUW* origin) {
@@ -21,7 +21,7 @@ static inline IUW* SatFree(IUW* origin) {
 
 static inline void SatWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -54,7 +54,7 @@ static inline BOL SatClauseFalseNC(const SatClause* c, IUD t, IUD f) {
 
 BOL SatTtEntails(const SatClause* kb, ISC kb_count, const SatClause* query,
                  ISC query_count, IUD universe) {
-  if (kb == NILP || query == NILP) {
+  if (kb == _NilP || query == _NilP) {
     return false;
   }
   // Enumerate every submask model of the symbol universe.
@@ -86,16 +86,16 @@ BOL SatTtEntails(const SatClause* kb, ISC kb_count, const SatClause* query,
 // --- Fig 7.15 SatFcEntails --------------------------------------------------
 
 BOL SatFcEntails(const SatDefinite* kb, ISC kb_count, IUD known, ISC q) {
-  if (kb == NILP || q > 63) {
+  if (kb == _NilP || q > 63) {
     return false;
   }
   IUD inferred = 0;  // processed symbols
   // count table: premises still unmet per clause
-  IUW* mem = ObjectFactoryHeap(NILP, IUD(kb_count + 64) * IUD(sizeof(ISC)));
+  IUW* mem = ObjectFactoryHeap(_NilP, IUD(kb_count + 64) * IUD(sizeof(ISC)));
   if (IsError(mem)) {
     return false;
   }
-  ISC* count = TPtr<ISC>(mem);
+  ISC* count = TRef<ISC>(mem);
   for (ISC i = 0; i < kb_count; ++i) {
     ISC n = 0;
     IUD m = kb[i].premise;
@@ -168,23 +168,23 @@ struct SatClauseSet {
   IUW* mem;
   ISC count;
   ISC cap;
-  SatClauseSet() : mem(NILP), count(0), cap(0) {}
+  SatClauseSet() : mem(_NilP), count(0), cap(0) {}
   ISC Add(const SatClause* c) {
     for (ISC i = 0; i < count; ++i) {
-      const SatClause* s = &TPtr<SatClause>(mem)[i];
+      const SatClause* s = &TRef<SatClause>(mem)[i];
       if (s->positive == c->positive && s->negative == c->negative) {
         return 0;  // already present
       }
     }
     if (count == cap) {
       ISC nc = cap == 0 ? 64 : cap * 2;
-      IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(sizeof(SatClause)));
+      IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(sizeof(SatClause)));
       if (IsError(nm)) {
         return -1;
       }
-      if (mem != NILP) {
-        SatClause* ns = TPtr<SatClause>(nm);
-        const SatClause* os = TPtr<SatClause>(mem);
+      if (mem != _NilP) {
+        SatClause* ns = TRef<SatClause>(nm);
+        const SatClause* os = TRef<SatClause>(mem);
         for (ISC i = 0; i < count; ++i) {
           ns[i] = os[i];
         }
@@ -193,7 +193,7 @@ struct SatClauseSet {
       mem = nm;
       cap = nc;
     }
-    TPtr<SatClause>(mem)[count++] = *c;
+    TRef<SatClause>(mem)[count++] = *c;
     return 1;
   }
 };
@@ -237,7 +237,7 @@ static ISC SatResolveNC(const SatClause* ci, const SatClause* cj,
 
 BOL SatResolution(const SatClause* clauses, ISC clause_count, IUD universe) {
   (void)universe;
-  if (clauses == NILP || clause_count < 1) {
+  if (clauses == _NilP || clause_count < 1) {
     return false;
   }
   SatClauseSet cs;
@@ -249,7 +249,7 @@ BOL SatResolution(const SatClause* clauses, ISC clause_count, IUD universe) {
   }
   // If the empty clause is already present (unit contradiction), done.
   for (ISC i = 0; i < cs.count; ++i) {
-    const SatClause* c = &TPtr<SatClause>(cs.mem)[i];
+    const SatClause* c = &TRef<SatClause>(cs.mem)[i];
     if (c->positive == 0 && c->negative == 0) {
       cs.mem = SatFree(cs.mem);
       return true;
@@ -262,8 +262,8 @@ BOL SatResolution(const SatClause* clauses, ISC clause_count, IUD universe) {
     for (ISC i = 0; i < cs.count && !empty; ++i) {
       for (ISC j = i + 1; j < cs.count; ++j) {
         SatClause scratch[64];
-        ISC n = SatResolveNC(&TPtr<SatClause>(cs.mem)[i],
-                             &TPtr<SatClause>(cs.mem)[j], scratch, 64, &empty);
+        ISC n = SatResolveNC(&TRef<SatClause>(cs.mem)[i],
+                             &TRef<SatClause>(cs.mem)[j], scratch, 64, &empty);
         if (empty) {
           cs.mem = SatFree(cs.mem);
           return true;
@@ -290,12 +290,53 @@ BOL SatResolution(const SatClause* clauses, ISC clause_count, IUD universe) {
   }
 }
 
+// --- No-good cache for DPLL (conflict memoization) ---------------------------
+// Bounded direct-mapped table of (t, f) partial assignments proven unsat.
+// A hash collision is rejected by comparing the full pair, so the cache only
+// ever prunes states that were genuinely proven unsatisfiable. This collapses
+// the combinatorial re-exploration that pure-symbol / unit-clause recursion
+// would otherwise repeat on hard UNSAT instances (observed: SatPlan's
+// unreachable-goal check spun >900s at 100% CPU before the fix). The table
+// MUST be cleared before each top-level DPLL call, because no-goods are only
+// valid for the clause set that produced them.
+struct DpllNoGood {
+  IUD t;
+  IUD f;
+  BOL used;
+};
+static DpllNoGood dpll_nogood_[16384];
+
+static ISC DpllNoGoodSlotNC(IUD t, IUD f) {
+  IUD h = t ^ (f << 1) ^ (t >> 7) ^ 0x9E3779B97F4A7C15ULL;
+  h ^= h >> 16;
+  return ISC(h & 16383);
+}
+static BOL DpllNoGoodSeenNC(IUD t, IUD f) {
+  DpllNoGood const* e = &dpll_nogood_[DpllNoGoodSlotNC(t, f)];
+  return e->used && e->t == t && e->f == f;
+}
+static void DpllNoGoodAddNC(IUD t, IUD f) {
+  DpllNoGood* e = &dpll_nogood_[DpllNoGoodSlotNC(t, f)];
+  e->t = t;
+  e->f = f;
+  e->used = true;
+}
+static void DpllNoGoodClear() {
+  for (ISC i = 0; i < 16384; ++i) {
+    dpll_nogood_[i].used = false;
+  }
+}
+
 // --- Fig 7.17 SatDpll --------------------------------------------------------
 
 static BOL SatDpllRecNC(const SatClause* clauses, ISC clause_count,
                         IUD universe, IUD* model, IUD t, IUD f) {
+  if (DpllNoGoodSeenNC(t, f)) {
+    return false;
+  }
   for (ISC i = 0; i < clause_count; ++i) {
     if (SatClauseFalseNC(&clauses[i], t, f)) {
+      DpllNoGoodAddNC(t, f);
       return false;
     }
   }
@@ -309,7 +350,7 @@ static BOL SatDpllRecNC(const SatClause* clauses, ISC clause_count,
       }
     }
     if (all_true) {
-      if (model != NILP) {
+      if (model != _NilP) {
         *model = t;
       }
       return true;
@@ -370,14 +411,19 @@ static BOL SatDpllRecNC(const SatClause* clauses, ISC clause_count,
   if (SatDpllRecNC(clauses, clause_count, universe, model, t | first, f)) {
     return true;
   }
-  return SatDpllRecNC(clauses, clause_count, universe, model, t, f | first);
+  BOL b2 = SatDpllRecNC(clauses, clause_count, universe, model, t, f | first);
+  if (!b2) {
+    DpllNoGoodAddNC(t, f);  // both branches fail: this partial assignment is a no-good
+  }
+  return b2;
 }
 
 BOL SatDpll(const SatClause* clauses, ISC clause_count, IUD universe) {
-  if (clauses == NILP || clause_count < 1) {
+  if (clauses == _NilP || clause_count < 1) {
     return false;
   }
-  return SatDpllRecNC(clauses, clause_count, universe, NILP, 0, 0);
+  DpllNoGoodClear();
+  return SatDpllRecNC(clauses, clause_count, universe, _NilP, 0, 0);
 }
 
 // --- Fig 7.18 SatWalksat -----------------------------------------------------
@@ -396,7 +442,7 @@ static IUD SatSatisfiedCountNC(const SatClause* clauses, ISC clause_count,
 
 BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
                ISC max_flips, IUD seed, IUD* out_model) {
-  if (clauses == NILP || clause_count < 1 || universe == 0) {
+  if (clauses == _NilP || clause_count < 1 || universe == 0) {
     return false;
   }
   IUD rnd = SatSeedNC(seed);
@@ -407,7 +453,7 @@ BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
   for (ISC i = 1; i <= max_flips; ++i) {
     if (SatSatisfiedCountNC(clauses, clause_count, m, universe) ==
         IUD(clause_count)) {
-      if (out_model != NILP) {
+      if (out_model != _NilP) {
         *out_model = m;
       }
       return true;
@@ -470,7 +516,7 @@ BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
   }
   if (SatSatisfiedCountNC(clauses, clause_count, m, universe) ==
       IUD(clause_count)) {
-    if (out_model != NILP) {
+    if (out_model != _NilP) {
       *out_model = m;
     }
     return true;
@@ -480,7 +526,7 @@ BOL SatWalksat(const SatClause* clauses, ISC clause_count, IUD universe, FPC p,
 
 // --- Fig 7.1 KBAgent ---------------------------------------------------------
 
-KBAgent::KBAgent() : kb_mem_(NILP, &ObjectFactoryHeap), kb_count_(0),
+KBAgent::KBAgent() : kb_mem_(_NilP, &ObjectFactoryHeap), kb_count_(0),
                        kb_cap_(0) {}
 
 KBAgent::~KBAgent() {
@@ -494,9 +540,9 @@ BOL KBAgent::Init(ISC kb_cap) {
   kb_cap_ = kb_cap;
   kb_count_ = 0;
   kb_mem_.origin =
-      ObjectFactoryHeap(NILP, IUD(kb_cap) * IUD(sizeof(SatClause)));
+      ObjectFactoryHeap(_NilP, IUD(kb_cap) * IUD(sizeof(SatClause)));
   if (IsError(kb_mem_.origin)) {
-    kb_mem_.origin = NILP;
+    kb_mem_.origin = _NilP;
     kb_cap_ = 0;
     return false;
   }
@@ -504,23 +550,23 @@ BOL KBAgent::Init(ISC kb_cap) {
   return true;
 }
 
-const SatClause* KBAgent::Clauses() const {
-  return TPtr<SatClause>(kb_mem_.origin);
+const SatClause* KBAgent::Clauses() {
+  return TRef<SatClause>(kb_mem_.origin);
 }
 
 BOL KBAgent::Tell(const SatClause* clauses, ISC count) {
-  if (clauses == NILP || count < 0) {
+  if (clauses == _NilP || count < 0) {
     return false;
   }
   for (ISC i = 0; i < count; ++i) {
     if (kb_count_ >= kb_cap_) {
       ISC nc = kb_cap_ * 2;
-      IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(sizeof(SatClause)));
+      IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(sizeof(SatClause)));
       if (IsError(nm)) {
         return false;
       }
-      SatClause* ns = TPtr<SatClause>(nm);
-      const SatClause* os = TPtr<SatClause>(kb_mem_.origin);
+      SatClause* ns = TRef<SatClause>(nm);
+      const SatClause* os = TRef<SatClause>(kb_mem_.origin);
       for (ISC j = 0; j < kb_count_; ++j) {
         ns[j] = os[j];
       }
@@ -528,30 +574,31 @@ BOL KBAgent::Tell(const SatClause* clauses, ISC count) {
       kb_mem_.origin = nm;
       kb_cap_ = nc;
     }
-    TPtr<SatClause>(kb_mem_.origin)[kb_count_++] = clauses[i];
+    TRef<SatClause>(kb_mem_.origin)[kb_count_++] = clauses[i];
   }
   return true;
 }
 
-BOL KBAgent::Ask(const SatClause* query_neg, ISC count, IUD universe) const {
+BOL KBAgent::Ask(const SatClause* query_neg, ISC count, IUD universe) {
   // KB entails the query iff KB ∧ ¬query is unsatisfiable (DPLL).
   ISC total = kb_count_ + count;
   if (total < 1) {
     return false;
   }
-  IUW* mem = ObjectFactoryHeap(NILP, IUD(total) * IUD(sizeof(SatClause)));
+  IUW* mem = ObjectFactoryHeap(_NilP, IUD(total) * IUD(sizeof(SatClause)));
   if (IsError(mem)) {
     return false;
   }
-  SatClause* all = TPtr<SatClause>(mem);
-  const SatClause* kb = TPtr<SatClause>(kb_mem_.origin);
+  SatClause* all = TRef<SatClause>(mem);
+  const SatClause* kb = TRef<SatClause>(kb_mem_.origin);
   for (ISC i = 0; i < kb_count_; ++i) {
     all[i] = kb[i];
   }
   for (ISC i = 0; i < count; ++i) {
     all[kb_count_ + i] = query_neg[i];
   }
-  BOL ok = !SatDpllRecNC(all, total, universe, NILP, 0, 0);
+  DpllNoGoodClear();
+  BOL ok = !SatDpllRecNC(all, total, universe, _NilP, 0, 0);
   mem = SatFree(mem);
   return ok;
 }
@@ -575,7 +622,7 @@ static inline ISC SatPlanIndexNC(IUD m) {
 
 BOL SatPlan(const SatPlanProblem* problem, ISC t_max, IUD* model_out,
            IUC* out_plan, ISC plan_cap) {
-  if (problem == NILP || problem->actions == NILP ||
+  if (problem == _NilP || problem->actions == _NilP ||
       problem->atom_count < 1 || problem->atom_count > 6 ||
       problem->action_count < 1 || t_max < 0 || plan_cap < 0) {
     return false;
@@ -685,8 +732,18 @@ BOL SatPlan(const SatPlanProblem* problem, ISC t_max, IUD* model_out,
     }
     // SAT-SOLVER: DPLL with model extraction.
     IUD model = 0;
-    const SatClause* cl = TPtr<SatClause>(cs.mem);
-    BOL sat = SatDpllRecNC(cl, cs.count, ~IUD(0), &model, 0, 0);
+    const SatClause* cl = TRef<SatClause>(cs.mem);
+    // The search universe is the symbols that actually occur in the
+    // formula. Passing ~IUD(0) makes DPLL branch on every other bit too:
+    // the SAT case finds a model early, but the UNSAT case then exhausts
+    // a 2^64 tree over dummy variables (observed: the unreachable-goal
+    // check spun >900s at 100% CPU).
+    IUD universe = 0;
+    for (ISC i = 0; i < cs.count; ++i) {
+      universe |= cl[i].positive | cl[i].negative;
+    }
+    DpllNoGoodClear();
+    BOL sat = SatDpllRecNC(cl, cs.count, universe, &model, 0, 0);
     if (!sat) {
       cs.mem = SatFree(cs.mem);
       continue;
@@ -715,7 +772,7 @@ BOL SatPlan(const SatPlanProblem* problem, ISC t_max, IUD* model_out,
       cs.mem = SatFree(cs.mem);
       continue;
     }
-    if (model_out != NILP) {
+    if (model_out != _NilP) {
       *model_out = model;
     }
     cs.mem = SatFree(cs.mem);
@@ -873,7 +930,7 @@ static void WmpResultNC(const IUC* state, ISC state_words, IUC action,
 }
 
 HybridWumpusAgent::HybridWumpusAgent()
-    : kb_mem_(NILP, &ObjectFactoryHeap),
+    : kb_mem_(_NilP, &ObjectFactoryHeap),
       kb_count_(0),
       kb_cap_(0),
       t_(0),
@@ -897,14 +954,14 @@ BOL HybridWumpusAgent::Init(ISC kb_cap) {
   }
   kb_cap_ = kb_cap;
   kb_count_ = 0;
-  kb_mem_.origin = ObjectFactoryHeap(NILP, IUD(kb_cap) * IUD(sizeof(WmpHorn)));
+  kb_mem_.origin = ObjectFactoryHeap(_NilP, IUD(kb_cap) * IUD(sizeof(WmpHorn)));
   if (IsError(kb_mem_.origin)) {
-    kb_mem_.origin = NILP;
+    kb_mem_.origin = _NilP;
     kb_cap_ = 0;
     return false;
   }
   SatWipe(kb_mem_.origin, IUD(kb_cap) * IUD(sizeof(WmpHorn)));
-  WmpHorn* kb = TPtr<WmpHorn>(kb_mem_.origin);
+  WmpHorn* kb = TRef<WmpHorn>(kb_mem_.origin);
   // (a,b) adjacent to (x,y) in the 2x2 grid
   for (ISC x = 0; x < 2; ++x) {
     for (ISC y = 0; y < 2; ++y) {
@@ -1020,7 +1077,7 @@ void HybridWumpusAgent::TellPercept(const WumpusPercept* p, BOL moved,
   // Fixpoint chain over the Horn KB.
   for (;;) {
     BOL fired = false;
-    const WmpHorn* kb = TPtr<WmpHorn>(kb_mem_.origin);
+    const WmpHorn* kb = TRef<WmpHorn>(kb_mem_.origin);
     for (ISC i = 0; i < kb_count_; ++i) {
       const WmpHorn* c = &kb[i];
       if (c->con_neg ? *kf & c->con : *kt & c->con) {
@@ -1038,11 +1095,11 @@ void HybridWumpusAgent::TellPercept(const WumpusPercept* p, BOL moved,
   }
 }
 
-BOL HybridWumpusAgent::Safe(IUC x, IUC y) const {
+BOL HybridWumpusAgent::Safe(IUC x, IUC y) {
   return (known_true_ & WmpOK(x, y)) != 0;
 }
 
-BOL HybridWumpusAgent::NotWumpus(IUC x, IUC y) const {
+BOL HybridWumpusAgent::NotWumpus(IUC x, IUC y) {
   return (known_false_ & WmpW(x, y)) != 0;
 }
 
@@ -1055,8 +1112,8 @@ BOL HybridWumpusAgent::Route(IUC from, IUD goals, IUD allowed) {
   prob.GoalTest = WmpGoalTestNC;
   prob.Actions = WmpActionsNC;
   prob.Result = WmpResultNC;
-  prob.StepCost = NILP;
-  prob.Heuristic = NILP;
+  prob.StepCost = _NilP;
+  prob.Heuristic = _NilP;
   wmp_allowed_ = allowed | goals;
   wmp_goals_ = goals;
   IUC acts[32];
@@ -1126,7 +1183,7 @@ BOL HybridWumpusAgent::PlanShot(IUC current, IUD possible, IUD safe) {
 
 IUC HybridWumpusAgent::Percept(const WumpusPercept* p, BOL moved, IUC x,
                                 IUC y) {
-  if (p == NILP || done_) {
+  if (p == _NilP || done_) {
     return kWmpClimb;
   }
   if (t_ > kWmpTMax) {
@@ -1216,5 +1273,5 @@ IUC HybridWumpusAgent::Percept(const WumpusPercept* p, BOL moved, IUC x,
   return action;
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalSatHXX

@@ -1,0 +1,12 @@
+# _Seams.yaml — PolygonWorld module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
+seams:
+  - name: _iGeekPolygonWorldCore
+    depends: [_iGeekCore]
+    file: 01.Core.hxx
+    label: "Testing PolygonWorld core..."
+  - name: _iGeekPolygonWorldRelease
+    depends: [_iGeekPolygonWorldCore]
+    file: 02.Release.hxx
+    label: "Testing PolygonWorld release..."

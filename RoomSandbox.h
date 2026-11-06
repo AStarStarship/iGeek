@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ROOM_SANDBOX_H
-#define IGEEK_ROOM_SANDBOX_H
+#ifndef _iGeekRoomSandboxH
+#define _iGeekRoomSandboxH
 #include <_Config.h>
-#if SEAM >= IGEEK_GYM_MANIFEST
+#if _Seam >= _iGeekEnvironmentManifest
 #include "Room.hpp"
 namespace iGeek {
 
@@ -15,7 +15,7 @@ No Docker, no containers. The Room is one contiguous block of memory
 - The Room's Stack is the agent's computation (the Crabs interpreter).
 - The Room's Doors are the agent's I/O (Slots to the outside).
 This is a standalone Room wrapper (not `public TRoom` on the Env/Gym
-base, which is broken upstream — see Env.h). The sandbox provides
+base, which is broken upstream — see Environment.h). The sandbox provides
 the lifecycle: create, status, pause, resume, destroy. */
 
 /* The room sandbox: a TRoom with a fixed Floor and optional Walls. */

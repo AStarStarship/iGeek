@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #ifndef TILEWORLD_EDITORMODE_DECL
 #define TILEWORLD_EDITORMODE_DECL
 #include <_Config.h>
@@ -42,9 +42,9 @@ class ModeEditor {
 
   const bool KeyTime();
 
-  virtual void UpdateInput(const FPC& dt) = 0;
-  virtual void UpdateGUI(const FPC& dt) = 0;
-  virtual void Update(const FPC& dt) = 0;
+  virtual void UpdateInput(FPC& dt) = 0;
+  virtual void UpdateGUI(FPC& dt) = 0;
+  virtual void Update(FPC& dt) = 0;
 
   virtual void RenderGUI(sf::RenderTarget& target) = 0;
   virtual void Render(sf::RenderTarget& target) = 0;

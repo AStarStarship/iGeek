@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_JOB_QUEUE_H
-#define IGEEK_JOB_QUEUE_H
+#ifndef _iGeekJobQueueH
+#define _iGeekJobQueueH
 #include <_Config.h>
-#if SEAM >= IGEEK_GYM_MANIFEST
+#if _Seam >= _iGeekEnvironmentManifest
 #include "Script.h"
 namespace iGeek {
 

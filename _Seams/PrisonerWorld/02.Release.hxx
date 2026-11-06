@@ -1,26 +1,19 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// PrisonerWorld release seam unit: the final sown test pass. Runs the
-// all-cooperate dilemma simulation (converted from the old _Main.hxx sim
-// loop, with the #include <iostream> no-stdlib violation removed in favor
-// of ASCIICrabs COut). Gated on IGEEK_PRISONERWORLD_RELEASE (SEAM_N).
-#if SEAM >= IGEEK_PRISONERWORLD_RELEASE
-#if SEAM == IGEEK_PRISONERWORLD_RELEASE
-#include "_Debug.h"
+#if _Seam >= _iGeekPrisonerWorldRelease
+#include "../../../ASCIICrabs/_Debug.h"
 #else
-#include "_Release.h"
+#include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-// PrisonerWorld.hxx is pulled ONCE by the rollup _Tests.hxx.
-using namespace ::_;
 namespace PrisonerWorldTest {
+using namespace ::_;
+using namespace iGeek;
 
 inline const CHA* Release(const CHA* args) {
-#if SEAM >= IGEEK_PRISONERWORLD_RELEASE
-  A_TEST_BEGIN;
-  D_COUT("\nPrisoner's Dilemma Simulation (all-cooperate)\n");
+#if _Seam >= _iGeekPrisonerWorldRelease
+  _ATestBegin;
+  _DROut("\nPrisoner's Dilemma Simulation (all-cooperate)\n");
 
-  PrisonerEnv env;
+  PrisonerEnvironment env;
   env.SetPayoffs(5, 3, 1, 0);
   env.Reset();
 
@@ -30,17 +23,17 @@ inline const CHA* Release(const CHA* args) {
   ISC episodes = 100;
   for (ISC ep = 0; ep < episodes; ++ep) {
     if (env.Done()) {
-      D_COUT("Episode " << ep << " done (history limit reached)\n");
+      _DROut("Episode " << ep << " done (history limit reached)\n");
       env.Reset();
     }
     env.Step(actions, rewards, terminals);
     if (ep % 10 == 0) {
-      D_COUT("Episode " << ep << ", Round " << env.Round() << "\n");
+      _DROut("Episode " << ep << ", Round " << env.Round() << "\n");
     }
   }
-  D_COUT("\nDone. Total episodes: " << episodes << "\n");
+  _DROut("\nDone. Total episodes: " << episodes << "\n");
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace PrisonerWorldTest

@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
+#include "Homotuples.h"
 #include <_Config.h>
 
-#ifndef TILEWORLD_STATE
-#define TILEWORLD_STATE
+#ifndef _iGeekTileWorldState
+#define _iGeekTileWorldState
 
 #include "player.h"
 #include "settings_graphics.h"
@@ -43,7 +43,7 @@ class State {
   State(StateData* state_data);
   virtual ~State();
 
-  const bool& GetQuit() const;
+  const bool& GetQuit();
   const bool KeyTime();
 
   void EndState();
@@ -51,9 +51,9 @@ class State {
   void UnpauseState();
 
   virtual void UpdateMousePositions(sf::View* view = nullptr);
-  virtual void UpdateKeyTime(const FPC& dt);
-  virtual void UpdateInput(const FPC& dt) = 0;
-  virtual void Update(const FPC& dt) = 0;
+  virtual void UpdateKeyTime(FPC& dt);
+  virtual void UpdateInput(FPC& dt) = 0;
+  virtual void Update(FPC& dt) = 0;
   virtual void Render(sf::RenderTarget* target = nullptr) = 0;
 };
 

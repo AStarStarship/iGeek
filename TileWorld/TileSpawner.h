@@ -3,13 +3,11 @@
 // TileSpawner.h — headless enemy-spawner tile (TileWorld core, SFML stripped).
 // Render() deleted (headless). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
-//
+#include <_Config.h>
+#include <Homotuples.h>
 #include "Tile.h"
-
-#ifndef TILEWORLD_ENEMYSPAWNERTILE_DECL
-#define TILEWORLD_ENEMYSPAWNERTILE_DECL
+#ifndef _iGeekTileWorldSpawnerH
+#define _iGeekTileWorldSpawnerH
 
 class TileSpawner : public Tile {
   _::ISC enemy_type_;
@@ -25,8 +23,8 @@ class TileSpawner : public Tile {
               _::FPC enemy_max_distance);
   virtual ~TileSpawner();
 
-  const _::ISC& GetEnemyType() const;
-  const _::BOL& GetSpawned() const;
+  const _::ISC& GetEnemyType();
+  const _::BOL& GetSpawned();
 
   // Modifiers
   void SetSpawned(const _::BOL spawned);

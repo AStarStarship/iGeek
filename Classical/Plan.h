@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_PLAN_T
-#define IGEEK_CLASSICAL_PLAN_T 1
+#ifndef _iGeekClassicalPlanH
+#define _iGeekClassicalPlanH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -88,5 +88,5 @@ function DECOMPOSE(hierarchy, s0 , plan, sf ) returns a solution
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalPlanH

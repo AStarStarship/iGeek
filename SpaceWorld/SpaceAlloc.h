@@ -1,12 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_ALLOC_H
-#define CRABS_SPACEWORLD_ALLOC_H
+#ifndef _iGeekSpaceWorldAllocH
+#define _iGeekSpaceWorldAllocH
 #include "SpaceConfig.h"
 #include "SpaceMath.h"
 #include "SpaceRcs.h"
 #include "SpaceCaps.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
 /** Distributes signed per-axis commands to the 24 RCS thrusters
  * (ThrusterAllocator.ts). Rotation works in the torque domain: a positive
@@ -30,7 +30,7 @@ struct TSpaceAllocator
    * for a signed rotation torque command (body frame, N m).
    * out[idx] in [0, thrust_max[idx]].
    */
-  void AllocateRotation(const TSpaceVec& torque, FPD out[SpaceRcsTotal]) {
+  void AllocateRotation(TSpaceVec& torque, FPD out[SpaceRcsTotal]) {
     last_rot.x = last_rot.x * rot_alpha + torque.x * (1 - rot_alpha);
     last_rot.y = last_rot.y * rot_alpha + torque.y * (1 - rot_alpha);
     last_rot.z = last_rot.z * rot_alpha + torque.z * (1 - rot_alpha);
@@ -77,7 +77,7 @@ struct TSpaceAllocator
   /** Fill `out` (SpaceRcsTotal, caller zeroed) with per-thruster demands
    * for a signed translation force command (body frame, N).
    */
-  void AllocateTranslation(const TSpaceVec& force, FPD out[SpaceRcsTotal]) {
+  void AllocateTranslation(TSpaceVec& force, FPD out[SpaceRcsTotal]) {
     last_lin.x = last_lin.x * lin_alpha + force.x * (1 - lin_alpha);
     last_lin.y = last_lin.y * lin_alpha + force.y * (1 - lin_alpha);
     last_lin.z = last_lin.z * lin_alpha + force.z * (1 - lin_alpha);
@@ -130,5 +130,5 @@ struct TSpaceAllocator
   void Reset() { last_rot = TSpaceVec(); last_lin = TSpaceVec(); }
 };
 } //< namespace iGeek
-#endif
-#endif
+#endif //< _Seam >= _iGeekSpaceWorldCore
+#endif //< _iGeekSpaceWorldAllocH

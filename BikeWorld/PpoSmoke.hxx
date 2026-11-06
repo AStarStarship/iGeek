@@ -1,13 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
 // Integration smoke only: this does not train or validate learned balance.
 #include "TileRuntime.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "BikeGym.hxx"
 #include "../PPO.hxx"
 #include <stdio.h>
 using namespace _;
 // PPO training smoke test. Converted from a standalone ISC main() — now a
 // callable the seam unit invokes. Returns 0 on success, 1 on failure.
-// (D_COUT kept as legacy debt, same as CarWorld/HeadlessTests.hxx.)
+// (_DROut kept as legacy debt, same as CarWorld/HeadlessTests.hxx.)
 ISC RunAllPpoSmoke() {
   TileMap map(1.0f, 120, 64);
   TVehicleRoute route; route.count = 2;
@@ -20,13 +21,13 @@ ISC RunAllPpoSmoke() {
   TPPOStats stats = {};
   for (ISC update = 0; update < 10; ++update) {
     stats = trainer.TrainStep();
-    if (!isfinite(stats.policy_loss_) || !isfinite(stats.value_loss_) ||
-        !isfinite(stats.entropy_) || !isfinite(stats.approx_kl_) ||
-        !isfinite(stats.explained_var_)) {
-      D_COUT("PPO_SMOKE failed update=" << update << "\n"); return 1;
+    if (!iGeek::IsFinite(stats.policy_loss_) || !iGeek::IsFinite(stats.value_loss_) ||
+        !iGeek::IsFinite(stats.entropy_) || !iGeek::IsFinite(stats.approx_kl_) ||
+        !iGeek::IsFinite(stats.explained_var_)) {
+      _DROut("PPO_SMOKE failed update=" << update << "\n"); return 1;
     }
   }
-  D_COUT("PPO_SMOKE passed updates=10 envs=" << gym.EnvCount() << " horizon=32 "
+  _DROut("PPO_SMOKE passed updates=10 envs=" << gym.EnvironmentCount() << " horizon=32 "
       "policy_loss=%.6f value_loss=%.6f entropy=%.6f\n");
   return 0;
 }

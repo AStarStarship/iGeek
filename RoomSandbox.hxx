@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_ROOM_SANDBOX_HXX
-#define IGEEK_ROOM_SANDBOX_HXX 1
+#ifndef _iGeekRoomSandboxHXX
+#define _iGeekRoomSandboxHXX
 #include "RoomSandbox.h"
 namespace iGeek {
 
@@ -42,5 +42,5 @@ BOL RoomSandboxIsRunning(const RoomSandbox* sandbox) {
   return sandbox && sandbox->active && !sandbox->paused;
 }
 
-}  //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekRoomSandboxHXX

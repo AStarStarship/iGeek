@@ -1,18 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
 #include "PrisonerWorld.h"
-#if SEAM >= CRABS_PRISONERWORLD
+#if _Seam >= _iGeekPrisonerWorldCore
 namespace iGeek {
 
 /* The one-and-only Prisoner environment instance.
- * Defined here so _Main.cpp can access it via PrisonerEnvPtr.
+ * Defined here so _Seams.cpp can access it via PrisonerEnvironmentironmentPtr.
  */
-PrisonerEnv the_prisoner_env;
+PrisonerEnvironment the_prisoner_env;
 
 /* Exported symbol: the one-and-only Prisoner environment instance.
- * Defined as a variable (not a function) so it can be accessed as PrisonerEnvPtr
+ * Defined as a variable (not a function) so it can be accessed as PrisonerEnvironmentironmentPtr
  * from other translation units.
  */
-PrisonerEnv* PrisonerEnvPtr = &the_prisoner_env;
+PrisonerEnvironment* PrisonerEnvironmentironmentPtr = &the_prisoner_env;
 
 } //< namespace iGeek
-#endif  // SEAM >= CRABS_PRISONERWORLD
+#endif  //< _Seam >= _iGeekPrisonerWorldCore

@@ -4,7 +4,7 @@
 // Matches the SFML-stripped ComponentMovement.h: the component no longer holds
 // an sf::Sprite&. It stores velocity + tuning constants; Move() integrates the
 // velocity, Update() clamps/decelerates then applies the displacement to a
-// passed-in _::TVec2F& position (the entity's pos_). No-stdlib.
+// passed-in _::FPC2& position (the entity's pos_). No-stdlib.
 #include "ComponentMovement.h"
 
 namespace TileWorld {
@@ -12,15 +12,15 @@ namespace TileWorld {
 MovementComponent::MovementComponent(_::FPC velocity_max, _::FPC acceleration,
                                      _::FPC deceleration)
     : velocity_max_(velocity_max), acceleration_(acceleration),
-      deceleration_(deceleration), velocity_(_::TVec2F(0.f, 0.f)) {}
+      deceleration_(deceleration), velocity_(_::FPC2(0.f, 0.f)) {}
 
 MovementComponent::~MovementComponent() {}
 
-const _::FPC& MovementComponent::VelocityMax() const { return velocity_max_; }
+const _::FPC& MovementComponent::VelocityMax() { return velocity_max_; }
 
-const _::TVec2F& MovementComponent::Velocity() const { return velocity_; }
+const _::FPC2& MovementComponent::Velocity() { return velocity_; }
 
-const _::BOL MovementComponent::GetState(const _::IUM state) const {
+const _::BOL MovementComponent::GetState(const _::IUM state) {
   switch (state) {
     case kIdle:
       if (velocity_.x == 0.f && velocity_.y == 0.f) return true;
@@ -59,7 +59,7 @@ void MovementComponent::Move(const _::FPC dir_x, const _::FPC dir_y,
   velocity_.y += acceleration_ * dir_y * dt;
 }
 
-void MovementComponent::Update(const _::FPC& dt, _::TVec2F& position) {
+void MovementComponent::Update(const _::FPC& dt, _::FPC2& position) {
   if (velocity_.x > 0.f) {
     if (velocity_.x > velocity_max_) velocity_.x = velocity_max_;
     velocity_.x -= deceleration_ * dt;

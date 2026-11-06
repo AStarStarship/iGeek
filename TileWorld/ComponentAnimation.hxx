@@ -1,7 +1,5 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
+#include "Homotuples.h"
 #include "animation_.h"
 
 AnimationComponent::AnimationComponent(sf::Sprite& sprite,
@@ -126,7 +124,7 @@ AnimationComponent::Animation::Animation(sf::Sprite& sprite,
   sprite.setTextureRect(start_rect);
 }
 
-const bool& AnimationComponent::Animation::IsDone() const { return done; }
+const bool& AnimationComponent::Animation::IsDone() { return done; }
 
 const bool& AnimationComponent::Animation::Play(const float& dt) {
   done = false;

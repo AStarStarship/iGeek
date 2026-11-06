@@ -1,17 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
-// The card world's POLICY-BACKWARD seam unit: the M4 finite-difference
-// gradcheck — the load-bearing correctness gate for the PPO loop. Verifies
-// TTransformer::Backward's grad_logits/grad_value match the numeric
-// (f(x+eps)-f(x-eps))/2eps gradient of TPolicyLoss/TValueLoss.
-// Gated on IGEEK_CARDSWORLD_CORE.
-
-#if SEAM >= IGEEK_CARDSWORLD_CORE
-
-using namespace ::_;
+#if _Seam >= _iGeekCardsWorldCore
 namespace CardsWorldTest {
+using namespace ::_;
+using namespace iGeek; 
 
-namespace {
 inline ISC& PBFAILS() {
   static ISC count = 0;
   return count;
@@ -19,7 +11,7 @@ inline ISC& PBFAILS() {
 #define PB_CHECK(cond)                                       \
   do {                                                       \
     if (!::_::Test(cond)) {                                  \
-      ::_::StdOut() << "\nFAILURE PolicyBwd at line:" << __LINE__ \
+      ::_::RefOut() << "\nFAILURE PolicyBwd at line:" << __LINE__ \
                     << " in \"" << __FILE__ << "\"\n";       \
       ++PBFAILS();                                           \
     }                                                        \
@@ -29,7 +21,7 @@ inline ISC& PBFAILS() {
   do {                                                       \
     { FPC _d = (a) - (b); if (_d < 0) _d = -_d;             \
       if (!::_::Test(_d < (tol))) {                         \
-        ::_::StdOut() << "\nFAILURE PolicyBwd (close " << (ISC)((a)*1e6f) \
+        ::_::RefOut() << "\nFAILURE PolicyBwd (close " << (ISC)((a)*1e6f) \
                       << " vs " << (ISC)((b)*1e6f) << ") at line:" \
                       << __LINE__ << " in \"" << __FILE__ << "\"\n"; \
         ++PBFAILS();                                         \
@@ -37,7 +29,7 @@ inline ISC& PBFAILS() {
 }  //< namespace
 
 inline const CHA* PolicyBwd(const CHA* args) {
-  A_TEST_BEGIN;
+  _ATestBegin;
   const ISC B = 3, A = 3;
   const FPC eps = 1e-3f;
 
@@ -57,7 +49,7 @@ inline const CHA* PolicyBwd(const CHA* args) {
   TTensor old_logp = TTensorAlloc(B, 1);  // unused by base grad.
   old_logp.At(0,0)=0; old_logp.At(1,0)=0; old_logp.At(2,0)=0;
 
-  D_COUT("PolicyBwd: gradcheck grad_logits (analytic vs finite-diff)\n");
+  _DROut("PolicyBwd: gradcheck grad_logits (analytic vs finite-diff)\n");
   // Analytic grad from Backward.
   TTransformer net(4, A, 8, 1);  // net shape irrelevant to the base grad.
   TTensor grad_logits = TTensorAlloc(B, A);
@@ -87,7 +79,7 @@ inline const CHA* PolicyBwd(const CHA* args) {
   }
   (void)max_err_idx;
 
-  D_COUT("PolicyBwd: gradcheck grad_value (analytic vs finite-diff)\n");
+  _DROut("PolicyBwd: gradcheck grad_value (analytic vs finite-diff)\n");
   for (ISC b = 0; b < B; ++b) {
     FPC lo = values.At(b, 0);
     values.At(b, 0) = lo + eps;
@@ -105,7 +97,7 @@ inline const CHA* PolicyBwd(const CHA* args) {
     PB_CHECK(de < 1e-4f);
   }
 
-  D_COUT("PolicyBwd: grad_logits row-sums to ~ -adv (identity check)\n");
+  _DROut("PolicyBwd: grad_logits row-sums to ~ -adv (identity check)\n");
   // For the policy surrogate, sum_a dL/dlogits[b,a] = -adv[b] * (1 - sum_a p)
   // = -adv[b] * (1 - 1) = 0. So each row's grad_logits should sum to ~0.
   for (ISC b = 0; b < B; ++b) {
@@ -120,11 +112,11 @@ inline const CHA* PolicyBwd(const CHA* args) {
   TTensorFree(grad_value);
 
   if (PBFAILS() != 0) {
-    D_COUT("\n" << PBFAILS() << " PolicyBwd assertion(s) FAILED\n");
+    _DROut("\n" << PBFAILS() << " PolicyBwd assertion(s) FAILED\n");
     return "cards_world_policy_bwd_test_failure";
   }
-  D_COUT("PolicyBwd: gradcheck PASSED (max err " << (ISC)(max_err*1e6f) << "e-6)\n");
-  return NILP;
+  _DROut("PolicyBwd: gradcheck PASSED (max err " << (ISC)(max_err*1e6f) << "e-6)\n");
+  return _NilP;
 }
 
 }  //< namespace CardsWorldTest

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_CSP_IMPL
-#define IGEEK_CLASSICAL_CSP_IMPL
+#ifndef _iGeekClassicalCSPH_IMPL
+#define _iGeekClassicalCSPH_IMPL
 #include "Csp.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -11,7 +11,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete). No naked new/delete/malloc in this folder.
 //
 // Domains are IUC bitmasks, so var_count and domain_count are both <= 32.
@@ -25,7 +25,7 @@ static inline IUW* CspFree(IUW* origin) {
 
 static inline void CspWipe(IUW* origin, IUD bytes) {
   IUD aligned = bytes + ((-bytes) & IUD(ACPUWordMask));
-  IUW* p = TPtr<IUW>(origin);
+  IUW* p = TRef<IUW>(origin);
   for (IUD i = 0; i < aligned >> ACPUBytesLog2; ++i) {
     p[i] = 0;
   }
@@ -90,9 +90,9 @@ struct CspArcQueue {
   ISC cap;
   ISC count;
   ISC head;
-  CspArcQueue() : mem(NILP), cap(0), count(0), head(0) {}
-  CspArcQueue(const CspArcQueue&) = delete;
-  CspArcQueue& operator=(const CspArcQueue&) = delete;
+  CspArcQueue() : mem(_NilP), cap(0), count(0), head(0) {}
+  CspArcQueue(CspArcQueue&) = delete;
+  CspArcQueue& operator=(CspArcQueue&) = delete;
   ~CspArcQueue() {
     Free();
   }
@@ -101,9 +101,9 @@ struct CspArcQueue {
     while (cap < expected) {
       cap <<= 1;
     }
-    mem = ObjectFactoryHeap(NILP, IUD(cap) * IUD(sizeof(IUD)));
+    mem = ObjectFactoryHeap(_NilP, IUD(cap) * IUD(sizeof(IUD)));
     if (IsError(mem)) {
-      mem = NILP;
+      mem = _NilP;
       cap = 0;
       return false;
     }
@@ -112,33 +112,33 @@ struct CspArcQueue {
     head = 0;
     return true;
   }
-  IUD* Items() const {
-    return TPtr<IUD>(mem);
+  IUD* Items() {
+    return TRef<IUD>(mem);
   }
   BOL Push(IUD arc) {
     if (count + 1 > cap) {
       ISC nc = cap * 2;
-      IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(sizeof(IUD)));
+      IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(sizeof(IUD)));
       if (IsError(nm)) {
         return false;
       }
-      IUD* ni = TPtr<IUD>(nm);
+      IUD* ni = TRef<IUD>(nm);
       for (ISC i = 0; i < count - head; ++i) {
-        ni[i] = TPtr<IUD>(mem)[head + i];
+        ni[i] = TRef<IUD>(mem)[head + i];
       }
       mem = CspFree(mem);
       mem = nm;
       cap = nc;
       head = 0;
     }
-    TPtr<IUD>(mem)[count++] = arc;
+    TRef<IUD>(mem)[count++] = arc;
     return true;
   }
-  BOL Empty() const {
+  BOL Empty() {
     return count == head;
   }
   IUD Pop() {
-    return TPtr<IUD>(mem)[head++];
+    return TRef<IUD>(mem)[head++];
   }
   void Free() {
     mem = CspFree(mem);
@@ -196,23 +196,23 @@ struct CspTrail {
   IUW* mem;
   ISC cap;
   ISC top;
-  CspTrail() : mem(NILP), cap(0), top(0) {}
-  CspTrail(const CspTrail&) = delete;
-  CspTrail& operator=(const CspTrail&) = delete;
+  CspTrail() : mem(_NilP), cap(0), top(0) {}
+  CspTrail(CspTrail&) = delete;
+  CspTrail& operator=(CspTrail&) = delete;
   ~CspTrail() {
     Free();
   }
-  Entry* Entries() const {
-    return TPtr<Entry>(mem);
+  Entry* Entries() {
+    return TRef<Entry>(mem);
   }
   BOL Init(ISC expected) {
     cap = 16;
     while (cap < expected) {
       cap <<= 1;
     }
-    mem = ObjectFactoryHeap(NILP, IUD(cap) * IUD(sizeof(Entry)));
+    mem = ObjectFactoryHeap(_NilP, IUD(cap) * IUD(sizeof(Entry)));
     if (IsError(mem)) {
-      mem = NILP;
+      mem = _NilP;
       cap = 0;
       return false;
     }
@@ -222,19 +222,19 @@ struct CspTrail {
   BOL Push(ISC var, IUC old_mask) {
     if (top + 1 > cap) {
       ISC nc = cap * 2;
-      IUW* nm = ObjectFactoryHeap(NILP, IUD(nc) * IUD(sizeof(Entry)));
+      IUW* nm = ObjectFactoryHeap(_NilP, IUD(nc) * IUD(sizeof(Entry)));
       if (IsError(nm)) {
         return false;
       }
-      Entry* ne = TPtr<Entry>(nm);
+      Entry* ne = TRef<Entry>(nm);
       for (ISC i = 0; i < top; ++i) {
-        ne[i] = TPtr<Entry>(mem)[i];
+        ne[i] = TRef<Entry>(mem)[i];
       }
       mem = CspFree(mem);
       mem = nm;
       cap = nc;
     }
-    Entry* e = &TPtr<Entry>(mem)[top++];
+    Entry* e = &TRef<Entry>(mem)[top++];
     e->var = var;
     e->old_mask = old_mask;
     return true;
@@ -380,11 +380,11 @@ static BOL CspBacktrackRec(const CSP* csp, IUC* d, IUC* asg, CspTrail* trail,
 
 BOL CspBacktrack(CSP* csp, const IUC* domains, IUC* out) {
   ISC words = csp->var_count;
-  IUW* mem = ObjectFactoryHeap(NILP, IUD(words) * IUD(sizeof(IUC)) * 2);
+  IUW* mem = ObjectFactoryHeap(_NilP, IUD(words) * IUD(sizeof(IUC)) * 2);
   if (IsError(mem)) {
     return false;
   }
-  IUC* d = TPtr<IUC>(mem);
+  IUC* d = TRef<IUC>(mem);
   IUC* asg = d + words;
   for (ISC v = 0; v < words; ++v) {
     d[v] = domains[v];
@@ -408,11 +408,11 @@ static inline IUD CspLcgStep(IUD s) {
 BOL CspMinConflicts(CSP* csp, const IUC* domains, IUC* out, ISC max_steps,
                     IUD seed) {
   ISC words = csp->var_count;
-  IUW* mem = ObjectFactoryHeap(NILP, IUD(words) * IUD(sizeof(IUC)) * 2);
+  IUW* mem = ObjectFactoryHeap(_NilP, IUD(words) * IUD(sizeof(IUC)) * 2);
   if (IsError(mem)) {
     return false;
   }
-  IUC* asg = TPtr<IUC>(mem);
+  IUC* asg = TRef<IUC>(mem);
   IUC* cv = asg + words;
   // Greedy initial assignment: each variable takes the value with the fewest
   // conflicts against the already-assigned earlier variables.
@@ -506,11 +506,11 @@ static BOL CspTreeDfsNC(const IUC* adj, IUC* parent, IUC* order, ISC* order_n,
 
 BOL CspTree(CSP* csp, const IUC* domains, IUC* out) {
   ISC words = csp->var_count;
-  IUW* mem = ObjectFactoryHeap(NILP, IUD(words) * IUD(sizeof(IUC)) * 5);
+  IUW* mem = ObjectFactoryHeap(_NilP, IUD(words) * IUD(sizeof(IUC)) * 5);
   if (IsError(mem)) {
     return false;
   }
-  IUC* d = TPtr<IUC>(mem);
+  IUC* d = TRef<IUC>(mem);
   IUC* adj = d + words;
   IUC* parent = adj + words;
   IUC* order = parent + words;

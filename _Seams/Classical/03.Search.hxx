@@ -1,18 +1,14 @@
 // Copyright AStarship <https://astarship.net>.
-//
 // Classical Search seam unit: graph search (BFS, UCS, IDS, DLS, RBFS).
-// Gated on IGEEK_CLASSICAL_SEARCH.
-#if SEAM >= IGEEK_CLASSICAL_CORE
-#if SEAM >= IGEEK_CLASSICAL_CORE
+#if _Seam >= _iGeekClassicalSearch
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-#include "Search.hxx"
-#include <cstdio>
-#include <cmath>
+#include "../../Classical/Search.hxx"
 namespace iGeek {
+using namespace ::_;
+using namespace iGeek; 
 
 static int s_pass = 0;
 static int s_fail = 0;
@@ -20,10 +16,10 @@ static int s_fail = 0;
 static void SCHECK(const char* name, BOL ok) {
   if (ok) {
     s_pass++;
-    D_COUT("PASS " << name << '\n');
+    _DROut("PASS " << name << '\n');
   } else {
     s_fail++;
-    D_COUT("FAIL " << name << '\n');
+    _DROut("FAIL " << name << '\n');
   }
 }
 
@@ -71,9 +67,9 @@ static FPC SHeuristic(const IUC* state, ISC state_words) {
 }
 
 inline const CHA* Search(const CHA* args) {
-#if SEAM >= IGEEK_CLASSICAL_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing Classical Search (BFS/UCS/IDS/DLS/RBFS)..."));
+#if _Seam >= _iGeekClassicalCore
+  _ATestBegin;
+  _DROut(Headingf("Testing Classical Search (BFS/UCS/IDS/DLS/RBFS)..."));
 
   IUC initial[1] = {0};
   Problem problem;
@@ -165,11 +161,11 @@ inline const CHA* Search(const CHA* args) {
     SCHECK("BFS: path_cap too small -> no solution", n < 0);
   }
 
-  D_COUT("s_pass=" << s_pass << " s_fail=" << s_fail << '\n');
-  return s_fail ? "CLASSICAL_SEARCH_FAIL: " : NILP;
+  _DROut("s_pass=" << s_pass << " s_fail=" << s_fail << '\n');
+  return s_fail ? "CLASSICAL_SEARCH_FAIL: " : _NilP;
 
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace iGeek

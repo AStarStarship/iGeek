@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_STOCHASTIC_DECL
-#define IGEEK_CLASSICAL_STOCHASTIC_DECL
+#ifndef _iGeekClassicalStochasticH
+#define _iGeekClassicalStochasticH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 #include "Search.h"
@@ -238,7 +238,7 @@ struct OnlineDfsAgent {
 
 /* Fig 4.24 LRTA*-AGENT over a single-outcome Problem. H[s] is the cost
 estimate (h when s is new); result[s, a] the successor observed. The step
-cost is problem.StepCost (NILP => unit cost). */
+cost is problem.StepCost (_NilP => unit cost). */
 struct LrtaStarAgent {
   Autoject table_mem_;
   Autoject data_mem_;
@@ -252,9 +252,9 @@ struct LrtaStarAgent {
   ~LrtaStarAgent();
   BOL Init(const Problem* problem);
   IUC Percept(const IUC* s_next);
-  FPC Cost(ISC state_id) const;  //< H[s] (sentinel-1 when unseen)
+  FPC Cost(ISC state_id);  //< H[s] (sentinel-1 when unseen)
   void Reset();
 };
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalStochasticH

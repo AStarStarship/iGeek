@@ -1,25 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
-// 
-// TypingWorld core seam unit: unit tests for the deterministic typing-mine
-// engine. Gated on IGEEK_TYPINGWORLD_CORE (first / default seam).
-// No C/C++ standard library: I/O via COut (ASCIICrabs console primitive).
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-#if SEAM == IGEEK_TYPINGWORLD_CORE
+#if _Seam >= _iGeekTypingWorldCore
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-// TypingWorld.hxx is pulled ONCE by the rollup _Tests.hxx; rely on that.
-using namespace ::_;
 namespace TypingWorldTest {
-using namespace iGeek;   // engine types (in iGeek) used unqualified
+using namespace ::_;
+using namespace iGeek;
 
 // Test determinism: two worlds with the same seed produce identical state.
 inline const CHA* Core(const CHA* args) {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (typing-mine core)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (typing-mine core)..."));
 
   // --- Determinism: two worlds with the same seed produce identical state ---
   const IUD seed = 7;
@@ -29,19 +22,19 @@ inline const CHA* Core(const CHA* args) {
   ISC n_steps = 200;
   for (ISC s = 0; s < n_steps; ++s) {
     // Alternate between typing the current target char and a wrong char
-    if (world_a.Target() != NILP) {
+    if (world_a.Target() != _NilP) {
       // Type correct char
       world_a.PressKey(world_a.Target()->word[world_a.Target()->hits]);
       // Type a wrong char (space is always wrong when word starts non-space)
       world_a.PressKey(' ');
       // Type another correct char
-      if (world_a.Target() != NILP)
+      if (world_a.Target() != _NilP)
         world_a.PressKey(world_a.Target()->word[world_a.Target()->hits]);
     }
-    if (world_b.Target() != NILP) {
+    if (world_b.Target() != _NilP) {
       world_b.PressKey(world_b.Target()->word[world_b.Target()->hits]);
       world_b.PressKey(' ');
-      if (world_b.Target() != NILP)
+      if (world_b.Target() != _NilP)
         world_b.PressKey(world_b.Target()->word[world_b.Target()->hits]);
     }
   }
@@ -66,7 +59,7 @@ inline const CHA* Core(const CHA* args) {
   CHA buf_b[iGeek::TypingWorldBlock::BlockWordMax + 1];
   world_a.TargetTyped(buf_a);
   world_b.TargetTyped(buf_b);
-  if (strcmp(buf_a, buf_b) != 0) {
+  if (TSCompare<CHA, CHD>(buf_a, buf_b) != 0) {
     return "TYPINGWORLD_FAIL: TargetTyped string mismatch (determinism)";
   }
   // Also verify world_b's state matches
@@ -74,17 +67,17 @@ inline const CHA* Core(const CHA* args) {
     return "TYPINGWORLD_FAIL: Remaining mismatch (determinism)";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 // --- Correct char advances: typing the next expected character advances state ---
 inline const CHA* CorrectCharAdvances() {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (correct char advance)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (correct char advance)..."));
   iGeek::TypingWorld world(7);
   // Read the current target word's first char
-  if (world.Target() == NILP) {
+  if (world.Target() == _NilP) {
     return "TYPINGWORLD_FAIL: no target on fresh world";
   }
   // Type the first character
@@ -112,16 +105,16 @@ inline const CHA* CorrectCharAdvances() {
     return "TYPINGWORLD_FAIL: hits changed after wrong PressKey";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 // --- Wrong char is a miss, no state change ---
 inline const CHA* WrongCharIsMiss() {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (wrong char is miss)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (wrong char is miss)..."));
   iGeek::TypingWorld world(7);
-  if (world.Target() == NILP) {
+  if (world.Target() == _NilP) {
     return "TYPINGWORLD_FAIL: no target on fresh world";
   }
   ISC old_hits = world.Target()->hits;
@@ -147,21 +140,21 @@ inline const CHA* WrongCharIsMiss() {
     return "TYPINGWORLD_FAIL: KeysMissed not +1 after wrong char";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 // --- Typing the full current word mines the block ---
 inline const CHA* MineFullWord() {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (mine full word)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (mine full word)..."));
   iGeek::TypingWorld world(7);
-  if (world.Target() == NILP) {
+  if (world.Target() == _NilP) {
     return "TYPINGWORLD_FAIL: no target on fresh world";
   }
   // Type chars until the block is mined
   while (!world.Done()) {
-    if (world.Target() == NILP) break;
+    if (world.Target() == _NilP) break;
     // Type the next expected character
     bool advanced = world.PressKey(world.Target()->word[world.Target()->hits]);
     (void)advanced;
@@ -174,18 +167,18 @@ inline const CHA* MineFullWord() {
     return "TYPINGWORLD_FAIL: MinedCount did not increment after full word";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 // --- Mine the whole world: repeatedly type each Target()->word in full until Done ---
 inline const CHA* MineWholeWorld() {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (mine whole world)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (mine whole world)..."));
   iGeek::TypingWorld world(7);
   // Mine until Done
   while (!world.Done()) {
-    if (world.Target() == NILP) break;
+    if (world.Target() == _NilP) break;
     // Type the full current word from current hits to word_len
     ISC wlen = world.Target()->word_len;
     for (ISC c = world.Target()->hits; c < wlen; ++c) {
@@ -199,8 +192,8 @@ inline const CHA* MineWholeWorld() {
   if (world.Remaining() != 0) {
     return "TYPINGWORLD_FAIL: Remaining != 0";
   }
-  if (world.Target() != NILP) {
-    return "TYPINGWORLD_FAIL: Target != NILP when Done";
+  if (world.Target() != _NilP) {
+    return "TYPINGWORLD_FAIL: Target != _NilP when Done";
   }
   if (world.TargetIndex() != -1) {
     return "TYPINGWORLD_FAIL: TargetIndex != -1 when Done";
@@ -209,18 +202,18 @@ inline const CHA* MineWholeWorld() {
     return "TYPINGWORLD_FAIL: KeysMissed != 0 when Done";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 // --- Reset restores ---
 inline const CHA* ResetRestores() {
-#if SEAM >= IGEEK_TYPINGWORLD_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing TypingWorld (reset restores)..."));
+#if _Seam >= _iGeekTypingWorldCore
+  _ATestBegin;
+  _DROut(Headingf("Testing TypingWorld (reset restores)..."));
   iGeek::TypingWorld world(7);
   // Mine the whole world first
   while (!world.Done()) {
-    if (world.Target() == NILP) break;
+    if (world.Target() == _NilP) break;
     ISC wlen = world.Target()->word_len;
     for (ISC c = world.Target()->hits; c < wlen; ++c) {
       world.PressKey(world.Target()->word[c]);
@@ -247,7 +240,7 @@ inline const CHA* ResetRestores() {
     return "TYPINGWORLD_FAIL: KeysMissed != 0 after Reset";
   }
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace TypingWorldTest

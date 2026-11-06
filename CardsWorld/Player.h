@@ -1,10 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-
 #pragma once
-#ifndef IGEEK_CARDSPLAYER_DECL
-#define IGEEK_CARDSPLAYER_DECL
+#ifndef _iGeekCardsPlayerH
+#define _iGeekCardsPlayerH
 #include <_Config.h>
-#if SEAM >= IGEEK_PLAYER
+#if _Seam >= _iGeekCardsWorldCore
 #include "Hand.h"
 namespace iGeek {
 namespace CardsWorld {
@@ -28,7 +27,7 @@ class Player {
   virtual ~Player() {}
 
   /* Gets the name. */
-  const CHA* Name() const { return name_; }
+  const CHA* Name() { return name_; }
 
   /* Sets the name (truncated to NameLengthMax-1). */
   void SetName(const CHA* name);
@@ -37,7 +36,7 @@ class Player {
   Hand& GetHand() { return hand_; }
 
   /* Returns the point/credit total. */
-  ISC PointsCount() const { return point_count_; }
+  ISC PointsCount() { return point_count_; }
 
   /* Adds (or subtracts) points. @return the new total. */
   ISC PointsAdd(ISC num_points);
@@ -46,13 +45,13 @@ class Player {
   void ResetWins() { win_count_ = 0; }
 
   /* Returns the win count. */
-  ISC WinCount() const { return win_count_; }
+  ISC WinCount() { return win_count_; }
 
   /* Adds a win. */
   void WinAdd() { ++win_count_; }
 };
 
-}  //< namespace CardsWorld
-} //< namespace iGeek
-#endif
-#endif
+}       //< namespace CardsWorld
+}       //< namespace iGeek
+#endif  //< _Seam >= _iGeekCardsWorldCore
+#endif  //< _iGeekCardsPlayerH  

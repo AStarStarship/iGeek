@@ -1,6 +1,6 @@
 # iGeek Engineering Plan
 
-Updated: 2026-10-20.
+Updated: 2026-10-29.
 Scope: public-safe native simulation, control, measurement and integration.
 This consolidated plan replaces conflicting historical handoffs. A completed
 smoke test is not acceptance of physics, a learning algorithm or an autopilot.
@@ -64,6 +64,12 @@ new test run performed for this documentation update:
   Worlds need individually verified status; directory presence is not support.
 - ArmWorld and the spacecraft autopilot are roadmap work, not implemented or
   validated capabilities claimed by this plan. No new World is launched here.
+- AI Gym core (2026-10-29): all 6 phases implemented and tested — Manifest,
+  AgentSlot, Script, JobQueue, RoomSandbox, RolloutCompare. 167 Gym checks
+  pass in the full seam suite (244 total). 5 Gym subclasses (CarWorld,
+  BikeWorld, ArmWorld, PacWorld, SudokuWorld) carry EnvironmentManifest. All 12 World
+  READMEs labeled per section 8. LoadDLL returns BOL (explicit failure).
+  Gym buffer ownership/shape/mutability/lifetime documented in Gym.h.
 
 ## 4. Acceptance blockers and bounded repair order
 
@@ -280,7 +286,7 @@ Do not reuse a stale binary as evidence for changed sources.
     cmake --build "$TMPDIR/BikeWorldRelease" -j4
     ctest --test-dir "$TMPDIR/BikeWorldRelease" --output-on-failure
 
-For separate Debug sanitizer builds, use IGEEK_SANITIZE, CARWORLD_SANITIZE or
+For separate Debug sanitizer builds, use _iGeekSanatize, _CarWorldSanatize or
 BIKEWORLD_SANITIZE respectively. Do not conflate a single subdirectory's
 CTest result with the whole repository or all dependencies.
 

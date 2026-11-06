@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonH
+#define _iGeekPolygonWorldGeneticPolygonH
 namespace iGeek {
 
 /* A class that represents a this that can morph through a genetic algorithm with other shapes.
@@ -117,7 +119,7 @@ class GeneticPolygon : public Polygon {
     void RenderBitmap();
 
     static FPD CrossOver(FPD dominant, FPD recessive);
-
+#endif  //< _iGeekPolygonWorldGeneticPolygonH
     void Rotate();
 
     FPD BoundBetween0and1(FPD inputValue);

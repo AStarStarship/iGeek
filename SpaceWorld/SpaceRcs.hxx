@@ -1,11 +1,11 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_SPACEWORLD_RCS_HXX
-#define CRABS_SPACEWORLD_RCS_HXX
+#ifndef _iGeekSpaceWorldRcsHXX
+#define _iGeekSpaceWorldRcsHXX
 #include "SpaceRcs.h"
-#if SEAM >= CRABS_SPACEWORLD
+#if _Seam >= _iGeekSpaceWorldCore
 namespace iGeek {
-void TSpaceRcsBuild(TSpaceThruster out[SpaceRcsTotal], const TSpaceHalf& half) {
+void TSpaceRcsBuild(TSpaceThruster out[SpaceRcsTotal], TSpaceHalf& half) {
   FPD hw = half.x, hh = half.y, hd = half.z;
   FPD c = 0.1;  // Cone half-height (m).
   // Front face (mounted at -Z), fires +Z. indices 0-3.

@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CHARACTER_HXX
-#define IGEEK_CHARACTER_HXX
+#ifndef _iGeekCharacterHXX
+#define _iGeekCharacterHXX
 #include "Character.h"
 
 using namespace PacWorld;
@@ -12,7 +12,7 @@ Character::Character()
       direction_(0, 0),
       next_direction_(0, 0),
       previous_intersection_(-1, -1),
-      maze_(NILP) {
+      maze_(_NilP) {
   for (ISC i = 0; i < 4; ++i) available_directions_[i] = true;
 }
 
@@ -89,28 +89,28 @@ void Character::Update(FPC delta) {
 
 void Character::SetDirection(ISC2 direction) { direction_ = direction; }
 
-ISC2 Character::Direction() const { return direction_; }
+ISC2 Character::Direction() { return direction_; }
 
 void Character::SetSpeed(FPC speed) { speed_ = speed; }
 
-FPC Character::Speed() const { return speed_; }
+FPC Character::Speed() { return speed_; }
 
 void Character::SetPosition(FPC2 position) { position_ = position; }
 
-FPC2 Character::Position() const { return position_; }
+FPC2 Character::Position() { return position_; }
 
-FPC4 Character::CollisionBox() const {
+FPC4 Character::CollisionBox() {
   // 34x34 box centered on the character (was sf::Transformable::transformRect).
   return FPC4(position_.x - 17.f, position_.y - 17.f, 34.f, 34.f);
 }
 
 void Character::SetMaze(Maze* maze) {
-  if (NILP == maze) return;
+  if (_NilP == maze) return;
   maze_ = maze;
 }
 
-BOL Character::WillMove() const {
+BOL Character::WillMove() {
   return !maze_->IsWall(previous_intersection_ + next_direction_);
 }
 
-#endif  // IGEEK_CHARACTER_HXX
+#endif  //< _iGeekCharacterHXX

@@ -1,8 +1,6 @@
-# [iGeek Cookbook](../)
-
-## [Getting Started](./)
-
-### Configuration and Build System
+---
+title: Configuration and Build System
+---
 
 iGeek is a **no-stdlib C++23** engine. Every build is CMake + GCC (or Clang)
 with `-std=c++2b`; there are no external dependencies for the core or the
@@ -37,7 +35,7 @@ cmake --build BikeWorld/build -j
 Undefined + float-cast-overflow, with recovery disabled):
 
 ```Bash
-cmake -S . -B build_core_san -DCMAKE_BUILD_TYPE=Debug -DIGEEK_SANITIZE=ON
+cmake -S . -B build_core_san -DCMAKE_BUILD_TYPE=Debug -D _iGeekSanataize=ON
 cmake --build build_core_san -j
 ASAN_OPTIONS=detect_leaks=1 ./build_core_san/igeeK_core
 ```
@@ -50,9 +48,3 @@ result. There is no CTest, GoogleTest, or Catch2 anywhere in the tree.
 
 **Requirements.** GCC 13+ (C++23), CMake 3.16+, a POSIX shell. Linux is the
 primary target; the engine is headless and console-only.
-
-**[<< Previous Section: Command Line Usage](./CommandLineUsage.md) | [Next Section: Mission and Vision >>](./MissionAndVision.md)**
-
-## License
-
-Copyright [AStarship™](https://astarship.net).

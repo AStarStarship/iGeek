@@ -1,7 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
-#include "skill_component.h"
+#include "SkillComponent.h"
 
 SkillComponent::SkillComponent() {
   skills.Push(Skill(SKILLS::kConstitution));
@@ -12,7 +10,7 @@ SkillComponent::SkillComponent() {
 
 SkillComponent::~SkillComponent() {}
 
-const int SkillComponent::GetSkill(const int skill) const {
+const int SkillComponent::GetSkill(const int skill) {
   if (skills.empty() || skill < 0 || skill >= skills.size())
     throw("ERROR::SKILLCOMPONENT::GETSKILL::SKILL DOES NOT EXIST: " + skill);
   else

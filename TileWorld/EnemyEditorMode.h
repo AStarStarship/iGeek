@@ -1,4 +1,4 @@
-#include "TVec.h"
+#include "Homotuples.h"
 // Copyright AStarship <https://astarship.net>.
 #ifndef TILEWORLD_ENEMYEDITORMODE
 #define TILEWORLD_ENEMYEDITORMODE
@@ -34,9 +34,9 @@ class EnemyEditorMode : public EditorMode {
   virtual ~EnemyEditorMode();
 
   // Functions
-  void updateInput(const FPC& dt);
-  void updateGui(const FPC& dt);
-  void Update(const FPC& dt);
+  void updateInput(FPC& dt);
+  void updateGui(FPC& dt);
+  void Update(FPC& dt);
 
   void renderGui(sf::RenderTarget& target);
   void Render(sf::RenderTarget& target);

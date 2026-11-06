@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_SAT_DECL
-#define IGEEK_CLASSICAL_SAT_DECL
+#ifndef _iGeekClassicalSatH
+#define _iGeekClassicalSatH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -304,9 +304,9 @@ struct KBAgent {
   BOL Tell(const SatClause* clauses, ISC count);
   /* KB entails the query iff KB ∧ ¬query is unsatisfiable. `query_neg`
   is the CNF of the negated query (the caller's MAKE-ACTION-QUERY). */
-  BOL Ask(const SatClause* query_neg, ISC count, IUD universe) const;
+  BOL Ask(const SatClause* query_neg, ISC count, IUD universe);
   /* Clauses currently in the KB (count = kb_count_). */
-  const SatClause* Clauses() const;
+  const SatClause* Clauses();
 };
 
 /* Fig 7.22 SATPLAN. Time-unindexed predicate atoms 0..atom_count-1
@@ -384,9 +384,9 @@ struct HybridWumpusAgent {
   entered a new square). */
   IUC Percept(const WumpusPercept* p, BOL moved, IUC x, IUC y);
   /* ASK(KB, OKx,y) — safe to move into (x, y)? */
-  BOL Safe(IUC x, IUC y) const;
+  BOL Safe(IUC x, IUC y);
   /* ASK(KB, ¬Wx,y) — the wumpus is NOT at (x, y)? */
-  BOL NotWumpus(IUC x, IUC y) const;
+  BOL NotWumpus(IUC x, IUC y);
   /* PLAN-ROUTE: append the relative actions moving from `from` to one of
   `goals` through `allowed | goals` squares (SearchBFS). */
   BOL Route(IUC from, IUD goals, IUD allowed);
@@ -394,5 +394,5 @@ struct HybridWumpusAgent {
   BOL PlanShot(IUC current, IUD possible, IUD safe);
 };
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalSatH

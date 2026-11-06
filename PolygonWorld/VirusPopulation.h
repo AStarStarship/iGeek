@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldVirusPopulationH
+#define _iGeekPolygonWorldVirusPopulationH
 #include "Host.h"
 #include "Virus.h"
 
@@ -45,4 +47,6 @@ class VirusPopulation {
   ISC numViruses;   //< The number of Viruses.
   Virus[] viruses;  //< The array of Virus.
   Host host;        //< A pointer to the Host this VirusPopulation lives on.
-}
+};
+
+#endif  //< _iGeekPolygonWorldVirusPopulationH

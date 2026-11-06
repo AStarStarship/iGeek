@@ -238,7 +238,7 @@ SI4 XYDirection(SI4 dx, SI4 dy) {
 
 MazeAgent::State::State() {}
 
-MazeAgent::State::State(const State& other) {
+MazeAgent::State::State(State& other) {
   state = other.state;
   x = other.x;
   y = other.y;
@@ -294,7 +294,7 @@ MazeAgent::Point2D::Point2D() {}
 
 MazeAgent::Point2D::Point2D(State& state) : x(state.x), y(state.y) {}
 
-MazeAgent::Point2D::Point2D(const Point2D& other) : x(other.x), y(other.y) {}
+MazeAgent::Point2D::Point2D(Point2D& other) : x(other.x), y(other.y) {}
 
 MazeAgent::MazeAgent(PolicyPilot pilot, MazeLoader get_maze, SI4 maze_number)
     : state(),

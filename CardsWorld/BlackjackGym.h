@@ -1,9 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CARDSBLACKJACKGYM_DECL
-#define IGEEK_CARDSBLACKJACKGYM_DECL
+#ifndef _iGeekCardsWorldCoreSBLACKJACKGYM_DECL
+#define _iGeekCardsWorldCoreSBLACKJACKGYM_DECL
 #include <_Config.h>
-#if SEAM >= IGEEK_BLACKJACKGYM
+#if _Seam >= _i
 #include "Blackjack.h"
 #include "../Tensor.h"
 namespace iGeek {
@@ -36,7 +36,7 @@ class BlackjackGym {
   explicit BlackjackGym(ISC tables);
   ~BlackjackGym();
 
-  ISC Tables() const { return table_count_; }
+  ISC Tables() { return table_count_; }
 
   /* Reset every table to a fresh round (batch ResetBatch). */
   void ResetBatch();
@@ -56,7 +56,7 @@ class BlackjackGym {
   Blackjack& Table(ISC i) { return *tables_[i]; }
 
   /* The total reward summed across the batch for the last step. */
-  FPC LastBatchReward() const { return last_batch_reward_; }
+  FPC LastBatchReward() { return last_batch_reward_; }
 
  private:
   ISC table_count_;

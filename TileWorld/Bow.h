@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef TILEWORLD_BOW
-#define TILEWORLD_BOW
+#ifndef _TileWorldBowH
+#define _TileWorldBowH
 #include <_Config.h>
 //
 #include "WeaponRanged.h"

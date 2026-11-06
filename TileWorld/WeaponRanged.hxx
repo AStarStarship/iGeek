@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "ranged_weapon.h"
+#include "RangedWeapon.h"
 
 WeaponRanged::WeaponRanged() { std::cout << "\nRangedWeapon"; }
 

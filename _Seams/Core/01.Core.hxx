@@ -1,22 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
-// iGeek core seam unit: the RL/agent layer self-test (SEAM >= IGEEK_CORE).
-// Inlined from core_test.cpp. Uses the ASCIICrabs seam test API
-// (Test/StdOut) — no <stdio.h>, no D_COUT, no C++ standard library.
-// Math (sin/cos) comes from the C library <math.h>, the same pragmatic
-// choice as Tensor.hxx (C, not C++ std).
-#pragma once
-#include <_Config.h>
-// The ASCIICrabs runtime (StdOut/COut, IsFinite/Puff, Stringf, Valuef, Test,
-// SScan, AType) is pulled ONCE by the rollup _Tests.hxx via _Package.hxx, which
-// is included BEFORE this seam unit. We do NOT re-include _Package.hxx here:
-// it is an unguarded rollup, and BIn.hxx/BOut.hxx (inside it) have no include
-// guards, so a second include redefines their functions. <math.h> is the only
-// direct include this unit needs (sin/cos for the toy Gym; C lib, not C++ std).
-#if SEAM >= IGEEK_CORE
-#include <math.h>       // sin/cos for the toy Gym (C library, not C++ std)
-
+#include "../CrabsTK/Math/Blas.h"
+#if _Seam >= _iGeekCore
 namespace iGeekTest {
-using namespace iGeek;   // RL core types (Gym/TTensor/TPPO/...) live in iGeek
+using namespace ::_;
+using namespace iGeek; 
 
 ISC core_fails = 0;
 
@@ -25,7 +12,7 @@ ISC core_fails = 0;
 inline void CoreCheck(BOL ok, const CHA* what) {
   if (!::_::Test(ok)) {
     core_fails += 1;
-    ::_::StdOut() << "\ncore FAIL: " << what << '\n';
+    ::_::RefOut() << "\ncore FAIL: " << what << '\n';
   }
 }
 
@@ -87,8 +74,7 @@ class TCoreToyGym : public Gym {
 };
 
 inline const CHA* Core(const CHA* args) {
-  (void)args;
-  A_TEST_BEGIN;
+  _ATestBegin;
 
   /* --- 1. TTensor ops -------------------------------------------- */
   TTensor A = TTensorAlloc(2, 2);
@@ -99,16 +85,16 @@ inline const CHA* Core(const CHA* args) {
   B.At(0, 0) = 5.0f; B.At(0, 1) = 6.0f;
   B.At(1, 0) = 7.0f; B.At(1, 1) = 8.0f;
   TTensorMatMul(A, B, C);
-  CoreCheck(C.AtC(0, 0) == 19.0f, "matmul(0,0)");
-  CoreCheck(C.AtC(0, 1) == 22.0f, "matmul(0,1)");
-  CoreCheck(C.AtC(1, 0) == 43.0f, "matmul(1,0)");
-  CoreCheck(C.AtC(1, 1) == 50.0f, "matmul(1,1)");
+  CoreCheck(C.At(0, 0) == 19.0f, "matmul(0,0)");
+  CoreCheck(C.At(0, 1) == 22.0f, "matmul(0,1)");
+  CoreCheck(C.At(1, 0) == 43.0f, "matmul(1,0)");
+  CoreCheck(C.At(1, 1) == 50.0f, "matmul(1,1)");
   TTensorFree(A); TTensorFree(B); TTensorFree(C);
 
   TTensor S = TTensorAlloc(1, 3);
   S.At(0, 0) = 1.0f; S.At(0, 1) = 1.0f; S.At(0, 2) = 1.0f;
   TTensorSoftmaxInPlace(S);
-  FPC sx = S.AtC(0, 0) + S.AtC(0, 1) + S.AtC(0, 2);
+  FPC sx = S.At(0, 0) + S.At(0, 1) + S.At(0, 2);
   CoreCheck(sx > 0.999f && sx < 1.001f, "softmax sums to 1");
   TTensorFree(S);
 
@@ -125,7 +111,7 @@ inline const CHA* Core(const CHA* args) {
   policy.Forward(obs, logits2, values2);
   BOL fwd_same = true;
   for (ISC i = 0; i < 4; ++i) {
-    if (logits.AtC(i / 2, i % 2) != logits2.AtC(i / 2, i % 2)) fwd_same = false;
+    if (logits.At(i / 2, i % 2) != logits2.At(i / 2, i % 2)) fwd_same = false;
   }
   CoreCheck(fwd_same, "linear forward deterministic");
 
@@ -149,9 +135,9 @@ inline const CHA* Core(const CHA* args) {
   CoreCheck(finite, "ppo stats finite");
 
   /* --- 4. Agent tiers --------------------------------------------- */
-  /* TTableAgent: history -> action via bound entries. */
+  /* TableAgent: history -> action via bound entries. */
   {
-    TTableAgent agent(/*action_count=*/2, /*history_len=*/1, /*percept_len=*/1);
+    TableAgent agent(/*action_count=*/2, /*history_len=*/1, /*percept_len=*/1);
     IUC key = 0;
     agent.SetEntry(&key, 1);
     IUC percept = 0;
@@ -176,9 +162,9 @@ inline const CHA* Core(const CHA* args) {
     IUC percept = 7;
     agent.OnPercept(&percept, 1);
     agent.OnPercept(&percept, 1);
-    const AgentState* st_ = agent.State();
-    CoreCheck(st_ != NILP, "model agent exposes state");
-    if (st_ != NILP) {
+    AgentState* st_ = agent.State();
+    CoreCheck(st_ != _NilP, "model agent exposes state");
+    if (st_ != _NilP) {
       IUC w0 = st_->Get(0);
       CoreCheck(w0 != 0, "model agent state accumulates");
     }
@@ -210,11 +196,11 @@ inline const CHA* Core(const CHA* args) {
   }
 
   if (core_fails != 0) {
-    ::_::StdOut() << "\niGeek core: " << core_fails << " check(s) FAILED\n";
+    ::_::RefOut() << "\niGeek core: " << core_fails << " check(s) FAILED\n";
     return "iGeek_core_test_failure";
   }
-  ::_::StdOut() << "\niGeek core: all checks passed\n";
-  return NILP;
+  ::_::RefOut() << "\niGeek core: all checks passed\n";
+  return _NilP;
 }
 
 }  //< namespace iGeekTest

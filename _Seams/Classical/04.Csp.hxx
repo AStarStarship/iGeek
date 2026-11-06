@@ -1,17 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
-//
-// Classical Csp seam unit: constraint satisfaction (AC-3, Backtrack,
-// MinConflicts, Tree). Gated on IGEEK_CLASSICAL_CSP.
-#if SEAM >= IGEEK_CLASSICAL_CORE
-#if SEAM >= IGEEK_CLASSICAL_CORE
+#if _Seam >= _iGeekClassicalCSPH
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
-#endif
-#include "Csp.hxx"
-#include <cstdio>
+#include "../../Classical/Csp.hxx"
 namespace iGeek {
+using namespace ::_;
+using namespace iGeek; 
 
 static int c_pass = 0;
 static int c_fail = 0;
@@ -19,10 +15,10 @@ static int c_fail = 0;
 static void CCHECK(const char* name, BOL ok) {
   if (ok) {
     c_pass++;
-    D_COUT("PASS " << name << '\n');
+    _DROut("PASS " << name << '\n');
   } else {
     c_fail++;
-    D_COUT("FAIL " << name << '\n');
+    _DROut("FAIL " << name << '\n');
   }
 }
 
@@ -86,9 +82,9 @@ static BOL VerifySolution(const CSP* csp, const IUC* out) {
 }
 
 inline const CHA* Csp(const CHA* args) {
-#if SEAM >= IGEEK_CLASSICAL_CORE
-  A_TEST_BEGIN;
-  D_COUT(Headingf("Testing Classical Csp (AC-3/Backtrack/MinConflicts/Tree)..."));
+#if _Seam >= _iGeekClassicalCore
+  _ATestBegin;
+  _DROut(Headingf("Testing Classical Csp (AC-3/Backtrack/MinConflicts/Tree)..."));
 
   CSP csp = BuildPathCsp();
 
@@ -155,11 +151,11 @@ inline const CHA* Csp(const CHA* args) {
     }
   }
 
-  D_COUT("c_pass=" << c_pass << " c_fail=" << c_fail << '\n');
-  return c_fail ? "CLASSICAL_CSP_FAIL: " : NILP;
+  _DROut("c_pass=" << c_pass << " c_fail=" << c_fail << '\n');
+  return c_fail ? "CLASSICAL_CSP_FAIL: " : _NilP;
 
 #endif
-  return NILP;
+  return _NilP;
 }
 
 }  //< namespace iGeek

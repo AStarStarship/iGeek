@@ -1,5 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-
+#pragma once
+#ifndef _iGeekPolygonWorldCellH
+#define _iGeekPolygonWorldCellH
 namespace iGeek {
 
 class Cell : public GeneticPolygon
@@ -45,3 +47,5 @@ class Cell : public GeneticPolygon
 };
 
 }  //< namespace iGeek
+
+#endif  //< _iGeekPolygonWorldCellH

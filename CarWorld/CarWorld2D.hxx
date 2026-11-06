@@ -1,17 +1,18 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_CARWORLD_2D_HXX
-#define CRABS_CARWORLD_2D_HXX
+#ifndef _iGeekCarWorld2DHXX
+#define _iGeekCarWorld2DHXX
 #include "CarWorld2D.h"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarPilot.hxx"
-#if SEAM >= CRABS_CARWORLD
+#if _Seam >= _iGeekCarWorldCore
 namespace iGeek {
 const CHA* TCarStatusName(ISC status) {
   const CHA* names[] = {"running", "goal", "collision", "timeout", "invalid", "blocked", "stopped"};
   return status >= CarRunning && status <= CarStopped ? names[status] : "?";
 }
-ACarEnv::ACarEnv(const TileMap& map, const TVehicleRoute& route,
-    const TCarState& initial, IUD seed)
+ACarEnv::ACarEnv(TileMap& map, TVehicleRoute& route,
+    TCarState& initial, IUD seed)
     : map_(map), route_(route), initial_(initial), seed_(seed) { Reset(); }
 void ACarEnv::Reset() {
   car_ = initial_; pilot_.Reset(); metrics_ = {}; status_ = CarRunning;
@@ -23,8 +24,8 @@ void ACarEnv::Reset() {
   if (!Done() && (route_.count < 2 || route_.count > VehicleRouteMax)) status_ = CarBlocked;
   if (!Done()) {
     for (ISC i = 0; i < route_.count; ++i) {
-      const TVehiclePoint& point = route_.points[i];
-      if (!isfinite(point.x) || !isfinite(point.y) || point.x < 0 || point.y < 0 ||
+      TVehiclePoint& point = route_.points[i];
+      if (!iGeek::IsFinite(point.x) || !iGeek::IsFinite(point.y) || point.x < 0 || point.y < 0 ||
           point.x >= map_.SizeMaxF().x || point.y >= map_.SizeMaxF().y) status_ = CarInvalid;
     }
   }
@@ -36,16 +37,16 @@ void ACarEnv::Reset() {
   }
   Observe();
 }
-FPD ACarEnv::GoalDistance() const {
+FPD ACarEnv::GoalDistance() {
   if (route_.count < 2 || route_.count > VehicleRouteMax) return 1e100;
-  const TVehiclePoint& goal = route_.points[route_.count - 1];
+  TVehiclePoint& goal = route_.points[route_.count - 1];
   return hypot(goal.x - car_.x, goal.y - car_.y);
 }
 void ACarEnv::Peaks() {
   TVehicleGuide guide = TVehicleGuidance(route_, car_.x, car_.y, car_.heading, 5);
   metrics_.max_cross_track = TBikeMax(metrics_.max_cross_track, guide.cross_track);
   metrics_.max_speed = TBikeMax(metrics_.max_speed, hypot(car_.forward, car_.lateral));
-  metrics_.max_lateral_accel = TBikeMax(metrics_.max_lateral_accel, fabs(car_.lateral_accel));
+  metrics_.max_lateral_accel = TBikeMax(metrics_.max_lateral_accel, Absolute(car_.lateral_accel));
   metrics_.max_utilization = TBikeMax(metrics_.max_utilization, car_.utilization);
 }
 FPC ACarEnv::Step(ISC action) {
@@ -63,10 +64,10 @@ FPC ACarEnv::Step(ISC action) {
   }
   return reward;
 }
-FPC ACarEnv::StepControl(const TCarControl& control) {
+FPC ACarEnv::StepControl(TCarControl& control) {
   if (Done()) return 0;
-  if (!TCarParamsValid(params_) || !isfinite(control.steer) ||
-      !isfinite(control.throttle) || !isfinite(control.brake)) {
+  if (!TCarParamsValid(params_) || !iGeek::IsFinite(control.steer) ||
+      !iGeek::IsFinite(control.throttle) || !iGeek::IsFinite(control.brake)) {
     status_ = CarInvalid; Observe(); return -10;
   }
   TVehicleGuide before = TVehicleGuidance(route_, car_.x, car_.y, car_.heading, 5);
@@ -101,7 +102,7 @@ FPC ACarEnv::StepControl(const TCarControl& control) {
 void ACarEnv::Observe() {
   for (ISC i = 0; i < ObsLength; ++i) obs_[i] = 0;
   if (status_ == CarInvalid || route_.count < 2 || route_.count > VehicleRouteMax) return;
-  const TVehiclePoint& goal = route_.points[route_.count - 1];
+  TVehiclePoint& goal = route_.points[route_.count - 1];
   FPD ch = cos(car_.heading), sh = sin(car_.heading);
   FPD dx = goal.x - car_.x, dy = goal.y - car_.y;
   TVehicleGuide guide = TVehicleGuidance(route_, car_.x, car_.y, car_.heading, 5);

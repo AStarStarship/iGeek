@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_GYM_H
-#define CRABS_BIKEWORLD_GYM_H
+#ifndef _iGeekBikeWorldGymH
+#define _iGeekBikeWorldGymH
 #include "BikeWorld.h"
 #include "../Gym.h"
-#if SEAM >= CRABS_BIKEWORLD
+#if _Seam >= _iGeekBikeWorldCore
 namespace iGeek {
 /** Actual iGeek Gym interface, with 1..GymEnvMax independent bike states.
  * Categorical actions select pilot speed commands; this is NOT an end-to-end
@@ -15,16 +15,16 @@ namespace iGeek {
 class ABikeGym : public Gym
 {
  public:
-  ABikeGym(const TileMap& map, const TVehicleRoute& route,
-           const TBikeState& initial, ISC count = 4, IUD seed = 1);
+  ABikeGym(TileMap& map, TVehicleRoute& route,
+           TBikeState& initial, ISC count = 4, IUD seed = 1);
   ~ABikeGym() override;
-  ABikeGym(const ABikeGym&) = delete;
-  ABikeGym& operator=(const ABikeGym&) = delete;
+  ABikeGym(ABikeGym&) = delete;
+  ABikeGym& operator=(ABikeGym&) = delete;
   void ResetBatch() override;
   void StepBatch() override;
-  /** @pre i in [0,EnvCount()). */
+  /** @pre i in [0,EnvironmentCount()). */
   ABikeEnv& Bike(ISC i) { return *bikes_[i]; }
-  ISC LastStatus(ISC i) const {
+  ISC LastStatus(ISC i) {
     return i >= 0 && i < env_count_ ? last_status_[i] : BikeInvalid;
   }
  private:

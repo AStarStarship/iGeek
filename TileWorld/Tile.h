@@ -7,11 +7,10 @@
 // world bounds from (grid_x, grid_y) * grid_size. Render() deleted
 // (headless). No-stdlib.
 #pragma once
-#include <_ConfigHeader.h>
-#include <TVec.h>
-
-#ifndef TILEWORLD_TILE
-#define TILEWORLD_TILE
+#ifndef _iGeekTileWorldTileH
+#define _iGeekTileWorldTileH
+#include <_Config.h>
+#include <Homotuples.h>
 
 enum TileTypes { kDefault = 0, kDamaging, kDoodad, kSpawnerEnemy };
 
@@ -23,7 +22,7 @@ class Tile {
   _::TIntRect texture_rect_;  // which atlas cell (data only)
   _::BOL collision_;
   _::ISM type_;
-  _::TVec2F position_;  // world position (was the sprite position)
+  _::FPC2 position_;  // world position (was the sprite position)
 
  public:
   Tile();
@@ -31,12 +30,12 @@ class Tile {
        const _::TIntRect& texture_rect, const _::BOL collision);
   virtual ~Tile();
 
-  const _::ISM& GetType() const;
-  virtual const _::BOL& GetCollision() const;
+  const _::ISM& GetType();
+  virtual BOL GetCollision();
 
-  virtual const _::TVec2F& GetPosition() const;
-  virtual const _::TFloatRect GlobalBounds() const;
-  virtual const _::BOL Intersects(const _::TFloatRect bounds) const;
+  virtual const _::FPC2& GetPosition();
+  virtual const _::TFloatRect GlobalBounds();
+  virtual const _::BOL Intersects(const _::TFloatRect bounds);
 
   virtual void Update() = 0;
 };

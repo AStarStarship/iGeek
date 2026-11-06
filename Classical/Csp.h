@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_CSP_DECL
-#define IGEEK_CLASSICAL_CSP_DECL
+#ifndef _iGeekClassicalCSPH_DECL
+#define _iGeekClassicalCSPH_DECL
 #include "../ASCIICrabs/_Config.h"
 namespace iGeek {
 

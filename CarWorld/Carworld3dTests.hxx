@@ -1,6 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 // 3D physics unit tests: flat ground rest, throttle pitch, turn roll, brake dive.
 #include "../BikeWorld/TileRuntime.hxx"
+#include "../../ASCIICrabs/Math.hxx"
 #include "CarPhysics3D.h"
 #include "CarPilot.hxx"
 #include <stdio.h>
@@ -8,7 +9,7 @@ using namespace _;
 static ISC checks = 0, failures = 0;
 static void Check(const CHA* name, BOL ok) {
   ++checks;
-  if (!ok) { ++failures; D_COUT("FAIL " << name << "\n"); }
+  if (!ok) { ++failures; _DROut("FAIL " << name << "\n"); }
 }
 ISC main() {
   // Flat map.
@@ -28,12 +29,12 @@ ISC main() {
     for (ISC sub = 0; sub < 4; ++sub)
       if (!TCarStep3D(car, p, zero, contacts, 0.005)) break;
   }
-  Check("3d: rest stays level (pitch)", fabs(car.pitch) < 0.005);
-  Check("3d: rest stays level (roll)", fabs(car.roll) < 0.005);
-  Check("3d: rest no movement", fabs(car.x - 32.5) < 1e-6);
+  Check("3d: rest stays level (pitch)", Absolute(car.pitch) < 0.005);
+  Check("3d: rest stays level (roll)", Absolute(car.roll) < 0.005);
+  Check("3d: rest no movement", Absolute(car.x - 32.5) < 1e-6);
   FPD fz_sum = 0;
   for (ISC i = 0; i < CarWheelCount; ++i) fz_sum += car.vertical_tire_force[i];
-  Check("3d: Fz closure ~ m*g", fabs(fz_sum - p.base.mass * BikeGravity) <
+  Check("3d: Fz closure ~ m*g", Absolute(fz_sum - p.base.mass * BikeGravity) <
       p.base.mass * BikeGravity * 0.05);
   // Test 2: full throttle at speed -> pitch up (nose up > 0).
   TCarState3D car2;
@@ -55,7 +56,7 @@ ISC main() {
   for (ISC frame = 0; frame < 25; ++frame) {
     for (ISC sub = 0; sub < 4; ++sub)
       if (!TCarStep3D(car3, p, turn, contacts, 0.005)) break;
-    max_roll = TBikeMax(max_roll, fabs(car3.roll));
+    max_roll = TBikeMax(max_roll, Absolute(car3.roll));
   }
   Check("3d: turn rolls", max_roll > 0.01);
   Check("3d: turn roll bounded", max_roll < 0.3);
@@ -90,6 +91,6 @@ ISC main() {
   FPD old_x = car6.x;
   BOL valid = TCarStep3D(car6, p, bad, contacts, 0.005);
   Check("3d: invalid input rejected", !valid || car6.x == old_x);
-  D_COUT("CARWORLD_3D checks=" << checks << " failures=" << failures << "\n");
+  _DROut("CARWORLD_3D checks=" << checks << " failures=" << failures << "\n");
   return failures == 0 ? 0 : 1;
 }

@@ -14,8 +14,9 @@
 // No C++ stdlib. Uses the TTensor ops from Tensor.hxx + <math.h>.
 #pragma once
 #include "Policy.h"
+#include "../ASCIICrabs/Math.hxx"
 #include "Tensor.hxx"
-#include <math.h>
+#include "../CrabsTK/Math/Blas.h"
 
 namespace iGeek {
 
@@ -40,7 +41,7 @@ void InitRand(TTensor& t, TLcg& rng, FPC scale) {
    With one token per row, the attention score is a single value, softmax of
    one element is 1.0, so the attention context == V. We still compute Q/K/V
    and the output projection to keep the structure correct + differentiable. */
-void MhsaForward(const TTensor& X, const TBlock& blk, TTensor& Y) {
+void MhsaForward(TTensor X, TBlock& blk, TTensor& Y) {
   ISC B = X.rows_;
   TTensor Q = TTensorAlloc(B, blk.dim_), K = TTensorAlloc(B, blk.dim_),
           V = TTensorAlloc(B, blk.dim_);
@@ -55,7 +56,7 @@ void MhsaForward(const TTensor& X, const TBlock& blk, TTensor& Y) {
 TTransformer::TTransformer(ISC obs_len, ISC action_count, ISC dim, ISC layers)
     : obs_len_(obs_len), action_count_(action_count),
       dim_(dim < 8 ? 8 : dim), layers_(layers < 1 ? 1 : layers),
-      seed_(12345), built_(false), blocks_(NILP) {}
+      seed_(12345), built_(false), blocks_(_NilP) {}
 
 TTransformer::~TTransformer() {
   if (!built_) {
@@ -64,7 +65,7 @@ TTransformer::~TTransformer() {
   TTensorFree(W_e_); TTensorFree(b_e_);
   TTensorFree(W_a_); TTensorFree(b_a_);
   TTensorFree(W_v_); TTensorFree(b_v_);
-  if (blocks_ != NILP) {
+  if (blocks_ != _NilP) {
     for (ISC l = 0; l < layers_; ++l) {
       TBlock& b = blocks_[l];
       TTensorFree(b.W_q); TTensorFree(b.W_k); TTensorFree(b.W_v);
@@ -73,7 +74,7 @@ TTransformer::~TTransformer() {
       TTensorFree(b.W_f2); TTensorFree(b.b_f1); TTensorFree(b.b_f2);
     }
     delete[] blocks_;
-    blocks_ = NILP;
+    blocks_ = _NilP;
   }
   built_ = false;
 }
@@ -88,7 +89,7 @@ void TTransformer::Build() {
     return;
   }
   TLcg rng(seed_);
-  FPC s = 1.0f / FPC(sqrt(FPC(dim_)));
+  FPC s = 1.0f / FPC(FPC(SquareRoot(dim_)));
   W_e_ = TTensorAlloc(obs_len_, dim_);
   b_e_ = TTensorAlloc(dim_, 1);
   InitRand(W_e_, rng, 0.5f);
@@ -121,7 +122,7 @@ void TTransformer::Build() {
   built_ = true;
 }
 
-void TTransformer::Forward(const TTensor& obs, TTensor& logits,
+void TTransformer::Forward(TTensor obs, TTensor& logits,
                            TTensor& values) {
   if (!built_) {
     Build();
@@ -133,7 +134,7 @@ void TTransformer::Forward(const TTensor& obs, TTensor& logits,
   TTensorLayerNormInPlace(H);
   // Blocks.
   for (ISC l = 0; l < layers_; ++l) {
-    const TBlock& blk = blocks_[l];
+    TBlock& blk = blocks_[l];
     TTensor Res = TTensorAlloc(B, dim_);
     for (ISC i = 0; i < B; ++i)
       for (ISC j = 0; j < dim_; ++j) Res.At(i, j) = H.At(i, j);
@@ -155,7 +156,7 @@ void TTransformer::Forward(const TTensor& obs, TTensor& logits,
   TTensorFree(H);
 }
 
-void TTransformer::SampleActions(const TTensor& logits, ISC* actions,
+void TTransformer::SampleActions(TTensor logits, ISC* actions,
                                  FPC* logp) {
   ISC B = logits.rows_;
   // Allocate LSE for ALL rows once (TTensorRowLogSumExp writes out.At(i,0) for
@@ -165,12 +166,12 @@ void TTransformer::SampleActions(const TTensor& logits, ISC* actions,
   TTensorRowLogSumExp(logits, lse);
   for (ISC b = 0; b < B; ++b) {
     ISC best = 0;
-    FPC bestv = logits.AtC(b, 0);
+    FPC bestv = logits.At(b, 0);
     for (ISC a = 1; a < logits.cols_; ++a) {
-      if (logits.AtC(b, a) > bestv) { bestv = logits.AtC(b, a); best = a; }
+      if (logits.At(b, a) > bestv) { bestv = logits.At(b, a); best = a; }
     }
     actions[b] = best;
-    logp[b] = logits.AtC(b, best) - lse.At(b, 0);
+    logp[b] = logits.At(b, best) - lse.At(b, 0);
   }
   TTensorFree(lse);
 }
@@ -188,26 +189,26 @@ void TTransformer::SampleActions(const TTensor& logits, ISC* actions,
      dV/dvalue[b]    = 2 * (value[b] - ret[b])
    (The PPO clip-ratio and vf-clip are applied in the TPPO loop on top of these
    base gradients; here we return the unclipped per-row gradients.) */
-void TTransformer::Backward(const TTensor& logits, const ISC* actions,
-                            const TTensor& advantages, const TTensor& old_logp,
-                            const TTensor& values, const TTensor& returns,
+void TTransformer::Backward(TTensor logits, const ISC* actions,
+                            TTensor advantages, TTensor old_logp,
+                            TTensor values, TTensor returns,
                             TTensor& grad_logits, TTensor& grad_value) {
   (void)old_logp;  // Used by the TPPO clip-ratio, not the base grad.
   ISC B = logits.rows_, A = logits.cols_;
   for (ISC b = 0; b < B; ++b) {
     // softmax(logits[b])
     TTensor row = TTensorAlloc(1, A);
-    for (ISC a = 0; a < A; ++a) row.At(0, a) = logits.AtC(b, a);
+    for (ISC a = 0; a < A; ++a) row.At(0, a) = logits.At(b, a);
     TTensorSoftmaxInPlace(row);
-    ISC a_b = (actions != NILP) ? actions[b] : 0;
-    FPC adv = advantages.AtC(b, 0);
+    ISC a_b = (actions != _NilP) ? actions[b] : 0;
+    FPC adv = advantages.At(b, 0);
     for (ISC a = 0; a < A; ++a) {
       FPC onehot = (a == a_b) ? 1.0f : 0.0f;
       grad_logits.At(b, a) = -adv * (onehot - row.At(0, a));
     }
     TTensorFree(row);
     // value grad
-    grad_value.At(b, 0) = 2.0f * (values.AtC(b, 0) - returns.AtC(b, 0));
+    grad_value.At(b, 0) = 2.0f * (values.At(b, 0) - returns.At(b, 0));
   }
 }
 
@@ -215,30 +216,30 @@ void TTransformer::Backward(const TTensor& logits, const ISC* actions,
    logp[b] = logits[b, a_b] - logsumexp(logits[b]). This is the scalar the M4
    finite-difference gradcheck differentiates w.r.t. the logits, and it is the
    same quantity whose gradient Backward returns (grad_logits). */
-FPC TPolicyLoss(const TTensor& logits, const ISC* actions,
-                const TTensor& advantages) {
+FPC TPolicyLoss(TTensor logits, const ISC* actions,
+                TTensor advantages) {
   ISC B = logits.rows_, A = logits.cols_;
   FPC total = 0.0f;
   for (ISC b = 0; b < B; ++b) {
     // logsumexp of row b (stable).
-    FPC maxv = logits.AtC(b, 0);
+    FPC maxv = logits.At(b, 0);
     for (ISC a = 1; a < A; ++a)
-      if (logits.AtC(b, a) > maxv) maxv = logits.AtC(b, a);
+      if (logits.At(b, a) > maxv) maxv = logits.At(b, a);
     FPC sum = 0.0f;
-    for (ISC a = 0; a < A; ++a) sum += FPC(exp(logits.AtC(b, a) - maxv));
+    for (ISC a = 0; a < A; ++a) sum += FPC(exp(logits.At(b, a) - maxv));
     FPC lse = maxv + FPC(log(sum));
-    ISC a_b = (actions != NILP) ? actions[b] : 0;
-    FPC logp = logits.AtC(b, a_b) - lse;
-    total += -logp * advantages.AtC(b, 0);
+    ISC a_b = (actions != _NilP) ? actions[b] : 0;
+    FPC logp = logits.At(b, a_b) - lse;
+    total += -logp * advantages.At(b, 0);
   }
   return total;
 }
 
 /* Value loss (scalar): V = sum_b (value[b] - ret[b])^2. */
-FPC TValueLoss(const TTensor& values, const TTensor& returns) {
+FPC TValueLoss(TTensor values, TTensor returns) {
   FPC total = 0.0f;
   for (ISC b = 0; b < values.rows_; ++b) {
-    FPC d = values.AtC(b, 0) - returns.AtC(b, 0);
+    FPC d = values.At(b, 0) - returns.At(b, 0);
     total += d * d;
   }
   return total;

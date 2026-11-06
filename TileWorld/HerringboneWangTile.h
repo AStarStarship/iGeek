@@ -96,7 +96,7 @@ STBHW_EXTERN void stbhw_get_template_size(stbhw_config *c, ISN *w, ISN *h);
 STBHW_EXTERN ISN stbhw_make_template(stbhw_config *c, unsigned char *data,
                                      ISN w, ISN h, ISN stride_in_bytes);
 
-#endif  // INCLUDE_STB_HWANG_H
+#endif  //< INCLUDE_STB_HWANG_H
 
 // TILE CONSTRAINT TYPES
 //
@@ -1175,4 +1175,4 @@ STBHW_EXTERN ISN stbhw_make_template(stbhw_config *c, unsigned char *data,
 
   return 1;
 }
-#endif  // STB_HBWANG_IMPLEMENTATION
+#endif  //< STB_HBWANG_IMPLEMENTATION

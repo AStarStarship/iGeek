@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_SEARCH_IMPL
-#define IGEEK_CLASSICAL_SEARCH_IMPL
+#ifndef _iGeekClassicalSearchHXX
+#define _iGeekClassicalSearchHXX
 #include "Search.h"
 #include "../ASCIICrabs/Binary.hpp"
 #include "../ASCIICrabs/Autoject.hxx"
@@ -12,7 +12,7 @@ namespace iGeek {
 //
 // All RAM is created and destroyed through the RAMFactory
 // (ObjectFactoryHeap — the same factory BigInt and AgentState use):
-//   alloc: ObjectFactoryHeap(NILP, bytes)  free: ObjectFactoryHeap(origin,
+//   alloc: ObjectFactoryHeap(_NilP, bytes)  free: ObjectFactoryHeap(origin,
 //   RAMFactoryDelete).  Fixed-capacity action scratch uses AArray
 // (stack-first, RAMFactory-managed under its Autoboofer). No naked
 // new/delete/malloc in this folder.
@@ -39,7 +39,7 @@ static BOL StatesEqualNC(const IUC* a, const IUC* b, ISC state_words) {
   return true;
 }
 
-/* Returns a RAMFactory block to the factory (a no-op for NILP origins). */
+/* Returns a RAMFactory block to the factory (a no-op for _NilP origins). */
 static inline IUW* SearchFree(IUW* origin) {
   return ObjectFactoryHeap(origin, RAMFactoryDelete);
 }
@@ -63,13 +63,13 @@ struct SearchPool {
   ISC count;
   ISC cap;
   SearchPool()
-      : states_(NILP, &ObjectFactoryHeap),
-        parents_(NILP, &ObjectFactoryHeap),
-        actions_(NILP, &ObjectFactoryHeap),
-        depth_(NILP, &ObjectFactoryHeap),
-        g_(NILP, &ObjectFactoryHeap), count(0), cap(0) {}
-  SearchPool(const SearchPool&) = delete;
-  SearchPool& operator=(const SearchPool&) = delete;
+      : states_(_NilP, &ObjectFactoryHeap),
+        parents_(_NilP, &ObjectFactoryHeap),
+        actions_(_NilP, &ObjectFactoryHeap),
+        depth_(_NilP, &ObjectFactoryHeap),
+        g_(_NilP, &ObjectFactoryHeap), count(0), cap(0) {}
+  SearchPool(SearchPool&) = delete;
+  SearchPool& operator=(SearchPool&) = delete;
   ~SearchPool() {
     Free();
   }
@@ -77,11 +77,11 @@ struct SearchPool {
     cap = cap0;
     count = 0;
     states_.origin =
-        ObjectFactoryHeap(NILP, IUD(cap0) * IUD(state_words) * IUD(sizeof(IUC)));
-    parents_.origin = ObjectFactoryHeap(NILP, IUD(cap0) * IUD(sizeof(ISC)));
-    actions_.origin = ObjectFactoryHeap(NILP, IUD(cap0) * IUD(sizeof(IUC)));
-    depth_.origin = ObjectFactoryHeap(NILP, IUD(cap0) * IUD(sizeof(ISC)));
-    g_.origin = ObjectFactoryHeap(NILP, IUD(cap0) * IUD(sizeof(FPC)));
+        ObjectFactoryHeap(_NilP, IUD(cap0) * IUD(state_words) * IUD(sizeof(IUC)));
+    parents_.origin = ObjectFactoryHeap(_NilP, IUD(cap0) * IUD(sizeof(ISC)));
+    actions_.origin = ObjectFactoryHeap(_NilP, IUD(cap0) * IUD(sizeof(IUC)));
+    depth_.origin = ObjectFactoryHeap(_NilP, IUD(cap0) * IUD(sizeof(ISC)));
+    g_.origin = ObjectFactoryHeap(_NilP, IUD(cap0) * IUD(sizeof(FPC)));
     return !IsError();
   }
   void Free() {
@@ -91,46 +91,46 @@ struct SearchPool {
     depth_.origin = SearchFree(depth_.origin);
     g_.origin = SearchFree(g_.origin);
   }
-  BOL IsError() const {
+  BOL IsError() {
     return _::IsError(states_.origin) || _::IsError(parents_.origin) ||
            _::IsError(actions_.origin) || _::IsError(depth_.origin) ||
            _::IsError(g_.origin);
   }
-  IUC* States() const {
-    return TPtr<IUC>(states_.origin);
+  IUC* States() {
+    return TRef<IUC>(states_.origin);
   }
-  ISC* Parents() const {
-    return TPtr<ISC>(parents_.origin);
+  ISC* Parents() {
+    return TRef<ISC>(parents_.origin);
   }
-  IUC* ActionArr() const {
-    return TPtr<IUC>(actions_.origin);
+  IUC* ActionArr() {
+    return TRef<IUC>(actions_.origin);
   }
-  ISC* Depth() const {
-    return TPtr<ISC>(depth_.origin);
+  ISC* Depth() {
+    return TRef<ISC>(depth_.origin);
   }
-  FPC* G() const {
-    return TPtr<FPC>(g_.origin);
+  FPC* G() {
+    return TRef<FPC>(g_.origin);
   }
 };
 
 static void SearchPoolGrow(SearchPool* pool, ISC state_words) {
   ISC new_cap = pool->cap * 2;
   IUW* ns = ObjectFactoryHeap(
-      NILP, IUD(new_cap) * IUD(state_words) * IUD(sizeof(IUC)));
-  IUW* np = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(ISC)));
-  IUW* na = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(IUC)));
-  IUW* nd = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(ISC)));
-  IUW* ng = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(FPC)));
-  IUC* ns_p = TPtr<IUC>(ns);
+      _NilP, IUD(new_cap) * IUD(state_words) * IUD(sizeof(IUC)));
+  IUW* np = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(ISC)));
+  IUW* na = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(IUC)));
+  IUW* nd = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(ISC)));
+  IUW* ng = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(FPC)));
+  IUC* ns_p = TRef<IUC>(ns);
   IUC* os = pool->States();
   for (ISC i = 0; i < pool->count; ++i) {
     for (ISC w = 0; w < state_words; ++w) {
       ns_p[IUD(i) * state_words + w] = os[IUD(i) * state_words + w];
     }
-    TPtr<ISC>(np)[i] = pool->Parents()[i];
-    TPtr<IUC>(na)[i] = pool->ActionArr()[i];
-    TPtr<ISC>(nd)[i] = pool->Depth()[i];
-    TPtr<FPC>(ng)[i] = pool->G()[i];
+    TRef<ISC>(np)[i] = pool->Parents()[i];
+    TRef<IUC>(na)[i] = pool->ActionArr()[i];
+    TRef<ISC>(nd)[i] = pool->Depth()[i];
+    TRef<FPC>(ng)[i] = pool->G()[i];
   }
   pool->Free();
   pool->states_.origin = ns;
@@ -160,7 +160,7 @@ static ISC SearchPoolAdd(SearchPool* pool, const IUC* state, ISC parent,
 
 /* Extract the action path from root to `node` (exclusive of the root's
 action). Returns -1 when the path is longer than path_cap. */
-static ISC SearchPoolPath(const SearchPool* pool, ISC node, IUC* path,
+static ISC SearchPoolPath(SearchPool* pool, ISC node, IUC* path,
                           ISC path_cap) {
   ISC len = 0;
   ISC n = node;
@@ -189,10 +189,10 @@ struct SearchVisited {
   ISC cap;
   ISC count;
   SearchVisited()
-      : keys_(NILP, &ObjectFactoryHeap), vals_(NILP, &ObjectFactoryHeap),
+      : keys_(_NilP, &ObjectFactoryHeap), vals_(_NilP, &ObjectFactoryHeap),
         cap(0), count(0) {}
-  SearchVisited(const SearchVisited&) = delete;
-  SearchVisited& operator=(const SearchVisited&) = delete;
+  SearchVisited(SearchVisited&) = delete;
+  SearchVisited& operator=(SearchVisited&) = delete;
   ~SearchVisited() {
     Free();
   }
@@ -203,8 +203,8 @@ struct SearchVisited {
     }
     cap = p;
     count = 0;
-    keys_.origin = ObjectFactoryHeap(NILP, IUD(p) * IUD(sizeof(IUD)));
-    vals_.origin = ObjectFactoryHeap(NILP, IUD(p) * IUD(sizeof(ISC)));
+    keys_.origin = ObjectFactoryHeap(_NilP, IUD(p) * IUD(sizeof(IUD)));
+    vals_.origin = ObjectFactoryHeap(_NilP, IUD(p) * IUD(sizeof(ISC)));
     if (IsError(keys_.origin) || IsError(vals_.origin)) {
       Free();
       return false;
@@ -213,11 +213,11 @@ struct SearchVisited {
     SearchWipe(vals_.origin, IUD(p) * IUD(sizeof(ISC)));
     return true;
   }
-  IUD* Keys() const {
-    return TPtr<IUD>(keys_.origin);
+  IUD* Keys() {
+    return TRef<IUD>(keys_.origin);
   }
-  ISC* Vals() const {
-    return TPtr<ISC>(vals_.origin);
+  ISC* Vals() {
+    return TRef<ISC>(vals_.origin);
   }
   void Free() {
     keys_.origin = SearchFree(keys_.origin);
@@ -231,8 +231,8 @@ static void SearchVisitedRehash(SearchVisited* vis, ISC new_cap) {
   ISC* ov = vis->Vals();
   vis->cap = new_cap;
   vis->count = 0;
-  vis->keys_.origin = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(IUD)));
-  vis->vals_.origin = ObjectFactoryHeap(NILP, IUD(new_cap) * IUD(sizeof(ISC)));
+  vis->keys_.origin = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(IUD)));
+  vis->vals_.origin = ObjectFactoryHeap(_NilP, IUD(new_cap) * IUD(sizeof(ISC)));
   SearchWipe(vis->keys_.origin, IUD(new_cap) * IUD(sizeof(IUD)));
   SearchWipe(vis->vals_.origin, IUD(new_cap) * IUD(sizeof(ISC)));
   ISC mask = new_cap - 1;
@@ -253,14 +253,14 @@ static void SearchVisitedRehash(SearchVisited* vis, ISC new_cap) {
       idx = (idx + 1) & mask;
     }
   }
-  SearchFree(TPtr<IUW>(ok));
-  SearchFree(TPtr<IUW>(ov));
+  SearchFree(TRef<IUW>(ok));
+  SearchFree(TRef<IUW>(ov));
 }
 
 /* Inserts the state of node `node` into the visited set.
 Returns true when newly inserted, false when an equal state was already
 present. */
-static BOL SearchVisitedInsert(SearchVisited* vis, const SearchPool* pool,
+static BOL SearchVisitedInsert(SearchVisited* vis, SearchPool* pool,
                                ISC state_words, IUD hash, ISC node) {
   const IUC* state = pool->States() + IUD(node) * IUD(state_words);
   ISC mask = vis->cap - 1;
@@ -283,9 +283,9 @@ static BOL SearchVisitedInsert(SearchVisited* vis, const SearchPool* pool,
   }
 }
 
-static FPC SearchStepCostNC(const Problem* problem, const SearchPool* pool,
+static FPC SearchStepCostNC(Problem* problem, SearchPool* pool,
                             ISC state_words, ISC parent, IUC action) {
-  if (problem->StepCost == NILP) {
+  if (problem->StepCost == _NilP) {
     return FPC(1.0f);
   }
   return problem->StepCost(pool->States() + IUD(parent) * IUD(state_words),
@@ -295,21 +295,21 @@ static FPC SearchStepCostNC(const Problem* problem, const SearchPool* pool,
 // --- Figures 3.13/3.22/3.24/3.30/3.38: the searchers -----------------------
 
 /* Figure 3.13 (breadth-first) with a visited set; unit-cost optimal. */
-ISC SearchBFS(const Problem* problem, IUC* path, ISC path_cap) {
+ISC SearchBFS(Problem* problem, IUC* path, ISC path_cap) {
   ISC sw = problem->state_words < 1 ? 1 : problem->state_words;
   SearchPool pool;
   SearchVisited vis;
   AArray<IUC, ISN, kSearchBranch> acts;
-  IUW* succ_mem = ObjectFactoryHeap(NILP, IUD(sw) * IUD(sizeof(IUC)));
-  IUW* queue_mem = ObjectFactoryHeap(NILP, 64 * sizeof(ISC));
+  IUW* succ_mem = ObjectFactoryHeap(_NilP, IUD(sw) * IUD(sizeof(IUC)));
+  IUW* queue_mem = ObjectFactoryHeap(_NilP, 64 * sizeof(ISC));
   if (!pool.Alloc(sw, 16) || !vis.Alloc(16) || IsError(succ_mem) ||
       IsError(queue_mem)) {
     succ_mem = SearchFree(succ_mem);
     queue_mem = SearchFree(queue_mem);
     return -1;
   }
-  IUC* succ = TPtr<IUC>(succ_mem);
-  ISC* queue = TPtr<ISC>(queue_mem);
+  IUC* succ = TRef<IUC>(succ_mem);
+  ISC* queue = TRef<ISC>(queue_mem);
   IUD h0 = StateHashNC(problem->initial, sw);
   SearchPoolAdd(&pool, problem->initial, -1, 0, 0, FPC(0.0f), sw);
   SearchVisitedInsert(&vis, &pool, sw, h0, 0);
@@ -351,13 +351,13 @@ ISC SearchBFS(const Problem* problem, IUC* path, ISC path_cap) {
       if (tail == queue_cap) {
         queue_cap *= 2;
         IUW* nq =
-            ObjectFactoryHeap(NILP, IUD(queue_cap) * IUD(sizeof(ISC)));
+            ObjectFactoryHeap(_NilP, IUD(queue_cap) * IUD(sizeof(ISC)));
         for (ISC i = 0; i < tail; ++i) {
-          TPtr<ISC>(nq)[i] = queue[i];
+          TRef<ISC>(nq)[i] = queue[i];
         }
         queue_mem = SearchFree(queue_mem);
         queue_mem = nq;
-        queue = TPtr<ISC>(queue_mem);
+        queue = TRef<ISC>(queue_mem);
       }
       queue[tail++] = m;
     }
@@ -368,7 +368,7 @@ ISC SearchBFS(const Problem* problem, IUC* path, ISC path_cap) {
 }
 
 /* Binary min-heap of node indices keyed by g (uniform-cost search). */
-static ISC SearchHeapPop(ISC* heap, ISC* n, const SearchPool* pool) {
+static ISC SearchHeapPop(ISC* heap, ISC* n, SearchPool* pool) {
   ISC top = heap[0];
   --(*n);
   if (*n > 0) {
@@ -397,22 +397,22 @@ static ISC SearchHeapPop(ISC* heap, ISC* n, const SearchPool* pool) {
 }
 
 static BOL SearchHeapPush(IUW** heap_mem, ISC* heap_cap, ISC* n, ISC node,
-                          const SearchPool* pool) {
+                          SearchPool* pool) {
   if (*n == *heap_cap) {
     *heap_cap *= 2;
     IUW* nh =
-        ObjectFactoryHeap(NILP, IUD(*heap_cap) * IUD(sizeof(ISC)));
+        ObjectFactoryHeap(_NilP, IUD(*heap_cap) * IUD(sizeof(ISC)));
     if (IsError(nh)) {
       return false;
     }
-    ISC* heap = TPtr<ISC>(*heap_mem);
+    ISC* heap = TRef<ISC>(*heap_mem);
     for (ISC i = 0; i < *n; ++i) {
-      TPtr<ISC>(nh)[i] = heap[i];
+      TRef<ISC>(nh)[i] = heap[i];
     }
     *heap_mem = SearchFree(*heap_mem);
     *heap_mem = nh;
   }
-  ISC* heap = TPtr<ISC>(*heap_mem);
+  ISC* heap = TRef<ISC>(*heap_mem);
   heap[*n] = node;
   ++(*n);
   // Sift up.
@@ -430,21 +430,21 @@ static BOL SearchHeapPush(IUW** heap_mem, ISC* heap_cap, ISC* n, ISC node,
   return true;
 }
 
-ISC SearchUCS(const Problem* problem, IUC* path, ISC path_cap) {
+ISC SearchUCS(Problem* problem, IUC* path, ISC path_cap) {
   ISC sw = problem->state_words < 1 ? 1 : problem->state_words;
   SearchPool pool;
   SearchVisited vis;
   AArray<IUC, ISN, kSearchBranch> acts;
-  IUW* succ_mem = ObjectFactoryHeap(NILP, IUD(sw) * IUD(sizeof(IUC)));
-  IUW* heap_mem = ObjectFactoryHeap(NILP, 16 * sizeof(ISC));
+  IUW* succ_mem = ObjectFactoryHeap(_NilP, IUD(sw) * IUD(sizeof(IUC)));
+  IUW* heap_mem = ObjectFactoryHeap(_NilP, 16 * sizeof(ISC));
   if (!pool.Alloc(sw, 16) || !vis.Alloc(16) || IsError(succ_mem) ||
       IsError(heap_mem)) {
     succ_mem = SearchFree(succ_mem);
     heap_mem = SearchFree(heap_mem);
     return -1;
   }
-  IUC* succ = TPtr<IUC>(succ_mem);
-  ISC* heap = TPtr<ISC>(heap_mem);
+  IUC* succ = TRef<IUC>(succ_mem);
+  ISC* heap = TRef<ISC>(heap_mem);
   IUD h0 = StateHashNC(problem->initial, sw);
   SearchPoolAdd(&pool, problem->initial, -1, 0, 0, FPC(0.0f), sw);
   SearchVisitedInsert(&vis, &pool, sw, h0, 0);
@@ -487,7 +487,7 @@ ISC SearchUCS(const Problem* problem, IUC* path, ISC path_cap) {
         done = true;
         break;
       }
-      heap = TPtr<ISC>(heap_mem);
+      heap = TRef<ISC>(heap_mem);
     }
   }
   succ_mem = SearchFree(succ_mem);
@@ -507,22 +507,22 @@ struct DlsFrame {
   ISC act_count;
 };
 
-ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
+ISC SearchDLS(Problem* problem, IUC* path, ISC path_cap, ISC limit) {
   if (limit < 0) {
     return -1;
   }
   ISC sw = problem->state_words < 1 ? 1 : problem->state_words;
   SearchPool pool;
-  IUW* succ_mem = ObjectFactoryHeap(NILP, IUD(sw) * IUD(sizeof(IUC)));
+  IUW* succ_mem = ObjectFactoryHeap(_NilP, IUD(sw) * IUD(sizeof(IUC)));
   IUW* stack_mem =
-      ObjectFactoryHeap(NILP, 16 * sizeof(DlsFrame));
+      ObjectFactoryHeap(_NilP, 16 * sizeof(DlsFrame));
   if (!pool.Alloc(sw, 16) || IsError(succ_mem) || IsError(stack_mem)) {
     succ_mem = SearchFree(succ_mem);
     stack_mem = SearchFree(stack_mem);
     return -1;
   }
-  IUC* succ = TPtr<IUC>(succ_mem);
-  DlsFrame* stack = TPtr<DlsFrame>(stack_mem);
+  IUC* succ = TRef<IUC>(succ_mem);
+  DlsFrame* stack = TRef<DlsFrame>(stack_mem);
   SearchPoolAdd(&pool, problem->initial, -1, 0, 0, FPC(0.0f), sw);
   if (problem->GoalTest(problem->initial, sw)) {
     return 0;
@@ -534,7 +534,7 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
   stack[0].expanded = false;
   stack[0].child_result = 0;
   stack[0].cutoff = false;
-  stack[0].acts = NILP;
+  stack[0].acts = _NilP;
   stack[0].act_count = 0;
   ISC result = -1;
   BOL finished = false;
@@ -564,13 +564,13 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
         continue;
       }
       f->expanded = true;
-      f->acts = ObjectFactoryHeap(NILP, kSearchBranch * sizeof(IUC));
+      f->acts = ObjectFactoryHeap(_NilP, kSearchBranch * sizeof(IUC));
       if (IsError(f->acts)) {
         f->child_result = -1;
         continue;
       }
       f->act_count = problem->Actions(pool.States() + IUD(n) * IUD(sw), sw,
-                                      TPtr<IUC>(f->acts), kSearchBranch);
+                                      TRef<IUC>(f->acts), kSearchBranch);
       if (f->act_count == 0) {
         f->child_result = -1;
         continue;
@@ -580,7 +580,7 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
       f->child_result = f->cutoff ? -2 : -1;
       continue;
     }
-    IUC action = TPtr<IUC>(f->acts)[f->cursor++];
+    IUC action = TRef<IUC>(f->acts)[f->cursor++];
     problem->Result(pool.States() + IUD(n) * IUD(sw), sw, action, succ);
     ISC m = SearchPoolAdd(&pool, succ, n, action, pool.Depth()[n] + 1,
                           FPC(0.0f), sw);
@@ -597,18 +597,18 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
     if (top + 1 == stack_cap) {
       stack_cap *= 2;
       IUW* ns =
-          ObjectFactoryHeap(NILP, IUD(stack_cap) * IUD(sizeof(DlsFrame)));
+          ObjectFactoryHeap(_NilP, IUD(stack_cap) * IUD(sizeof(DlsFrame)));
       if (IsError(ns)) {
         result = -1;
         finished = true;
         break;
       }
       for (ISC i = 0; i <= top; ++i) {
-        TPtr<DlsFrame>(ns)[i] = stack[i];
+        TRef<DlsFrame>(ns)[i] = stack[i];
       }
       stack_mem = SearchFree(stack_mem);
       stack_mem = ns;
-      stack = TPtr<DlsFrame>(stack_mem);
+      stack = TRef<DlsFrame>(stack_mem);
     }
     ++top;
     stack[top].node = m;
@@ -616,7 +616,7 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
     stack[top].expanded = false;
     stack[top].child_result = 0;
     stack[top].cutoff = false;
-    stack[top].acts = NILP;
+    stack[top].acts = _NilP;
     stack[top].act_count = 0;
   }
   for (ISC i = 0; i <= top; ++i) {
@@ -630,7 +630,7 @@ ISC SearchDLS(const Problem* problem, IUC* path, ISC path_cap, ISC limit) {
 /* Figure 3.30 iterative-deepening search. DLS reports -1 only when the
 whole tree below the limit was exhausted without a goal, so -1 is a
 definitive no-solution; -2 means "deeper". */
-ISC SearchIDS(const Problem* problem, IUC* path, ISC path_cap, ISC max_limit) {
+ISC SearchIDS(Problem* problem, IUC* path, ISC path_cap, ISC max_limit) {
   if (max_limit < 0) {
     return -1;
   }
@@ -653,37 +653,37 @@ struct RbfsFrame {
   ISC child_count;
 };
 
-static FPC RbfsFNC(const Problem* problem, const SearchPool* pool,
+static FPC RbfsFNC(Problem* problem, SearchPool* pool,
                    ISC state_words, ISC node) {
   return pool->G()[node] +
          problem->Heuristic(pool->States() + IUD(node) * IUD(state_words),
                             state_words);
 }
 
-ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
-  if (problem->Heuristic == NILP) {
+ISC SearchRBFS(Problem* problem, IUC* path, ISC path_cap) {
+  if (problem->Heuristic == _NilP) {
     return -1;
   }
   ISC sw = problem->state_words < 1 ? 1 : problem->state_words;
   SearchPool pool;
   AArray<IUC, ISN, kSearchBranch> acts;
-  IUW* succ_mem = ObjectFactoryHeap(NILP, IUD(sw) * IUD(sizeof(IUC)));
+  IUW* succ_mem = ObjectFactoryHeap(_NilP, IUD(sw) * IUD(sizeof(IUC)));
   IUW* stack_mem =
-      ObjectFactoryHeap(NILP, 16 * sizeof(RbfsFrame));
+      ObjectFactoryHeap(_NilP, 16 * sizeof(RbfsFrame));
   if (!pool.Alloc(sw, 16) || IsError(succ_mem) || IsError(stack_mem)) {
     succ_mem = SearchFree(succ_mem);
     stack_mem = SearchFree(stack_mem);
     return -1;
   }
-  IUC* succ = TPtr<IUC>(succ_mem);
-  RbfsFrame* stack = TPtr<RbfsFrame>(stack_mem);
+  IUC* succ = TRef<IUC>(succ_mem);
+  RbfsFrame* stack = TRef<RbfsFrame>(stack_mem);
   SearchPoolAdd(&pool, problem->initial, -1, 0, 0, FPC(0.0f), sw);
   ISC stack_cap = 16;
   ISC top = 0;
   stack[0].node = 0;
   stack[0].alt = FPC(1e30f);
   stack[0].expanded = false;
-  stack[0].children = NILP;
+  stack[0].children = _NilP;
   stack[0].child_count = 0;
   ISC result = -1;
   BOL finished = false;
@@ -701,7 +701,7 @@ ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
         finished = true;
         break;
       }
-      f->children = ObjectFactoryHeap(NILP, IUD(act_count) * IUD(sizeof(ISC)));
+      f->children = ObjectFactoryHeap(_NilP, IUD(act_count) * IUD(sizeof(ISC)));
       if (IsError(f->children)) {
         result = -1;
         finished = true;
@@ -718,33 +718,33 @@ ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
           finished = true;
           break;
         }
-        TPtr<ISC>(f->children)[f->child_count++] = m;
+        TRef<ISC>(f->children)[f->child_count++] = m;
       }
       if (finished) {
         break;
       }
       // Order children by f = g + h (insertion sort; small lists).
       for (ISC i = 1; i < f->child_count; ++i) {
-        ISC key = TPtr<ISC>(f->children)[i];
+        ISC key = TRef<ISC>(f->children)[i];
         FPC kf = RbfsFNC(problem, &pool, sw, key);
         ISC j = i - 1;
         while (j >= 0 &&
-               RbfsFNC(problem, &pool, sw, TPtr<ISC>(f->children)[j]) > kf) {
-          TPtr<ISC>(f->children)[j + 1] = TPtr<ISC>(f->children)[j];
+               RbfsFNC(problem, &pool, sw, TRef<ISC>(f->children)[j]) > kf) {
+          TRef<ISC>(f->children)[j + 1] = TRef<ISC>(f->children)[j];
           --j;
         }
-        TPtr<ISC>(f->children)[j + 1] = key;
+        TRef<ISC>(f->children)[j + 1] = key;
       }
     }
     // alt <- MIN(alt, MIN-f(children[1..]))
     for (ISC i = 1; i < f->child_count; ++i) {
-      FPC fv = RbfsFNC(problem, &pool, sw, TPtr<ISC>(f->children)[i]);
+      FPC fv = RbfsFNC(problem, &pool, sw, TRef<ISC>(f->children)[i]);
       if (fv < f->alt) {
         f->alt = fv;
       }
     }
     if (f->child_count >= 2 &&
-        RbfsFNC(problem, &pool, sw, TPtr<ISC>(f->children)[1]) > f->alt) {
+        RbfsFNC(problem, &pool, sw, TRef<ISC>(f->children)[1]) > f->alt) {
       // UNEXPAND(children[1..]) back to parent; node <- node.parent.
       f->children = SearchFree(f->children);
       f->child_count = 0;
@@ -764,7 +764,7 @@ ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
       continue;
     }
     // Descend into children[0].
-    ISC c = TPtr<ISC>(f->children)[0];
+    ISC c = TRef<ISC>(f->children)[0];
     if (problem->GoalTest(pool.States() + IUD(c) * IUD(sw), sw)) {
       result = SearchPoolPath(&pool, c, path, path_cap);
       finished = true;
@@ -773,24 +773,24 @@ ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
     if (top + 1 == stack_cap) {
       stack_cap *= 2;
       IUW* ns =
-          ObjectFactoryHeap(NILP, IUD(stack_cap) * IUD(sizeof(RbfsFrame)));
+          ObjectFactoryHeap(_NilP, IUD(stack_cap) * IUD(sizeof(RbfsFrame)));
       if (IsError(ns)) {
         result = -1;
         finished = true;
         break;
       }
       for (ISC i = 0; i <= top; ++i) {
-        TPtr<RbfsFrame>(ns)[i] = stack[i];
+        TRef<RbfsFrame>(ns)[i] = stack[i];
       }
       stack_mem = SearchFree(stack_mem);
       stack_mem = ns;
-      stack = TPtr<RbfsFrame>(stack_mem);
+      stack = TRef<RbfsFrame>(stack_mem);
     }
     ++top;
     stack[top].node = c;
     stack[top].alt = FPC(1e30f);
     stack[top].expanded = false;
-    stack[top].children = NILP;
+    stack[top].children = _NilP;
     stack[top].child_count = 0;
   }
   for (ISC i = 0; i <= top; ++i) {
@@ -801,5 +801,5 @@ ISC SearchRBFS(const Problem* problem, IUC* path, ISC path_cap) {
   return result;
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalSearchHXX

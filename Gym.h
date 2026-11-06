@@ -1,10 +1,10 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_GYM_DECL
-#define IGEEK_GYM_DECL
-#include "Env.h"
-#include "EnvGoal.h"
-#include "GymManifest.h"
+#ifndef _iGeekGymH
+#define _iGeekGymH
+#include "Environment.h"
+#include "EnvironmentGoal.h"
+#include "EnvironmentManifest.h"
 namespace iGeek {
 
 /* Max parallel envs in one Gym batch. Fixed-size (no std vector).
@@ -16,7 +16,7 @@ enum { GymEnvMax = 8 };
    the policy can step them all in one call (the `Agent{observations,
    actions, rewards, terminals, action_mask}` arrays).
 Migrated 2026-10-07:
-  - STANDALONE (not `public TRoom`) — see Env.h for the verified reason
+  - STANDALONE (not `public TRoom`) — see Environment.h for the verified reason
     (TRoom instantiation is broken upstream; logged to ASCIICrabs/AGENT_PLAN.md).
   - `Gym(const CHA* name)` (was `const STA*` dead type).
   - Added the vectorized batch accessors the PPO loop needs (see
@@ -46,18 +46,18 @@ class Gym {
  public:
 
   Gym(const CHA* gym_name = "gym")
-      : gym_name_(gym_name), env_count_(0), observations_(NILP),
-        actions_(NILP), rewards_(NILP), terminals_(NILP), action_mask_(NILP),
+      : gym_name_(gym_name), env_count_(0), observations_(_NilP),
+        actions_(_NilP), rewards_(_NilP), terminals_(_NilP), action_mask_(_NilP),
         obs_len_(0), action_count_(0) {
-    TManifestInit(&manifest_);
+    EnvironmentManifestInit(&manifest_);
   }
   virtual ~Gym() {}
 
-  const CHA* Name() const { return gym_name_; }
-  const TManifest& Manifest() const { return manifest_; }
-  void SetManifest(const TManifest& m) { manifest_ = m; }
+  const CHA* Name() { return gym_name_; }
+  EnvironmentManifest& Manifest() { return manifest_; }
+  void SetManifest(EnvironmentManifest& m) { manifest_ = m; }
 
-  void AddEnv(Env* env);
+  void AddEnv(Environment* env);
 
   BOL LoadDLL(const CHA* library);
 
@@ -67,8 +67,8 @@ class Gym {
   preallocated at init — the the reference PPO kernel "preallocate at init, free at close"
   pattern). The arrays are indexed [env_count][feature]. */
 
-  /* Number of envs in the batch (= EnvCount of the added envs). */
-  ISC EnvCount() { return env_count_; }
+  /* Number of envs in the batch (= EnvironmentCount of the added envs). */
+  ISC EnvironmentCount() { return env_count_; }
 
   /* Flat observation buffer: [env_count][obs_len]. */
   FPC* Observations() { return observations_; }
@@ -92,7 +92,7 @@ class Gym {
  protected:
 
   const CHA* gym_name_;
-  TManifest manifest_;
+  EnvironmentManifest manifest_;
   ISC env_count_;
   FPC* observations_;
   ISC* actions_;
@@ -101,7 +101,7 @@ class Gym {
   FPC* action_mask_;
   ISC obs_len_;
   ISC action_count_;
-  Env* envs_[GymEnvMax];
+  Environment* envs_[GymEnvMax];
 };
 
 } //< namespace iGeek

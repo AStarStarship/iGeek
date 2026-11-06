@@ -15,13 +15,13 @@ builds on Linux g++.
 - `MazeWorld.h` / `MazeWorld.hxx` — `MazeWorld` struct: seeded LCG maze
   generation + A* + `COut` terminal render. No-stdlib (no std containers, no
   exceptions, no heap — all fixed-size arrays).
-- `_Config.h` — defines the local `IGEEK_MAZEWORLD` seam ID (24) and sets
+- `_Config.h` — defines the local `_iGeekMazeWorld` seam ID (24) and sets
   `SEAM`, mirroring the SpaceWorld local-seam pattern.
-- `_Seams/_Main.cpp` — the ONLY .cpp file. Includes `_Seams/_Main.hxx` (the
+- `_Seams/_Seams.cpp` — the ONLY .cpp file. Includes `_Seams/_Main.hxx` (the
   entry header) for rapid single-TU compilation.
 - `_Seams/_Main.hxx` — generates a seeded maze, solves it with A*, prints the
   grid + path length. I/O is raw `write()` (no `<cstdio>`).
-- `CMakeLists.txt` — builds `mazeworld` from `_Seams/_Main.cpp`, registers
+- `CMakeLists.txt` — builds `mazeworld` from `_Seams/_Seams.cpp`, registers
   `mazeworld_probe` in CTest.
 
 ## Build
@@ -33,7 +33,7 @@ cmake --build build -j4
 ctest --test-dir build --output-on-failure
 ```
 
-Expect `mazeworld_probe` to pass (exit 0, `MAZEWORLD_OK path_len=N`).
+Expect `mazeworld_probe` to pass (exit 0, `_MazeWorldOK path_len=N`).
 
 ## Verification
 

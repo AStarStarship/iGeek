@@ -1,0 +1,29 @@
+# _Seams.yaml — Core module seams.
+# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
+# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
+seams:
+  - name: _iGeekCore
+    file: 01.Core.hxx
+    label: "Testing Core core..."
+  - name: _iGeekCoreManifest
+    files: 02.Manifest.hxx
+    label: "Testing Core manifest..."
+  - name: _iGeekCoreAgentSlot
+    files: 03.AgentSlot.hxx
+    label: "Testing Agent Slot..."
+  - name: _iGeekCoreScript
+    files: 04.Script.hxx
+    label: "Testing Script..."
+  - name: _iGeekCoreJobQueue
+    files: 05.JobQueue.hxx
+    label: "Testing Job Queue..."
+  - name: _iGeekCoreRoomSandbox
+    files: 06.RoomSandbox.hxx
+    label: "Testing Room Sandbox..."
+  - name: _iGeekCoreRolloutCompare
+    files: 07.RolloutCompare.hxx
+    label: "Testing Rollout Compare..."
+  - name: _iGeekRelease
+    depends: [_iGeekCore]
+    file: 08.Release.hxx
+    label: "Testing Core Release..."

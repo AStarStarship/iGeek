@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef IGEEK_CLASSICAL_FOLLEARN_T
-#define IGEEK_CLASSICAL_FOLLEARN_T 1
+#ifndef _iGeekClassicalFolLearnH
+#define _iGeekClassicalFolLearnH
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
@@ -111,5 +111,5 @@ function EXTEND-EXAMPLE(example, literal ) returns a set of examples
 @endcode
 */
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  //< _iGeekClassicalFolLearnH

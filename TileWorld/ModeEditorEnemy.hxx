@@ -1,7 +1,5 @@
-#include "TVec.h"
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
+#include "Homotuples.h"
 #include "mode_editor_enemy.h"
 
 void ModeEditorEnemy::InitVariables() {

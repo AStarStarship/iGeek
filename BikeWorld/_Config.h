@@ -1,10 +1,9 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef CRABS_BIKEWORLD_CONFIG_H
-#define CRABS_BIKEWORLD_CONFIG_H
-#define CRABS_BIKEWORLD 24
-#ifndef SEAM
-#define SEAM CRABS_BIKEWORLD
+#ifndef _iGeekBikeWorldConfigH
+#define _iGeekBikeWorldConfigH
+#ifndef _Seam
+#define _Seam _iGeekBikeWorldCore
 #endif
 #include "../../ASCIICrabs/_ConfigHeader.h"
 #include "../../ASCIICrabs/_ConfigDefault.h"

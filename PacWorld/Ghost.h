@@ -1,17 +1,15 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#ifndef PACWORLD_GHOST
-#define PACWORLD_GHOST
-
+#ifndef _iGeekPacWorldGhostH
+#define _iGeekPacWorldGhostH
 #include "Character.h"
 #include "Pac.h"
-
 namespace PacWorld {
 
 /* A headless ghost that chases pac. Extends Character (movement/collision).
-   The AI (ChangeDirection) picks the open direction that best points toward
-   pac, using a no-stdlib angle comparison (dot product, no atan2). No SFML,
-   no stdlib. */
+  The AI (ChangeDirection) picks the open direction that best points toward
+  pac, using a no-stdlib angle comparison (dot product, no atan2). No SFML,
+  no stdlib. */
 class Ghost : public Character {
   BOL is_weak_;
   FPC weakness_duration_;  // seconds remaining in weak state.
@@ -31,15 +29,15 @@ class Ghost : public Character {
 
   /* Set the ghost to weak (frightened) for `duration` seconds. */
   void SetWeak(FPC duration);
-  BOL IsWeak() const;
+  BOL IsWeak();
 
   void Update(FPC delta) override;
 
-  ISC State() const { return is_weak_ ? kStateWeak : kStateStrong; }
+  ISC State() { return is_weak_ ? kStateWeak : kStateStrong; }
 
  protected:
   /* AI: pick the open direction that best points toward pac. */
   void ChangeDirection() override;
 };
-}  // namespace PacWorld
+}  //< namespace PacWorld
 #endif

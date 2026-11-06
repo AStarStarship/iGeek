@@ -1,12 +1,12 @@
 // Copyright AStarship <https://astarship.net>.
 #pragma once
-#include "TVec.h"
-#ifndef TILEWORLD_SWORD
-#define TILEWORLD_SWORD
+#ifndef _iGeekTileWorldSwordH
+#define _iGeekTileWorldSwordH
 #include <_Config.h>
-//
+#include "Homotuples.h"
 #include "WeaponMelee.h"
 namespace TileWorld {
+  
 class MeleeWeapon;
 class Sword : public MeleeWeapon {
  private:

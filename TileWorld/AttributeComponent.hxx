@@ -1,6 +1,4 @@
 // Copyright AStarship <https://astarship.net>.
-#include "stdafx.h"
-//
 #include "component_attribute.h"
 
 AttributeComponent::AttributeComponent(int level) {
@@ -23,7 +21,7 @@ AttributeComponent::AttributeComponent(int level) {
 
 AttributeComponent::~AttributeComponent() {}
 
-_::AString AttributeComponent::DebugPrint() const {
+_::AString AttributeComponent::DebugPrint() {
   std::stringstream ss;
 
   ss << "Level: " << level << "\n"
