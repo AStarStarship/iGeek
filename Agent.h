@@ -10,21 +10,26 @@ namespace iGeek {
 class AgentBase {
  public:
   virtual ~AgentBase() {}
+
   /* Observe a percept (IUC word array, length percept_len); update state. */
   virtual void OnPercept(const IUC* percept, ISC percept_len) = 0;
+
   /* Choose the next action (a single IUC word). */
   virtual IUC Action() = 0;
+
   /* Internal state for inspection/snapshot. _NilP for stateless tiers. */
-  virtual AgentState* State() { return _NilP; }
+  virtual AgentState* State() { return 0; }
+
   /* Reset internal state to a fresh episode. */
   virtual void Reset() = 0;
+
   /* Number of distinct actions the tier can emit (the world's action count). */
   virtual ISC ActionCount() = 0;
 };
 
 /* Tier 1 — table-driven: maps the last history_len percepts (concatenated
- * IUC words) to an action via a fixed lookup table. Shows whether the task is
- * even learnable. */
+IUC words) to an action via a fixed lookup table. Shows whether the task is
+even learnable. */
 class TableAgent : public AgentBase {
  public:
   TableAgent(ISC action_count, ISC history_len, ISC percept_len);
@@ -52,12 +57,12 @@ class TableAgent : public AgentBase {
 };
 
 /* Tier 2 — simple reflex: condition-action rules on the CURRENT percept only
- * (no history). The world registers rules; the agent matches the first exact
- * word-equal rule and takes its action, else the default. */
-class TReflexAgent : public AgentBase {
+(no history). The world registers rules; the agent matches the first exact
+word-equal rule and takes its action, else the default. */
+class ReflexAgent : public AgentBase {
  public:
-  TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap);
-  ~TReflexAgent() override;
+  ReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap);
+  ~ReflexAgent() override;
   void OnPercept(const IUC* percept, ISC percept_len) override;
   IUC Action() override;
   void Reset() override;
@@ -78,12 +83,12 @@ class TReflexAgent : public AgentBase {
 };
 
 /* Tier 3 — model-based reflex: maintains an internal AgentState world model.
- * On each percept it updates the model; on Action() it reads the model. This
- * is the tier whose internal state the qualia metrics probe (plan 3.4). */
-class TModelAgent : public AgentBase {
+On each percept it updates the model; on Action() it reads the model. This
+is the tier whose internal state the qualia metrics probe (plan 3.4). */
+class ModelAgent : public AgentBase {
  public:
-  TModelAgent(ISC action_count, ISC state_slots);
-  ~TModelAgent() override;
+  ModelAgent(ISC action_count, ISC state_slots);
+  ~ModelAgent() override;
   void OnPercept(const IUC* percept, ISC percept_len) override;
   IUC Action() override;
   AgentState* State() override;

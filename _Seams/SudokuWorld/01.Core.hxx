@@ -99,7 +99,12 @@ inline const CHA* Core(const CHA* args) {
   {
     ASudokuGym gym(1, 7, 40);
     CoreCheck(gym.EnvironmentCount() == 1, "gym has 1 env");
-    CoreCheck(gym.ObsLength() == SudokuCells, "gym obs length is 81");
+    CoreCheck(gym.ObservationLength() == SudokuCells, "gym observation length is 81");
+    /* Manifest contract: the in-Room contract for a joining agent. */
+    CoreCheck(EnvironmentManifestValidate(&gym.Manifest()),
+              "SudokuWorld manifest validates");
+    CoreCheck(TSEquals(gym.Manifest().name, "sudoku") != _NilP,
+              "SudokuWorld manifest name == sudoku");
     ScriptedSolve(gym);
     CoreCheck(gym.Terminals()[0] > 0.5f, "scripted agent completes the episode");
     CoreCheck(SudokuVerify(gym.Board(0)), "scripted agent's board is a valid solution");

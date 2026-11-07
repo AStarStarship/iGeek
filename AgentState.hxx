@@ -4,6 +4,7 @@
 #ifndef _iGeekAgentStateHXX
 #define _iGeekAgentStateHXX
 namespace iGeek {
+using namespace ::_;
 
 AgentState::AgentState(ISC slot_count)
     : autoject_{_NilP, &ObjectFactoryHeap},
@@ -69,6 +70,8 @@ void AgentState::Restore(const IUC* in) {
 IUD AgentState::ByteSize() {
   return IUD(slot_count_) * IUD(sizeof(IUW));
 }
+
+const IUC* AgentState::Words() { return words_; }
 
 }       //< namespace iGeek
 #endif  //< _iGeekAgentStateHXX

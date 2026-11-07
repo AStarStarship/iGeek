@@ -2,17 +2,16 @@
 #pragma once
 #ifndef _iGeekTensorH
 #define _iGeekTensorH
-// NOTE: do NOT include _Package.hxx here — that pulls in the whole ASCIICrabs
-// implementation and double-includes it in the single-TU world build. The POD
-// types (FPC/ISC/BOL/_NilP) come from the config headers already on the build.
+#include <_Config.h>
 namespace iGeek {
+using namespace ::_;
 
 /* Minimal row-major float tensor for RL policy math.
 NO standard library. This is the primitive the vectorized-batch policy
-(TTransformer) and PPO loop (TPPO) are built on.
+(TransformerPolicy) and PPO loop (PPO) are built on.
 
 vectorized-batch: the whole RL data model is tensor-valued
-(obs_t*, float* actions/rewards, logits, grad_logits, grad_values_pred,
+(observation_t*, float* actions/rewards, logits, grad_logits, grad_values_pred,
 action_mask). We need a flat float buffer with shape + the handful of
 elementwise/linear ops a policy forward/backward uses.
 
@@ -22,12 +21,11 @@ heavy kernels (MatMul, Softmax, LayerNorm, backprop) are logged to
 here in iGeek as plain FPC* loops over a flat buffer.
 
 Chimera+: T prefix = POD struct, CamelCase type, lower_snake_case
-mutable members, free functions T-prefixed.
-*/
-struct TTensor {
+mutable members, free functions T-prefixed. */
+struct TensorFPC {
   FPC* data_;     //< Flat row-major float storage (rows_ * cols_).
   ISC rows_;      //< Number of rows (batch dim).
-  ISC cols_;      //< Number of cols (feature dim).
+  ISC cols_;      //< Number of columns (feature dim).
   ISC dtype_;     //< 0 = FPC (default). Reserved for bf16/ISC later.
 
   /* Element at (r, c). No bounds check (call sites know the shape). */
@@ -40,44 +38,44 @@ struct TTensor {
   BOL IsNil() { return data_ == _NilP; }
 };
 
-/* --- Allocation (preallocate-at-init pattern: preallocate at init, free at close) --- */
+// Allocation (preallocate-at-init pattern: preallocate at init, free at close)
 
-/* Allocate a rows x cols FPC tensor, zero-initialized. Returns a TTensor
-whose data_ is heap-owned (free with TTensorFree). */
-TTensor TTensorAlloc(ISC rows, ISC cols);
+/* Allocate a rows x columns FPC tensor, zero-initialized. Returns a TensorFPC
+whose data_ is heap-owned (free with TensorFPCFree). */
+TensorFPC TensorFPCAlloc(ISC rows, ISC columns);
 
 /* Free the tensor storage. Sets *t.data_ = _NilP so a double-free is safe. */
-void TTensorFree(TTensor& t);
+void TensorFPCFree(TensorFPC& t);
 
-/* --- Elementwise / linear ops (CPU FPC, no CUDA) ---------------------- */
+// Elementwise / linear ops (CPU FPC, no CUDA)
 
 /* C[i,j] = sum_k A[i,k] * B[k,j].   A: r x k, B: k x c, C: r x c. */
-void TTensorMatMul(TTensor A, TTensor B, TTensor& C);
+void TensorFPCMatMul(TensorFPC A, TensorFPC B, TensorFPC& C);
 
 /* In-place row softmax: each row of X becomes exp(x)/sum(exp(x)). */
-void TTensorSoftmaxInPlace(TTensor& X);
+void TensorFPCSoftmaxInPlace(TensorFPC& X);
 
 /* Row-wise layer norm (mean/std per row), in place. */
-void TTensorLayerNormInPlace(TTensor& X);
+void TensorFPCLayerNormInPlace(TensorFPC& X);
 
 /* In-place ReLU: x = max(0, x). */
-void TTensorReluInPlace(TTensor& X);
+void TensorFPCReluInPlace(TensorFPC& X);
 
 /* C = A + B (elementwise). A and B MUST have the same shape [r, c].
-For a bias column [K, 1] added to a [B, K] tensor, use TTensorAddBias. */
-void TTensorAdd(TTensor A, TTensor B, TTensor& C);
+For a bias column [K, 1] added to a [B, K] tensor, use TensorFPCAddBias. */
+void TensorFPCAdd(TensorFPC A, TensorFPC B, TensorFPC& C);
 
 /* In-place bias broadcast: X is [B, K], bias is [K, 1]. Adds bias[j] to
 every row's column j: X[i, j] += bias[j, 0]. This is the correct way to
 add a learned bias (a [K, 1] column) to a batched [B, K] activation —
-TTensorAdd would overflow because it assumes matching shapes. */
-void TTensorAddBiasInPlace(TTensor& X, TTensor bias);
+TensorFPCAdd would overflow because it assumes matching shapes. */
+void TensorFPCAddBiasInPlace(TensorFPC& X, TensorFPC bias);
 
 /* C = A * s (scalar broadcast). */
-void TTensorScale(TTensor A, FPC s, TTensor& C);
+void TensorFPCScale(TensorFPC A, FPC s, TensorFPC& C);
 
 /* Row-wise log-sum-exp (stable), into out (rows x 1). */
-void TTensorRowLogSumExp(TTensor A, TTensor& out);
+void TensorFPCRowLogSumExp(TensorFPC A, TensorFPC& out);
 
 } //< namespace iGeek
 #endif

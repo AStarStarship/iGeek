@@ -4,6 +4,7 @@
 #ifndef _iGeekAgentHXX
 #define _iGeekAgentHXX
 namespace iGeek {
+using namespace ::_;
 
 TableAgent::TableAgent(ISC action_count, ISC history_len, ISC percept_len)
     : action_count_(action_count < 1 ? 1 : action_count),
@@ -102,9 +103,9 @@ void TableAgent::SetEntry(const IUC* key, IUC action) {
   key_count_ = new_count;
 }
 
-// --- TReflexAgent ---------------------------------------------------------
+// --- ReflexAgent ---------------------------------------------------------
 
-TReflexAgent::TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap)
+ReflexAgent::ReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap)
     : action_count_(action_count < 1 ? 1 : action_count),
       percept_len_(percept_len < 1 ? 1 : percept_len),
       rule_cap_(rule_cap < 1 ? 1 : rule_cap), rule_count_(0),
@@ -115,13 +116,13 @@ TReflexAgent::TReflexAgent(ISC action_count, ISC percept_len, ISC rule_cap)
   current_ = new IUC[percept_len_]();
 }
 
-TReflexAgent::~TReflexAgent() {
+ReflexAgent::~ReflexAgent() {
   delete[] conditions_;
   delete[] rule_actions_;
   delete[] current_;
 }
 
-void TReflexAgent::OnPercept(const IUC* percept, ISC percept_len) {
+void ReflexAgent::OnPercept(const IUC* percept, ISC percept_len) {
   if (percept == _NilP) {
     return;
   }
@@ -130,7 +131,7 @@ void TReflexAgent::OnPercept(const IUC* percept, ISC percept_len) {
   }
 }
 
-IUC TReflexAgent::Action() {
+IUC ReflexAgent::Action() {
   for (ISC r = 0; r < rule_count_; ++r) {
     BOL match = true;
     for (ISC i = 0; i < percept_len_; ++i) {
@@ -146,17 +147,17 @@ IUC TReflexAgent::Action() {
   return default_action_;
 }
 
-void TReflexAgent::Reset() {
+void ReflexAgent::Reset() {
   for (ISC i = 0; i < percept_len_; ++i) {
     current_[i] = 0;
   }
 }
 
-ISC TReflexAgent::ActionCount() {
+ISC ReflexAgent::ActionCount() {
   return action_count_;
 }
 
-BOL TReflexAgent::AddRule(const IUC* condition, IUC action) {
+BOL ReflexAgent::AddRule(const IUC* condition, IUC action) {
   if (condition == _NilP || rule_count_ >= rule_cap_) {
     return false;
   }
@@ -168,20 +169,20 @@ BOL TReflexAgent::AddRule(const IUC* condition, IUC action) {
   return true;
 }
 
-void TReflexAgent::SetDefaultAction(IUC action) {
+void ReflexAgent::SetDefaultAction(IUC action) {
   default_action_ = action;
 }
 
-// --- TModelAgent ----------------------------------------------------------
+// --- ModelAgent ----------------------------------------------------------
 
-TModelAgent::TModelAgent(ISC action_count, ISC state_slots)
+ModelAgent::ModelAgent(ISC action_count, ISC state_slots)
     : action_count_(action_count < 1 ? 1 : action_count),
       state_slots_(state_slots < 1 ? 1 : state_slots),
       state_(state_slots_) {}
 
-TModelAgent::~TModelAgent() {}
+ModelAgent::~ModelAgent() {}
 
-void TModelAgent::OnPercept(const IUC* percept, ISC percept_len) {
+void ModelAgent::OnPercept(const IUC* percept, ISC percept_len) {
   if (percept == _NilP) {
     return;
   }
@@ -197,7 +198,7 @@ void TModelAgent::OnPercept(const IUC* percept, ISC percept_len) {
   }
 }
 
-IUC TModelAgent::Action() {
+IUC ModelAgent::Action() {
   // Generic read: the action is the index of the slot holding the largest
   // accumulated value (ties -> lowest index). Bounded by action_count_.
   ISC best = 0;
@@ -215,15 +216,15 @@ IUC TModelAgent::Action() {
   return IUC(best);
 }
 
-AgentState* TModelAgent::State() {
+AgentState* ModelAgent::State() {
   return &state_;
 }
 
-void TModelAgent::Reset() {
+void ModelAgent::Reset() {
   state_.Clear();
 }
 
-ISC TModelAgent::ActionCount() {
+ISC ModelAgent::ActionCount() {
   return action_count_;
 }
 

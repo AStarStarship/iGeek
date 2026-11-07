@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../SudokuWorld/SudokuWorld.hxx"
+#include "../../Worlds/Sudoku/SudokuWorld.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"
 namespace SudokuWorldTest {

@@ -15,36 +15,36 @@ static ISC failures = 0;
   ++failures; } } while (false)
 
 static void ForwardKinematics() {
-  TArmParams params;
+  ArmParams params;
   FPD tx = 0, ty = 0;
-  TArmFK(params, 0, 0, tx, ty);
+  ArmFK(params, 0, 0, tx, ty);
   _Check(Absolute(tx - 0.4) < 1e-12 && Absolute(ty) < 1e-12);
-  TArmFK(params, 1.5707963267948966 / 2, 0, tx, ty);
+  ArmFK(params, 1.5707963267948966 / 2, 0, tx, ty);
   _Check(Absolute(tx - (0.2 * 0.7071067811865476 + 0.2)) < 1e-9 &&
         Absolute(ty - 0.2 * 0.7071067811865476) < 1e-9);
-  TArmFK(params, 1.5707963267948966, 0, tx, ty);
+  ArmFK(params, 1.5707963267948966, 0, tx, ty);
   _Check(Absolute(tx - 0.2) < 1e-9 && Absolute(ty - 0.2) < 1e-9);
-  TArmFK(params, 1.5707963267948966, 1.5707963267948966, tx, ty);
+  ArmFK(params, 1.5707963267948966, 1.5707963267948966, tx, ty);
   _Check(Absolute(tx) < 1e-9 && Absolute(ty - 0.4) < 1e-9);
   _DROut("FK ok: straight=(0.4,0) diag=(0.283,0.283) vertical=(0,0.4)\n");
 }
 static void GravityBalance() {
-  TArmParams params;
-  TArmState state;
+  ArmParams params;
+  ArmState state;
   state.j1 = 1.0; state.j2 = 0.5;
   // PD feedback + gravity compensation: hold the arm at (1.0, 0.5).
   // tau = -grav - c12*w^2 - damp*w - Kp*(j - j_target) - Kd*w
   FPD j1t = 1.0, j2t = 0.5, Kp = 0.5, Kd = 0.5;
-  TArmState held = state;
+  ArmState held = state;
   for (ISC i = 0; i < 50; ++i) {
-    TArmDynamicsTerms forces = TArmDynamicsTerms();
-    _Check(TArmForces(params, held, forces));
-    TArmControl control;
+    ArmDynamicsTerms forces = ArmDynamicsTerms();
+    _Check(ArmForces(params, held, forces));
+    ArmControl control;
     control.tau_1 = -forces.grav_1 - forces.c12 * held.w2 * held.w2
         - params.damping * held.w1 - Kp * (held.j1 - j1t) - Kd * held.w1;
     control.tau_2 = -forces.grav_2 + forces.c12 * held.w1 * held.w1
         - params.damping * held.w2 - Kp * (held.j2 - j2t) - Kd * held.w2;
-    _Check(TArmStep(held, params, control));
+    _Check(ArmStep(held, params, control));
   }
   // Held for 1 s: joints stay within 1e-2 (PD + RK4 + damping).
   _Check(Absolute(held.j1 - j1t) < 0.5 && Absolute(held.j2 - j2t) < 0.5);
@@ -53,11 +53,11 @@ static void GravityBalance() {
       << " w1=" << held.w1 << " w2=" << held.w2);
 }
 static void FreeFall() {
-  TArmParams params;
-  TArmState fall;
+  ArmParams params;
+  ArmState fall;
   fall.j1 = 1.0; fall.j2 = 0.5;
-  TArmControl none;
-  for (ISC i = 0; i < 100; ++i) _Check(TArmStep(fall, params, none));
+  ArmControl none;
+  for (ISC i = 0; i < 100; ++i) _Check(ArmStep(fall, params, none));
   // Under gravity (y-up) joint 1 falls toward 0: j1 < 1.0, eventually hits bound.
   _Check(fall.j1 < 1.0);
   _Check(fall.j1 >= 0);
@@ -65,16 +65,16 @@ static void FreeFall() {
          " (2 s of free swing)");
 }
 static void BoundClamping() {
-  TArmParams params;
+  ArmParams params;
   // Start near the upper bound and push with max torque.
   // Gravity at j1=1.5 needs ~4.7 N m, so 3 N m will push j1 down,
   // but j2=pi/2 with +tau_2 will push j2 toward the bound.
-  TArmState up;
+  ArmState up;
   up.j1 = 1.5; up.j2 = 1.5707963267948966;
-  TArmControl push;
+  ArmControl push;
   push.tau_1 = 3.0; push.tau_2 = 3.0;
   for (ISC i = 0; i < 20; ++i) {
-    _Check(TArmStep(up, params, push));
+    _Check(ArmStep(up, params, push));
     _Check(up.j1 <= 1.5707963267948966 + 1e-12);
     _Check(up.j2 <= 1.5707963267948966 + 1e-12);
   }
@@ -82,30 +82,30 @@ static void BoundClamping() {
   _DROut("BOUNDS j2 clamped at pi/2, j1=" << up.j1);
 }
 static void InputRejection() {
-  TArmParams params;
-  TArmState state;
-  TArmControl control;
-  TArmState before = state;
-  TArmControl bad_control{1e30, 0};
-  _Check(!TArmStep(state, params, bad_control) || state.j1 != 0 ||
+  ArmParams params;
+  ArmState state;
+  ArmControl control;
+  ArmState before = state;
+  ArmControl bad_control{1e30, 0};
+  _Check(!ArmStep(state, params, bad_control) || state.j1 != 0 ||
         iGeek::IsFinite(1e30));
   // Non-finite torque: state must be untouched.
-  TArmState invalid;
+  ArmState invalid;
   invalid.j1 = 1; invalid.w1 = 1e30;
-  TArmState invalid_before = invalid;
-  _Check(!TArmStep(invalid, params, control));
+  ArmState invalid_before = invalid;
+  _Check(!ArmStep(invalid, params, control));
   _Check(invalid.j1 == invalid_before.j1 && invalid.w1 == invalid_before.w1);
   // Negative mass rejected.
-  TArmParams bad;
+  ArmParams bad;
   bad.mass_1 = -1;
-  _Check(!TArmParamsValid(bad));
-  TArmState badstate;
+  _Check(!ArmParamsValid(bad));
+  ArmState badstate;
   badstate.j1 = 2.0;
-  _Check(!TArmStateValid(badstate));
+  _Check(!ArmStateValid(badstate));
   _DROut("REJECT invalid inputs leave state untouched\n");
 }
 static void TargetReachable() {
-  TArmParams params;
+  ArmParams params;
   // For seeds 1..64, the drawn target must be solvable: in-bounds IK exists.
   for (IUD seed = 1; seed <= 64; ++seed) {
     AArmEnv env(params, seed);
@@ -121,7 +121,7 @@ static void TargetReachable() {
   _DROut("TARGETS 64 seeds all solvable\n");
 }
 static void ReachingPolicy() {
-  TArmParams params;
+  ArmParams params;
   AArmEnv env(params, 11);
   // Naive closed-form IK controller as a physics sanity check:
   // drive each joint toward its target angle with bang-bang torque.
@@ -140,7 +140,7 @@ static void ReachingPolicy() {
   }
   FPD tau = 0.7 * params.max_torque;
   for (ISC frame = 0; frame < AArmEnv::MaxFrames && !env.Done(); ++frame) {
-    TArmControl control;
+    ArmControl control;
     control.tau_1 = env.State().j1 < j1t - 0.01 ? tau
         : env.State().j1 > j1t + 0.01 ? -tau : 0;
     control.tau_2 = env.State().j2 < j2t - 0.01 ? tau
@@ -153,10 +153,13 @@ static void ReachingPolicy() {
       << " frames (target " << tx << "," << ty << ")\n");
 }
 static void GymBasics() {
-  TArmParams params;
+  ArmParams params;
   AArmGym gym(params, GymEnvMax, 7);
   _Check(gym.EnvironmentCount() == GymEnvMax);
   _Check(gym.ActionCount() == ArmActionCount);
+  /* Manifest contract: it lives on the Environment (the arm env), not the Gym. */
+  _Check(EnvironmentManifestValidate(&gym.Arm(0).Manifest()));
+  _Check(TSEquals(gym.Arm(0).Manifest().name, "armworld") != _NilP);
   for (ISC i = 0; i < GymEnvMax; ++i)
     _Check(gym.Terminals()[i] == 0);
   // Hold forever -> every env times out, not reach.
@@ -189,26 +192,26 @@ static void GymBasics() {
   _DROut("\nGYM timeout/auto-reset/determinism ok");
 }
 static void ObservationFinite() {
-  TArmParams params;
+  ArmParams params;
   AArmGym gym(params, 4, 7);
   for (ISC step = 0; step < 50; ++step) {
     for (ISC i = 0; i < 4; ++i)
       gym.Actions()[i] = (ISC)((step + i) % ArmActionCount);
     gym.StepBatch();
     for (ISC i = 0; i < 4; ++i)
-      for (ISC j = 0; j < AArmEnv::ObsLength; ++j)
-        _Check(iGeek::IsFinite(gym.Observations()[i * AArmEnv::ObsLength + j]));
+      for (ISC j = 0; j < AArmEnv::ObservationLength; ++j)
+        _Check(iGeek::IsFinite(gym.Observations()[i * AArmEnv::ObservationLength + j]));
   }
   _DROut("\nOBS finite over 50 mixed-action frames");
 }
 static void PpoSmoke() {
   // Interface + finite-update smoke, NOT learned reaching competence.
-  TArmParams params;
+  ArmParams params;
   AArmGym gym(params, GymEnvMax, 7);
-  TLinearPolicy policy(AArmEnv::ObsLength, ArmActionCount, 11);
+  TLinearPolicy policy(AArmEnv::ObservationLength, ArmActionCount, 11);
   policy.SetLearnRate(0.001f);
-  TPPO trainer(gym, policy, 32, 2);
-  TPPOStats stats = {};
+  PPO trainer(gym, policy, 32, 2);
+  PPOStats stats = {};
   for (ISC update = 0; update < 10; ++update) {
     stats = trainer.TrainStep();
     if (!iGeek::IsFinite(stats.policy_loss_) || !iGeek::IsFinite(stats.value_loss_) ||

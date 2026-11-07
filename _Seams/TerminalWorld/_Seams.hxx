@@ -2,7 +2,7 @@
 //
 // The TerminalWorld engine, pulled ONCE here (unguarded .hxx);
 // the seam units rely on this rather than re-including it.
-#include "../../TerminalWorld/TerminalEnvironment.hxx"
+#include "../../Worlds/Terminal/TerminalEnvironment.hxx"
 #include "../../EnvironmentManifest.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"

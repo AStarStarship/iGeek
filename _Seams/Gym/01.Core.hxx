@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 #include "../../AgentSlot.hxx"
-#if _Seam >= _iGeekEnvironmentManifest
+#if _Seam >= _iGeekEnvironmentRolloutCompare
 namespace iGeekGymTest {
 using namespace ::_;
 using namespace iGeek;
@@ -22,11 +22,11 @@ inline const CHA* Core(const CHA* args) {
   _ATestBegin;
   ::_::RefOut() << Headingf("Testing Gym AgentSlot (join/leave/heartbeat)...");
 
-  TAgentSlot slots[AgentSlotMax];
-  TAgentSlotArrayInit(slots, AgentSlotMax);
+  AgentSlot slots[AgentSlotMax];
+  AgentSlotArrayInit(slots, AgentSlotMax);
 
   /* Initially no active agents. */
-  ACheck(TAgentSlotCountActive(slots, AgentSlotMax) == ISC(0),
+  ACheck(AgentSlotCountActive(slots, AgentSlotMax) == ISC(0),
          "initially no active agents");
 
   /* Join agent 1. */
@@ -48,7 +48,7 @@ inline const CHA* Core(const CHA* args) {
   slots[1].state = AgentStateActive;
 
   /* Two active agents. */
-  ACheck(TAgentSlotCountActive(slots, AgentSlotMax) == ISC(2),
+  ACheck(AgentSlotCountActive(slots, AgentSlotMax) == ISC(2),
          "two active agents");
 
   /* Heartbeat agent 1. */
@@ -63,14 +63,14 @@ inline const CHA* Core(const CHA* args) {
   /* Evict at frame 25: no stale agents (both heartbeated recently). */
   ACheck(RoomEvictStale(slots, AgentSlotMax, IUD(25)) == ISC(0),
          "no eviction at frame 25");
-  ACheck(TAgentSlotCountActive(slots, AgentSlotMax) == ISC(2),
+  ACheck(AgentSlotCountActive(slots, AgentSlotMax) == ISC(2),
          "still two active at frame 25");
 
   /* Evict at frame 126: agent 1 (last hb 20, timeout 100, elapsed 106 > 100)
      and agent 2 (last hb 25, timeout 100, elapsed 101 > 100) are both stale. */
   ISC evicted = RoomEvictStale(slots, AgentSlotMax, IUD(126));
   ACheck(evicted == ISC(2), "evict 2 stale agents at frame 126");
-  ACheck(TAgentSlotCountActive(slots, AgentSlotMax) == ISC(0),
+  ACheck(AgentSlotCountActive(slots, AgentSlotMax) == ISC(0),
          "no active agents after eviction");
 
   /* Leave a non-existent agent. */
@@ -86,11 +86,11 @@ inline const CHA* Core(const CHA* args) {
          "agent 3 slot is Gone after leave");
 
   /* Fill all slots, then try to join one more. */
-  TAgentSlotArrayInit(slots, AgentSlotMax);
+  AgentSlotArrayInit(slots, AgentSlotMax);
   for (ISC i = 0; i < AgentSlotMax; ++i) {
     RoomJoin(slots, AgentSlotMax, IUC(i + 10), "x", IUD(300));
   }
-  ACheck(TAgentSlotFindFree(slots, AgentSlotMax) < 0,
+  ACheck(AgentSlotFindFree(slots, AgentSlotMax) < 0,
          "no free slots when full");
   ACheck(!RoomJoin(slots, AgentSlotMax, IUC(99), "overflow", IUD(300)),
          "join fails when full");

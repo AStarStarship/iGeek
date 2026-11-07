@@ -3,8 +3,7 @@
 #ifndef _iGeekJobQueueH
 #define _iGeekJobQueueH
 #include <_Config.h>
-#if _Seam >= _iGeekEnvironmentManifest
-#include "Script.h"
+#if _Seam >= _iGeekEnvironmentRolloutCompare
 namespace iGeek {
 
 /* Max jobs in the queue. */
@@ -20,7 +19,7 @@ enum {
 
 /* A fixed-size job spec: one entry in the queue.
    The Room dequeues a job, spawns envs, runs episodes,
-   collects telemetry (into the Script), marks Done. */
+   records telemetry on its Floor, marks Done. */
 struct JobSpec {
   IUC job_id;
   CHA job_name[32];

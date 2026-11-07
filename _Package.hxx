@@ -20,31 +20,21 @@
 #include "../ASCIICrabs/_Package.hxx"
 
 // 2. Data nodes.
-#include "EnvironmentGoal.h"
 #include "EnvironmentGoal.hxx"
-#include "EnvironmentReward.h"
 #include "EnvironmentReward.hxx"
-#include "Environment.h"
 #include "Environment.hxx"
 
 // 3. Math.
-#include "Tensor.h"
 #include "Tensor.hxx"
 
 // 4. Learning.
-#include "Policy.h"
 #include "PolicyNet.hxx"
-#include "Gym.h"
 #include "Gym.hxx"
-#include "PPO.h"
 #include "PPO.hxx"
 
 // 5. Agent tiers + metrics.
-#include "AgentState.h"
 #include "AgentState.hxx"
-#include "Metrics.h"
 #include "Metrics.hxx"
-#include "Agent.h"
 #include "Agent.hxx"
 
 #endif  //< _iGeekPackageHXX

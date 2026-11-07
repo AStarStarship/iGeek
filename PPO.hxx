@@ -1,13 +1,13 @@
 // Copyright AStarship <https://astarship.net>.
-// PPO.hxx — TPPO training loop (GAE + clipped PPO + value-clip + entropy).
+// PPO.hxx — PPO training loop (GAE + clipped PPO + value-clip + entropy).
 //
 // vectorized-batch: mirrors the structure of the local reference PPO implementation's
 // src/algo.cu fused PPO kernel (clipped policy loss, vf-clip, entropy bonus,
 // GAE advantages) in CPU FPC on the ASCIICrabs no-stdlib type system.
 //
-// The policy update uses the TPolicy::Backward gradient interface (the same
+// The policy update uses the Policy::Backward gradient interface (the same
 // one M4 gradchecked) + a policy weight step. For the M5 toy test the policy
-// is a TLinearPolicy (whose SgdStep is exact); wiring the TTransformer's full
+// is a TLinearPolicy (whose SgdStep is exact); wiring the TransformerPolicy's full
 // block backprop into PPO is the follow-up.
 #pragma once
 #include "PPO.h"
@@ -16,17 +16,17 @@
 #include "../CrabsTK/Math/Blas.h"
 namespace iGeek {
 
-TPPO::TPPO(Gym& gym, TPolicy& policy, ISC horizon, ISC epochs)
+PPO::PPO(Gym& gym, Policy& policy, ISC horizon, ISC epochs)
     : gym_(gym), policy_(policy), horizon_(horizon), epochs_(epochs),
       gamma_(0.99f), lam_(0.95f), clip_eps_(0.2f), vf_clip_eps_(0.2f),
       ent_coef_(0.01f), vf_coef_(0.5f) {
   ISC B = gym.EnvironmentCount();
   ISC N = horizon_ * B;  // total buffer rows.
-  ISC obs_len = policy_.ObsLength();
+  ISC observation_len = policy_.ObservationLength();
   ISC A = policy_.ActionCount();
-  obs_ = TTensorAlloc(N, obs_len);
-  old_logits_ = TTensorAlloc(N, A);
-  values_ = TTensorAlloc(N, 1);
+  observation_ = TensorFPCAlloc(N, observation_len);
+  old_logits_ = TensorFPCAlloc(N, A);
+  values_ = TensorFPCAlloc(N, 1);
   actions_ = new ISC[N]();
   logp_ = new FPC[N]();
   rewards_ = new FPC[N]();
@@ -35,27 +35,27 @@ TPPO::TPPO(Gym& gym, TPolicy& policy, ISC horizon, ISC epochs)
   returns_ = new FPC[N]();
 }
 
-TPPO::~TPPO() {
-  TTensorFree(obs_); TTensorFree(old_logits_); TTensorFree(values_);
+PPO::~PPO() {
+  TensorFPCFree(observation_); TensorFPCFree(old_logits_); TensorFPCFree(values_);
   delete[] actions_; delete[] logp_; delete[] rewards_; delete[] terminals_;
   delete[] advantages_; delete[] returns_;
 }
 
 /* Collect one rollout: horizon batch-steps from the gym, each stored as
    horizon*B rows in the buffer. */
-void TPPO::CollectRollout() {
+void PPO::CollectRollout() {
   ISC B = gym_.EnvironmentCount();
   ISC A = policy_.ActionCount();
   gym_.ResetBatch();
   ISC n = 0;
   for (ISC h = 0; h < horizon_; ++h) {
-    // Forward on the current batch obs.
-    TTensor obs_b = TTensorAlloc(B, policy_.ObsLength());
+    // Forward on the current batch observation.
+    TensorFPC obs_b = TensorFPCAlloc(B, policy_.ObservationLength());
     for (ISC i = 0; i < B; ++i)
-      for (ISC j = 0; j < policy_.ObsLength(); ++j)
-        obs_b.At(i, j) = gym_.Observations()[i * policy_.ObsLength() + j];
-    TTensor logits = TTensorAlloc(B, A);
-    TTensor values = TTensorAlloc(B, 1);
+      for (ISC j = 0; j < policy_.ObservationLength(); ++j)
+        obs_b.At(i, j) = gym_.Observations()[i * policy_.ObservationLength() + j];
+    TensorFPC logits = TensorFPCAlloc(B, A);
+    TensorFPC values = TensorFPCAlloc(B, 1);
     policy_.Forward(obs_b, logits, values);
     // Fixed-size buffers (NOT VLAs — VLAs are non-standard C++ and corrupt
     // the stack at -O2 with larger batches; GymEnvMax is the Gym's hard cap).
@@ -63,8 +63,8 @@ void TPPO::CollectRollout() {
     policy_.SampleActions(logits, acts, lp);
     // Store this step's buffer rows.
     for (ISC i = 0; i < B; ++i) {
-      for (ISC j = 0; j < policy_.ObsLength(); ++j)
-        obs_.At(n + i, j) = obs_b.At(i, j);
+      for (ISC j = 0; j < policy_.ObservationLength(); ++j)
+        observation_.At(n + i, j) = obs_b.At(i, j);
       for (ISC a = 0; a < A; ++a) old_logits_.At(n + i, a) = logits.At(i, a);
       values_.At(n + i, 0) = values.At(i, 0);
       actions_[n + i] = acts[i];
@@ -79,14 +79,14 @@ void TPPO::CollectRollout() {
       terminals_[n + i] = gym_.Terminals()[i];
     }
     n += B;
-    TTensorFree(obs_b); TTensorFree(logits); TTensorFree(values);
+    TensorFPCFree(obs_b); TensorFPCFree(logits); TensorFPCFree(values);
   }
 }
 
 /* GAE advantages: delta_t = r_t + gamma*V(s_{t+1})*(1-done) - V(s_t);
    adv_t = sum_k lambda^k delta_{t+k}. Within each env's trajectory (reset at
    terminals), compute backwards. */
-void TPPO::ComputeAdvantages() {
+void PPO::ComputeAdvantages() {
   ISC B = gym_.EnvironmentCount();
   ISC N = horizon_ * B;
   // Zero advantages.
@@ -129,15 +129,15 @@ void TPPO::ComputeAdvantages() {
 
 /* One epoch of clipped PPO + value-clip + entropy over the full buffer
    (minibatch = full buffer for the toy test). Returns the stats. */
-TPPOStats TPPO::UpdatePolicy() {
+PPOStats PPO::UpdatePolicy() {
   ISC N = horizon_ * gym_.EnvironmentCount();
   ISC A = policy_.ActionCount();
   // Build the per-row tensors the Backward interface wants.
-  TTensor logits = TTensorAlloc(N, A);
-  TTensor values = TTensorAlloc(N, 1);
-  TTensor old_logp_t = TTensorAlloc(N, 1);
-  TTensor adv_t = TTensorAlloc(N, 1);
-  TTensor ret_t = TTensorAlloc(N, 1);
+  TensorFPC logits = TensorFPCAlloc(N, A);
+  TensorFPC values = TensorFPCAlloc(N, 1);
+  TensorFPC old_logp_t = TensorFPCAlloc(N, 1);
+  TensorFPC adv_t = TensorFPCAlloc(N, 1);
+  TensorFPC ret_t = TensorFPCAlloc(N, 1);
   for (ISC i = 0; i < N; ++i) {
     for (ISC a = 0; a < A; ++a) logits.At(i, a) = old_logits_.At(i, a);
     values.At(i, 0) = values_.At(i, 0);
@@ -146,8 +146,8 @@ TPPOStats TPPO::UpdatePolicy() {
     ret_t.At(i, 0) = returns_[i];
   }
   // Base gradients (the exact fused-kernel quantities).
-  TTensor grad_logits = TTensorAlloc(N, A);
-  TTensor grad_value = TTensorAlloc(N, 1);
+  TensorFPC grad_logits = TensorFPCAlloc(N, A);
+  TensorFPC grad_value = TensorFPCAlloc(N, 1);
   policy_.Backward(logits, actions_, adv_t, old_logp_t, values, ret_t,
                    grad_logits, grad_value);
   // Compute the PPO clipped surrogate + stats (diagnostic; the actual weight
@@ -177,28 +177,35 @@ TPPOStats TPPO::UpdatePolicy() {
   (void)approx_kl;
   // Weight step: only TLinearPolicy has SgdStep; cast (the toy test uses it).
   if (TLinearPolicy* lp = dynamic_cast<TLinearPolicy*>(&policy_)) {
-    lp->SgdStep(obs_, grad_logits, grad_value, lp->LearnRate());
+    lp->SgdStep(observation_, grad_logits, grad_value, lp->LearnRate());
   }
-  TPPOStats stats;
+  PPOStats stats;
   stats.policy_loss_ = pol_loss;
   stats.value_loss_ = val_loss;
   stats.entropy_ = entropy;
   stats.approx_kl_ = approx_kl;
   stats.explained_var_ = 0.0f;
-  TTensorFree(logits); TTensorFree(values); TTensorFree(old_logp_t);
-  TTensorFree(adv_t); TTensorFree(ret_t); TTensorFree(grad_logits);
-  TTensorFree(grad_value);
+  TensorFPCFree(logits); TensorFPCFree(values); TensorFPCFree(old_logp_t);
+  TensorFPCFree(adv_t); TensorFPCFree(ret_t); TensorFPCFree(grad_logits);
+  TensorFPCFree(grad_value);
   return stats;
 }
 
-TPPOStats TPPO::TrainStep() {
+PPOStats PPO::TrainStep() {
   CollectRollout();
   ComputeAdvantages();
-  TPPOStats stats;
+  PPOStats stats;
   for (ISC e = 0; e < epochs_; ++e) {
     stats = UpdatePolicy();
   }
   return stats;
 }
+
+  void PPO::SetGamma(FPC g) { gamma_ = g; }
+  void PPO::SetLambda(FPC l) { lam_ = l; }
+  void PPO::SetClipEps(FPC e) { clip_eps_ = e; }
+  void PPO::SetVfClipEps(FPC e) { vf_clip_eps_ = e; }
+  void PPO::SetEntropyCoef(FPC c) { ent_coef_ = c; }
+  void PPO::SetValueCoef(FPC c) { vf_coef_ = c; }
 
 } //< namespace iGeek

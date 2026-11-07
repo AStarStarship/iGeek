@@ -2,6 +2,7 @@
 #pragma once
 #include "JobQueue.h"
 namespace iGeek {
+using namespace ::_;
 
 void JobSpecInit(JobSpec* job) {
   if (!job) return;

@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../MazeWorld/MazeWorld.hxx"
+#include "../../Worlds/Maze2D/MazeWorld.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"
 namespace MazeWorldTest {

@@ -5,6 +5,7 @@
 #include "Environment.h"
 #include "EnvironmentGoal.h"
 #include "EnvironmentManifest.h"
+#include "../../ASCIICrabs/Room.hpp"
 namespace iGeek {
 
 /* Max parallel envs in one Gym batch. Fixed-size (no std vector).
@@ -28,7 +29,7 @@ Buffer ownership, shape, mutability, lifetime:
     (either heap `new[]` or stack storage) and freed in the subclass
     destructor. The base Gym never allocates or frees them.
   - Shape: flat 1-D, indexed [env * feature + i].
-    observations_ has env_count * obs_len_ floats.
+    observations_ has env_count * observation_len_ floats.
     actions_, rewards_, terminals_ have env_count elements.
     action_mask_ has env_count * action_count_ floats.
   - Mutability: the policy WRITES actions_, the Gym WRITES
@@ -42,20 +43,18 @@ Buffer ownership, shape, mutability, lifetime:
   - AddEnv stores the pointer in envs_[] but does not take ownership;
     the caller must keep the Env alive for the Gym's lifetime.
 */
-class Gym {
+class Gym : public Environment {
  public:
 
   Gym(const CHA* gym_name = "gym")
-      : gym_name_(gym_name), env_count_(0), observations_(_NilP),
-        actions_(_NilP), rewards_(_NilP), terminals_(_NilP), action_mask_(_NilP),
-        obs_len_(0), action_count_(0) {
-    EnvironmentManifestInit(&manifest_);
-  }
+      : Environment(gym_name), gym_name_(gym_name), env_count_(0),
+        observations_(_NilP), actions_(_NilP), rewards_(_NilP),
+        terminals_(_NilP), action_mask_(_NilP), observation_len_(0),
+        action_count_(0) {}
   virtual ~Gym() {}
 
-  const CHA* Name() { return gym_name_; }
-  EnvironmentManifest& Manifest() { return manifest_; }
-  void SetManifest(EnvironmentManifest& m) { manifest_ = m; }
+  /* The Gym's own name. */
+  const CHA* GymName() { return gym_name_; }
 
   void AddEnv(Environment* env);
 
@@ -70,7 +69,7 @@ class Gym {
   /* Number of envs in the batch (= EnvironmentCount of the added envs). */
   ISC EnvironmentCount() { return env_count_; }
 
-  /* Flat observation buffer: [env_count][obs_len]. */
+  /* Flat observation buffer: [env_count][observation_len]. */
   FPC* Observations() { return observations_; }
   /* Flat action buffer (policy writes, Gym reads): [env_count]. */
   ISC* Actions() { return actions_; }
@@ -92,14 +91,13 @@ class Gym {
  protected:
 
   const CHA* gym_name_;
-  EnvironmentManifest manifest_;
   ISC env_count_;
   FPC* observations_;
   ISC* actions_;
   FPC* rewards_;
   FPC* terminals_;
   FPC* action_mask_;
-  ISC obs_len_;
+  ISC observation_len_;
   ISC action_count_;
   Environment* envs_[GymEnvMax];
 };

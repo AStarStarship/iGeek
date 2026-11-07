@@ -5,8 +5,9 @@
 #include "AgentSlot.h"
 #include "../ASCIICrabs/Stringf.hpp"
 namespace iGeek {
+using namespace ::_;
 
-void TAgentSlotInit(TAgentSlot* slot) {
+void AgentSlotInit(AgentSlot* slot) {
   if (!slot) return;
   slot->agent_id = IUC(0);
   for (ISN i = 0; i < 32; ++i) slot->agent_name[i] = 0;
@@ -16,12 +17,12 @@ void TAgentSlotInit(TAgentSlot* slot) {
   slot->heartbeat_timeout = ISC(100);
 }
 
-void TAgentSlotArrayInit(TAgentSlot* slots, ISC count) {
+void AgentSlotArrayInit(AgentSlot* slots, ISC count) {
   if (!slots) return;
-  for (ISC i = 0; i < count; ++i) TAgentSlotInit(&slots[i]);
+  for (ISC i = 0; i < count; ++i) AgentSlotInit(&slots[i]);
 }
 
-ISC TAgentSlotFindFree(const TAgentSlot* slots, ISC count) {
+ISC AgentSlotFindFree(const AgentSlot* slots, ISC count) {
   if (!slots) return -1;
   for (ISC i = 0; i < count; ++i) {
     if (slots[i].state == AgentStateGone) return i;
@@ -29,10 +30,10 @@ ISC TAgentSlotFindFree(const TAgentSlot* slots, ISC count) {
   return -1;
 }
 
-BOL RoomJoin(TAgentSlot* slots, ISC count, IUC agent_id,
+BOL RoomJoin(AgentSlot* slots, ISC count, IUC agent_id,
              const CHA* agent_name, IUD frame) {
   if (!slots || !agent_name) return false;
-  ISC idx = TAgentSlotFindFree(slots, count);
+  ISC idx = AgentSlotFindFree(slots, count);
   if (idx < 0) return false;
   slots[idx].agent_id = agent_id;
   TSPrint(slots[idx].agent_name, ISW(32), agent_name);
@@ -42,7 +43,7 @@ BOL RoomJoin(TAgentSlot* slots, ISC count, IUC agent_id,
   return true;
 }
 
-BOL RoomLeave(TAgentSlot* slots, ISC count, IUC agent_id) {
+BOL RoomLeave(AgentSlot* slots, ISC count, IUC agent_id) {
   if (!slots) return false;
   for (ISC i = 0; i < count; ++i) {
     if (slots[i].agent_id == agent_id &&
@@ -56,7 +57,7 @@ BOL RoomLeave(TAgentSlot* slots, ISC count, IUC agent_id) {
   return false;
 }
 
-BOL RoomHeartbeat(TAgentSlot* slots, ISC count, IUC agent_id, IUD frame) {
+BOL RoomHeartbeat(AgentSlot* slots, ISC count, IUC agent_id, IUD frame) {
   if (!slots) return false;
   for (ISC i = 0; i < count; ++i) {
     if (slots[i].agent_id == agent_id &&
@@ -68,7 +69,7 @@ BOL RoomHeartbeat(TAgentSlot* slots, ISC count, IUC agent_id, IUD frame) {
   return false;
 }
 
-ISC RoomEvictStale(TAgentSlot* slots, ISC count, IUD frame) {
+ISC RoomEvictStale(AgentSlot* slots, ISC count, IUD frame) {
   if (!slots) return ISC(0);
   ISC evicted = 0;
   for (ISC i = 0; i < count; ++i) {
@@ -85,7 +86,7 @@ ISC RoomEvictStale(TAgentSlot* slots, ISC count, IUD frame) {
   return evicted;
 }
 
-ISC TAgentSlotCountActive(const TAgentSlot* slots, ISC count) {
+ISC AgentSlotCountActive(const AgentSlot* slots, ISC count) {
   if (!slots) return ISC(0);
   ISC n = 0;
   for (ISC i = 0; i < count; ++i) {

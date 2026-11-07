@@ -34,26 +34,26 @@ inline const CHA* PolicyBwd(const CHA* args) {
   const FPC eps = 1e-3f;
 
   // Fixed inputs (small, non-degenerate so gradients are non-trivial).
-  TTensor logits = TTensorAlloc(B, A);
+  TensorFPC logits = TensorFPCAlloc(B, A);
   // Distinct logits per row so softmax is not uniform.
   logits.At(0,0)=0.3f; logits.At(0,1)=1.1f; logits.At(0,2)=-0.2f;
   logits.At(1,0)=2.0f; logits.At(1,1)=-1.5f; logits.At(1,2)=0.7f;
   logits.At(2,0)=-0.8f; logits.At(2,1)=0.4f; logits.At(2,2)=1.9f;
   ISC actions[B] = {1, 0, 2};
-  TTensor adv = TTensorAlloc(B, 1);
+  TensorFPC adv = TensorFPCAlloc(B, 1);
   adv.At(0,0)=0.9f; adv.At(1,0)=-1.3f; adv.At(2,0)=0.5f;
-  TTensor values = TTensorAlloc(B, 1);
+  TensorFPC values = TensorFPCAlloc(B, 1);
   values.At(0,0)=0.4f; values.At(1,0)=-0.6f; values.At(2,0)=1.1f;
-  TTensor returns = TTensorAlloc(B, 1);
+  TensorFPC returns = TensorFPCAlloc(B, 1);
   returns.At(0,0)=1.0f; returns.At(1,0)=-0.2f; returns.At(2,0)=0.8f;
-  TTensor old_logp = TTensorAlloc(B, 1);  // unused by base grad.
+  TensorFPC old_logp = TensorFPCAlloc(B, 1);  // unused by base grad.
   old_logp.At(0,0)=0; old_logp.At(1,0)=0; old_logp.At(2,0)=0;
 
   _DROut("PolicyBwd: gradcheck grad_logits (analytic vs finite-diff)\n");
   // Analytic grad from Backward.
-  TTransformer net(4, A, 8, 1);  // net shape irrelevant to the base grad.
-  TTensor grad_logits = TTensorAlloc(B, A);
-  TTensor grad_value = TTensorAlloc(B, 1);
+  TransformerPolicy net(4, A, 8, 1);  // net shape irrelevant to the base grad.
+  TensorFPC grad_logits = TensorFPCAlloc(B, A);
+  TensorFPC grad_value = TensorFPCAlloc(B, 1);
   net.Backward(logits, actions, adv, old_logp, values, returns,
                grad_logits, grad_value);
   // Finite-difference each logits[b,a].
@@ -107,9 +107,9 @@ inline const CHA* PolicyBwd(const CHA* args) {
     PB_CHECK(dr < 1e-3f);
   }
 
-  TTensorFree(logits); TTensorFree(adv); TTensorFree(values);
-  TTensorFree(returns); TTensorFree(old_logp); TTensorFree(grad_logits);
-  TTensorFree(grad_value);
+  TensorFPCFree(logits); TensorFPCFree(adv); TensorFPCFree(values);
+  TensorFPCFree(returns); TensorFPCFree(old_logp); TensorFPCFree(grad_logits);
+  TensorFPCFree(grad_value);
 
   if (PBFAILS() != 0) {
     _DROut("\n" << PBFAILS() << " PolicyBwd assertion(s) FAILED\n");

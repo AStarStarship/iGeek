@@ -8,6 +8,7 @@
 #include <_Config.h>
 #include "../CrabsTK/Math/Blas.h"
 namespace iGeek {
+using namespace ::_;
 
 void BehaviorMetrics::RecordTrial(BOL was_present, BOL did_report,
                                   ISC steps_to_report) {

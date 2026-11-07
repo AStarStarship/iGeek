@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../BikeWorld/Tests.hxx"
-#include "../../BikeWorld/PpoSmoke.hxx"
+#include "../../Worlds/Bike/Tests.hxx"
+#include "../../Worlds/Bike/PpoSmoke.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"
 namespace BikeWorldTest {

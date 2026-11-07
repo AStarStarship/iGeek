@@ -4,9 +4,7 @@
 #define _iGeekEnvironmentGoalH
 #include "../ASCIICrabs/Operand.h"
 namespace iGeek {
-using ::_::Operand;
-using ::_::Op;
-using ::_::Crabs;
+using namespace ::_;
 
 /* An ASCIICrabs Operand data node holding the three goals relevant to one env step:
    the raw observation, the achieved goal, and the desired goal.
@@ -23,23 +21,23 @@ Migrated 2026-10-07:
 class EnvironmentGoal : public Operand {
  public:
 
-  EnvironmentGoal() : observation_(_NilP), desired_goal_(_NilP), achieved_goal_(_NilP) {}
-  ~EnvironmentGoal() {}
+  EnvironmentGoal();
+  ~EnvironmentGoal();
 
   /* ASCIICrabs Operand operation. */
   const Op* Star(CHC index, Crabs* crabs) override;
 
   /* Accessors (vectorized-batch: the policy reads observation, the reward
   compares achieved vs desired). */
-  Crabs* Observation() { return observation_; }
-  Crabs* DesiredGoal() { return desired_goal_; }
-  Crabs* AchievedGoal() { return achieved_goal_; }
-  const Crabs* ObservationC() { return observation_; }
+  Crabs* Observation();
+  Crabs* DesiredGoal();
+  Crabs* AchievedGoal();
+  const Crabs* ObservationC();
 
   /* Bind a datum container to a slot (no std; the world owns the Crabs). */
-  void SetObservation(Crabs* c) { observation_ = c; }
-  void SetDesiredGoal(Crabs* c) { desired_goal_ = c; }
-  void SetAchievedGoal(Crabs* c) { achieved_goal_ = c; }
+  void SetObservation(Crabs* c);
+  void SetDesiredGoal(Crabs* c);
+  void SetAchievedGoal(Crabs* c);
 
  private:
 
