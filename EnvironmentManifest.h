@@ -3,8 +3,7 @@
 #ifndef _iGeekEnvironmentManifestH
 #define _iGeekEnvironmentManifestH
 #include <_Config.h>
-#if _Seam >= _iGeekEnvironmentManifest
-#include "Environment.h"
+#if _Seam >= _iGeekEnvironmentRolloutCompare
 #include "ROut.h"
 #include "AType.hpp"
 #include "List.hpp"
@@ -13,8 +12,10 @@ namespace iGeek {
 using namespace ::_;
 
 /* The manifest as a dictionary: CHS keys, value types in the DTB byte,
-   hash in IUN. Same shape the JSON accessors use to read/write it. */
-typedef _::TDic<CHR, CHR, ISR, ISR, DTB, IUN> ManifestDic;
+   hash in IUN. Same shape the JSON accessors use to read/write it.
+   Written as TDic<> so it uses DIC_A's default parameter list, which is
+   the same list DIC_D supplies. */
+typedef _::TDic<> ManifestDic;
 
 /* Fixed-length string capacity for manifest fields. */
 enum {
@@ -63,7 +64,7 @@ struct EnvironmentManifest {
   FPC reward_high;
   BOL reward_higher_is_better;
   ISC determinism;
-  ISC obs_count;
+  ISC observation_count;
   ISC action_count;
   ISC max_episode_steps;
   ISC environment_count_max;
@@ -71,10 +72,6 @@ struct EnvironmentManifest {
   ISC seam_number;
   ISC manifest_version;
 };
-
-/* Initializes a manifest to safe defaults (zeroed, kind=Env, domain=Invalid,
-   determinism=Unknown, manifest_version=1). */
-void EnvironmentManifestInit(EnvironmentManifest* m);
 
 /* Total tuples: 12 scalars + 5 strings (each field stored as _CHA chars). */
 enum {
@@ -85,117 +82,14 @@ enum {
       ManifestModalityLen + ManifestWorldLen,
 };
 
-/* Writes a CHA array into the List as individual _CHA tuples, starting
-   at the given index. Returns the next free index. */
-template<LST_A>
-static ISC WriteStr(TList<LST_P>* floor, const CHA* s, ISN len, ISC start) {
-  for (ISN i = 0; i < len; ++i) {
-    if (_::TListInsert<LST_P>(floor, s[i], start + ISC(i)) != start + ISC(i))
-      return -1;
-  }
-  return start + ISC(len);
-}
+/* ---- Non-template API (defined in EnvironmentManifest.hxx) ----------- */
 
-/* Reads a CHA array from the List as individual _CHA tuples. */
-template<LST_A>
-static BOL ReadStr(TList<LST_P>* floor, CHA* s, ISN len, ISC start) {
-  for (ISN i = 0; i < len; ++i) {
-    const void* p = _::TListValue<LST_P>(floor, start + ISC(i));
-    if (!p) return false;
-    if (_::TListType<LST_P>(floor, start + ISC(i)) != _CHA) return false;
-    s[i] = CHA(*TRef<const CHA>(p));
-  }
-  return true;
-}
-
-/* Serializes the manifest into the Floor as ASCII tuples.
-   @param m       The manifest to write.
-   @param floor   The Room's Floor (ASCII List) to write into.
-   @return        True on success, false if the Floor is full. */
-template<LST_A>
-BOL EnvironmentManifestDump(const EnvironmentManifest* m, TList<LST_P>* floor) {
-  if (!m || !floor) return false;
-  _::TListClear<LST_P>(floor);
-  /* 12 scalars at indices 0-11. */
-  if (_::TListInsert<LST_P>(floor, m->kind) != ISC(0)) return false;
-  if (_::TListInsert<LST_P>(floor, m->domain) != ISC(1)) return false;
-  if (_::TListInsert<LST_P>(floor, m->determinism) != ISC(2)) return false;
-  if (_::TListInsert<LST_P>(floor, m->reward_low) != ISC(3)) return false;
-  if (_::TListInsert<LST_P>(floor, m->reward_high) != ISC(4)) return false;
-  if (_::TListInsert<LST_P>(floor, IUC(m->reward_higher_is_better)) != ISC(5))
-    return false;
-  if (_::TListInsert<LST_P>(floor, m->obs_count) != ISC(6)) return false;
-  if (_::TListInsert<LST_P>(floor, m->action_count) != ISC(7)) return false;
-  if (_::TListInsert<LST_P>(floor, m->max_episode_steps) != ISC(8)) return false;
-  if (_::TListInsert<LST_P>(floor, m->environment_count_max) != ISC(9)) return false;
-  if (_::TListInsert<LST_P>(floor, m->seam_number) != ISC(10)) return false;
-  if (_::TListInsert<LST_P>(floor, m->manifest_version) != ISC(11)) return false;
-  /* 5 strings as _CHA tuples at indices 12+. */
-  ISC idx = ManifestScalarCount;
-  if (WriteStr(floor, m->name, ManifestNameLen, idx) < 0) return false;
-  idx += ManifestNameLen;
-  if (WriteStr(floor, m->version, ManifestVersionLen, idx) < 0) return false;
-  idx += ManifestVersionLen;
-  if (WriteStr(floor, m->description, ManifestDescriptionLen, idx) < 0)
-    return false;
-  idx += ManifestDescriptionLen;
-  if (WriteStr(floor, m->modality, ManifestModalityLen, idx) < 0) return false;
-  idx += ManifestModalityLen;
-  if (WriteStr(floor, m->world_name, ManifestWorldLen, idx) < 0) return false;
-  return true;
-}
-
-/* Deserializes a manifest from the Floor.
-   @param floor   The Room's Floor to read from.
-   @param m       The manifest to fill.
-   @return        True on success, false if the Floor is empty or corrupt. */
-template<LST_A>
-BOL EnvironmentManifestLoad(TList<LST_P>* floor, EnvironmentManifest* m) {
-  if (!floor || !m) return false;
-  if (ISC(floor->map.count) != ManifestTupleTotal) return false;
-  /* Verify scalar types. */
-  if (_::TListType<LST_P>(floor, ISC(0)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(1)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(2)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(3)) != _FPC) return false;
-  if (_::TListType<LST_P>(floor, ISC(4)) != _FPC) return false;
-  if (_::TListType<LST_P>(floor, ISC(5)) != _IUC) return false;
-  if (_::TListType<LST_P>(floor, ISC(6)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(7)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(8)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(9)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(10)) != _ISC) return false;
-  if (_::TListType<LST_P>(floor, ISC(11)) != _ISC) return false;
-  /* Read scalars. */
-  m->kind = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(0))));
-  m->domain = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(1))));
-  m->determinism = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(2))));
-  m->reward_low = FPC(*_::TRef<const FPC>(_::TListValue<LST_P>(floor, ISC(3))));
-  m->reward_high = FPC(*_::TRef<const FPC>(_::TListValue<LST_P>(floor, ISC(4))));
-  m->reward_higher_is_better =
-      IUC(*_::TRef<const IUC>(_::TListValue<LST_P>(floor, ISC(5)))) != IUC(0);
-  m->obs_count = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(6))));
-  m->action_count = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(7))));
-  m->max_episode_steps = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(8))));
-  m->environment_count_max = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(9))));
-  m->seam_number = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(10))));
-  m->manifest_version = ISC(*_::TRef<const ISC>(_::TListValue<LST_P>(floor, ISC(11))));
-  /* Read strings. */
-  ISC idx = ManifestScalarCount;
-  if (!ReadStr(floor, m->name, ManifestNameLen, idx)) return false;
-  idx += ManifestNameLen;
-  if (!ReadStr(floor, m->version, ManifestVersionLen, idx)) return false;
-  idx += ManifestVersionLen;
-  if (!ReadStr(floor, m->description, ManifestDescriptionLen, idx)) return false;
-  idx += ManifestDescriptionLen;
-  if (!ReadStr(floor, m->modality, ManifestModalityLen, idx)) return false;
-  idx += ManifestModalityLen;
-  if (!ReadStr(floor, m->world_name, ManifestWorldLen, idx)) return false;
-  return true;
-}
+/* Initializes a manifest to safe defaults (zeroed, kind=Env, domain=Invalid,
+   determinism=Unknown, manifest_version=1). */
+void EnvironmentManifestInit(EnvironmentManifest* m);
 
 /* Validates a manifest: non-empty name/version, valid kind/domain/
-   determinism, reward_low <= reward_high, obs_count > 0,
+   determinism, reward_low <= reward_high, observation_count > 0,
    action_count > 0, max_episode_steps > 0, environment_count_max > 0.
    @return        True if valid, false otherwise. */
 BOL EnvironmentManifestValidate(const EnvironmentManifest* m);
@@ -219,6 +113,22 @@ BOL EnvironmentManifestPrintJson(const ManifestDic* dic, ::_::ROut& out);
 /* POD <-> Dic bridge: all 17 fields, canonical key names, field order. */
 BOL EnvironmentManifestToDic(const EnvironmentManifest* m, ManifestDic* dic);
 BOL ManifestDicToEnvironmentManifest(const ManifestDic* dic, EnvironmentManifest* m);
+
+/* ---- Template API (defined in EnvironmentManifest.hpp) --------------- */
+
+/* Serializes the manifest into the Floor as ASCII tuples.
+   @param m       The manifest to write.
+   @param floor   The Room's Floor (ASCII List) to write into.
+   @return        True on success, false if the Floor is full. */
+template<LST_A>
+BOL EnvironmentManifestDump(const EnvironmentManifest* m, TList<LST_P>* floor);
+
+/* Deserializes a manifest from the Floor.
+   @param floor   The Room's Floor to read from.
+   @param m       The manifest to fill.
+   @return        True on success, false if the Floor is empty or corrupt. */
+template<LST_A>
+BOL EnvironmentManifestLoad(TList<LST_P>* floor, EnvironmentManifest* m);
 
 }  //< namespace iGeek
 #endif

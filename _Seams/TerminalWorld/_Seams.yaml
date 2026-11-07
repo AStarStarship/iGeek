@@ -1,4 +1,8 @@
-# Copyright AStarship <https://astarship.net>.
+# _Seams.yaml — TerminalWorld module seams.
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
 seams:
   - name: _iGeekTerminalWorldCore
     depends: [_iGeekCore]

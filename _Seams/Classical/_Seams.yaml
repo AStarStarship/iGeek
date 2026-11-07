@@ -1,22 +1,34 @@
+# _Seams.yaml — Classical module seams.
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
 seams:
   - name: _iGeekClassicalCore
+    depends: [_iGeekCore]
     file: 01.Core.hxx
     label: "Testing Classical core..."
-  - name: _iGeekClassicalRelease
-    file: 02.Release.hxx
-    label: "Testing Classical release..."
   - name: _iGeekClassicalSearch
+    depends: [_iGeekClassicalCore]
     file: 03.Search.hxx
     label: "Testing Classical Search..."
   - name: _iGeekClassicalCSPH
+    depends: [_iGeekClassicalSearch]
     file: 04.Csp.hxx
     label: "Testing Classical Csp..."
-  - name: _iGeekClassicalMDP
+  - name: _iGeekClassicalMdp
+    depends: [_iGeekClassicalCSPH]
     file: 05.Mdp.hxx
     label: "Testing Classical Mdp..."
-  - name: _iGeekClassicalSAT
+  - name: _iGeekClassicalSat
+    depends: [_iGeekClassicalMdp]
     file: 06.Sat.hxx
     label: "Testing Classical Sat..."
   - name: _iGeekClassicalGame
+    depends: [_iGeekClassicalSat]
     file: 07.Game.hxx
     label: "Testing Classical Game..."
+  - name: _iGeekClassicalRelease
+    depends: [_iGeekClassicalGame]
+    file: 08.Release.hxx
+    label: "Testing Classical release..."

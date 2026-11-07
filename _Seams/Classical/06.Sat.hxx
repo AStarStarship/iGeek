@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#if _Seam >= _iGeekClassicalSatH
+#if _Seam >= _iGeekClassicalSat
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"

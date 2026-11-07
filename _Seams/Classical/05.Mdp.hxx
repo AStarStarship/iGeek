@@ -1,6 +1,6 @@
 // Copyright AStarship <https://astarship.net>.
 // Classical Mdp seam unit: value iteration + policy iteration.
-#if _Seam >= _iGeekClassicalMDPH
+#if _Seam >= _iGeekClassicalMdp
 #include "../../../ASCIICrabs/_Debug.h"
 #else
 #include "../../../ASCIICrabs/_Release.h"

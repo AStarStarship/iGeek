@@ -32,19 +32,19 @@ inline const CHA* Policy(const CHA* args) {
   _ATestBegin;
   const ISC B = 4, A = 2, OBS = 4, DIM = 16, LAYERS = 2;
 
-  // Build a fixed observation batch (4 tables, 4 obs features each).
-  TTensor obs = TTensorAlloc(B, OBS);
-  obs.At(0,0)=12.0f; obs.At(0,1)=5.0f; obs.At(0,2)=1.0f; obs.At(0,3)=0.0f;
-  obs.At(1,0)=18.0f; obs.At(1,1)=9.0f; obs.At(1,2)=0.0f; obs.At(1,3)=0.0f;
-  obs.At(2,0)=7.0f;  obs.At(2,1)=2.0f; obs.At(2,2)=1.0f; obs.At(2,3)=0.0f;
-  obs.At(3,0)=21.0f; obs.At(3,1)=10.0f; obs.At(3,2)=1.0f; obs.At(3,3)=0.0f;
+  // Build a fixed observation batch (4 tables, 4 observation features each).
+  TensorFPC observation = TensorFPCAlloc(B, OBS);
+  observation.At(0,0)=12.0f; observation.At(0,1)=5.0f; observation.At(0,2)=1.0f; observation.At(0,3)=0.0f;
+  observation.At(1,0)=18.0f; observation.At(1,1)=9.0f; observation.At(1,2)=0.0f; observation.At(1,3)=0.0f;
+  observation.At(2,0)=7.0f;  observation.At(2,1)=2.0f; observation.At(2,2)=1.0f; observation.At(2,3)=0.0f;
+  observation.At(3,0)=21.0f; observation.At(3,1)=10.0f; observation.At(3,2)=1.0f; observation.At(3,3)=0.0f;
 
   _DROut("Policy: shape (logits [B,A], values [B])\n");
   {
-    TTransformer net(OBS, A, DIM, LAYERS);
-    TTensor logits = TTensorAlloc(B, A);
-    TTensor values = TTensorAlloc(B, 1);
-    net.Forward(obs, logits, values);
+    TransformerPolicy net(OBS, A, DIM, LAYERS);
+    TensorFPC logits = TensorFPCAlloc(B, A);
+    TensorFPC values = TensorFPCAlloc(B, 1);
+    net.Forward(observation, logits, values);
     POL_CHECK(logits.rows_ == B && logits.cols_ == A);
     POL_CHECK(values.rows_ == B && values.cols_ == 1);
     // Finite + sane range (small net, inputs <= 21). A value is "finite"
@@ -57,41 +57,41 @@ inline const CHA* Policy(const CHA* args) {
       POL_CHECK(values.At(i,0) < 1e6f && values.At(i,0) > -1e6f);
       POL_CHECK(logits.At(i,0) < 1e6f && logits.At(i,0) > -1e6f);
     }
-    TTensorFree(logits); TTensorFree(values);
+    TensorFPCFree(logits); TensorFPCFree(values);
   }
 
-  _DROut("Policy: determinism (two nets, same seed, same obs -> identical)\n");
+  _DROut("Policy: determinism (two nets, same seed, same observation -> identical)\n");
   {
-    TTransformer n1(OBS, A, DIM, LAYERS);
-    TTransformer n2(OBS, A, DIM, LAYERS);
-    TTensor l1 = TTensorAlloc(B, A), l2 = TTensorAlloc(B, A);
-    TTensor v1 = TTensorAlloc(B, 1), v2 = TTensorAlloc(B, 1);
-    n1.Forward(obs, l1, v1);
-    n2.Forward(obs, l2, v2);
+    TransformerPolicy n1(OBS, A, DIM, LAYERS);
+    TransformerPolicy n2(OBS, A, DIM, LAYERS);
+    TensorFPC l1 = TensorFPCAlloc(B, A), l2 = TensorFPCAlloc(B, A);
+    TensorFPC v1 = TensorFPCAlloc(B, 1), v2 = TensorFPCAlloc(B, 1);
+    n1.Forward(observation, l1, v1);
+    n2.Forward(observation, l2, v2);
     for (ISC i = 0; i < B; ++i) {
       for (ISC j = 0; j < A; ++j) POL_CLOSE(l1.At(i,j), l2.At(i,j));
       POL_CLOSE(v1.At(i,0), v2.At(i,0));
     }
-    // A third forward on the SAME net must also match (stateless w.r.t. obs).
-    TTensor l1b = TTensorAlloc(B, A);
-    n1.Forward(obs, l1b, v1);
+    // A third forward on the SAME net must also match (stateless w.r.t. observation).
+    TensorFPC l1b = TensorFPCAlloc(B, A);
+    n1.Forward(observation, l1b, v1);
     for (ISC i = 0; i < B; ++i)
       for (ISC j = 0; j < A; ++j) POL_CLOSE(l1.At(i,j), l1b.At(i,j));
-    TTensorFree(l1); TTensorFree(l2); TTensorFree(l1b);
-    TTensorFree(v1); TTensorFree(v2);
+    TensorFPCFree(l1); TensorFPCFree(l2); TensorFPCFree(l1b);
+    TensorFPCFree(v1); TensorFPCFree(v2);
   }
 
-  _DROut("Policy: different obs -> (generally) different logits\n");
+  _DROut("Policy: different observation -> (generally) different logits\n");
   {
-    TTransformer net(OBS, A, DIM, LAYERS);
-    TTensor l1 = TTensorAlloc(B, A), l2 = TTensorAlloc(B, A);
-    TTensor v1 = TTensorAlloc(B, 1), v2 = TTensorAlloc(B, 1);
-    net.Forward(obs, l1, v1);
-    // Build a fresh obs with every feature shifted by +5 (different input).
-    TTensor obsb = TTensorAlloc(B, OBS);
+    TransformerPolicy net(OBS, A, DIM, LAYERS);
+    TensorFPC l1 = TensorFPCAlloc(B, A), l2 = TensorFPCAlloc(B, A);
+    TensorFPC v1 = TensorFPCAlloc(B, 1), v2 = TensorFPCAlloc(B, 1);
+    net.Forward(observation, l1, v1);
+    // Build a fresh observation with every feature shifted by +5 (different input).
+    TensorFPC observationb = TensorFPCAlloc(B, OBS);
     for (ISC i = 0; i < B; ++i)
-      for (ISC j = 0; j < OBS; ++j) obsb.At(i,j) = obs.At(i,j) + 5.0f;
-    net.Forward(obsb, l2, v2);
+      for (ISC j = 0; j < OBS; ++j) observationb.At(i,j) = observation.At(i,j) + 5.0f;
+    net.Forward(observationb, l2, v2);
     // At least one (i,j) should differ (deterministic net, different input).
     BOL any_diff = false;
     for (ISC i = 0; i < B && !any_diff; ++i)
@@ -100,16 +100,16 @@ inline const CHA* Policy(const CHA* args) {
         if (d > 1e-4f) any_diff = true;
       }
     POL_CHECK(any_diff);
-    TTensorFree(l1); TTensorFree(l2); TTensorFree(v1); TTensorFree(v2);
-    TTensorFree(obsb);
+    TensorFPCFree(l1); TensorFPCFree(l2); TensorFPCFree(v1); TensorFPCFree(v2);
+    TensorFPCFree(observationb);
   }
 
   _DROut("Policy: SampleActions (greedy argmax + logp <= 0)\n");
   {
-    TTransformer net(OBS, A, DIM, LAYERS);
-    TTensor logits = TTensorAlloc(B, A);
-    TTensor values = TTensorAlloc(B, 1);
-    net.Forward(obs, logits, values);
+    TransformerPolicy net(OBS, A, DIM, LAYERS);
+    TensorFPC logits = TensorFPCAlloc(B, A);
+    TensorFPC values = TensorFPCAlloc(B, 1);
+    net.Forward(observation, logits, values);
     ISC actions[B]; FPC logp[B];
     net.SampleActions(logits, actions, logp);
     for (ISC i = 0; i < B; ++i) {
@@ -119,10 +119,10 @@ inline const CHA* Policy(const CHA* args) {
       ISC best = (logits.At(i,1) > logits.At(i,0)) ? 1 : 0;
       POL_CHECK(actions[i] == best);
     }
-    TTensorFree(logits); TTensorFree(values);
+    TensorFPCFree(logits); TensorFPCFree(values);
   }
 
-  TTensorFree(obs);
+  TensorFPCFree(observation);
   if (POLFAILS() != 0) {
     _DROut("\n" << POLFAILS() << " Policy assertion(s) FAILED\n");
     return "cards_world_policy_test_failure";

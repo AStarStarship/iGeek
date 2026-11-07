@@ -19,16 +19,16 @@ inline ISC& PPFAILS() {
     }                                                        \
   } while (0)
 
-/* A toy gym: B parallel 1-step "match the target" envs. obs[0] = target bit
+/* A toy gym: B parallel 1-step "match the target" envs. observation[0] = target bit
    (0 or 1) + noise; the correct action == target. Episode = 1 step (terminal
    always). Reward +1 correct, -1 wrong. */
 struct TToyGym : public Gym {
   ISC targets_[8];
   TToyGym(ISC b) : Gym("toy") {
     env_count_ = b < 1 ? 1 : (b > GymEnvMax ? GymEnvMax : b);
-    obs_len_ = 2;
+    observation_len_ = 2;
     action_count_ = 2;
-    observations_ = new FPC[env_count_ * obs_len_]();
+    observations_ = new FPC[env_count_ * observation_len_]();
     actions_ = new ISC[env_count_]();
     rewards_ = new FPC[env_count_]();
     terminals_ = new FPC[env_count_]();
@@ -43,9 +43,9 @@ struct TToyGym : public Gym {
   }
   void ResetBatch() override {
     for (ISC i = 0; i < env_count_; ++i) {
-      // obs[0] = target, obs[1] = 0 (a second feature to make it non-trivial).
-      observations_[i * obs_len_ + 0] = (FPC)targets_[i];
-      observations_[i * obs_len_ + 1] = 0.0f;
+      // observation[0] = target, observation[1] = 0 (a second feature to make it non-trivial).
+      observations_[i * observation_len_ + 0] = (FPC)targets_[i];
+      observations_[i * observation_len_ + 1] = 0.0f;
       rewards_[i] = 0.0f;
       terminals_[i] = 1.0f;  // 1-step env.
       action_mask_[i * action_count_ + 0] = 1.0f;
@@ -69,7 +69,7 @@ inline const CHA* PPO(const CHA* args) {
   TToyGym gym(B);
   TLinearPolicy policy(OBS, A, 777);
   policy.SetLearnRate(0.3f);
-  TPPO ppo(gym, policy, HORIZON, EPOCHS);
+  PPO ppo(gym, policy, HORIZON, EPOCHS);
   ppo.SetGamma(0.9f);
   ppo.SetLambda(0.9f);
   ppo.SetClipEps(0.2f);
@@ -78,25 +78,25 @@ inline const CHA* PPO(const CHA* args) {
   // Measure reward before training (a few steps).
   FPC reward_before = 0.0f;
   for (ISC s = 0; s < 20; ++s) {
-    TPPOStats st = ppo.TrainStep();
+    PPOStats st = ppo.TrainStep();
     reward_before += st.policy_loss_;  // placeholder; we measure gym reward below
   }
   // Actually measure the gym reward directly: run the policy, sum rewards.
   auto measure = [&]() -> FPC {
     gym.ResetBatch();
-    TTensor obs = TTensorAlloc(B, OBS);
+    TensorFPC observation = TensorFPCAlloc(B, OBS);
     for (ISC i = 0; i < B; ++i)
-      for (ISC j = 0; j < OBS; ++j) obs.At(i, j) = gym.Observations()[i * OBS + j];
-    TTensor logits = TTensorAlloc(B, A);
-    TTensor values = TTensorAlloc(B, 1);
-    policy.Forward(obs, logits, values);
+      for (ISC j = 0; j < OBS; ++j) observation.At(i, j) = gym.Observations()[i * OBS + j];
+    TensorFPC logits = TensorFPCAlloc(B, A);
+    TensorFPC values = TensorFPCAlloc(B, 1);
+    policy.Forward(observation, logits, values);
     ISC acts[B]; FPC lp[B];
     policy.SampleActions(logits, acts, lp);
     for (ISC i = 0; i < B; ++i) gym.Actions()[i] = acts[i];
     gym.StepBatch();
     FPC r = 0.0f;
     for (ISC i = 0; i < B; ++i) r += gym.Rewards()[i];
-    TTensorFree(obs); TTensorFree(logits); TTensorFree(values);
+    TensorFPCFree(observation); TensorFPCFree(logits); TensorFPCFree(values);
     return r / (FPC)B;  // mean reward in [-1, 1].
   };
 

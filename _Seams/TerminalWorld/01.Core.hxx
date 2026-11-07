@@ -11,6 +11,7 @@
 #else
 #include "../../../ASCIICrabs/_Release.h"
 #endif
+#include "../../Worlds/Terminal/Terminal.hxx"
 #include "../../../ASCIICrabs/Room.hpp"
 #include "../../../ASCIICrabs/Dic.hpp"
 namespace TerminalWorldTest {
@@ -45,8 +46,8 @@ inline const CHA* Core(const CHA* args) {
   _DCheck(m.determinism == ManifestDeterminismSeeded, "determinism == Seeded");
   _DCheck(m.reward_low < m.reward_high, "reward_low < reward_high");
   _DCheck(m.reward_higher_is_better, "reward higher is better");
-  _DCheck(m.obs_count == TermWorldObsCount, "obs_count == 16");
-  _DCheck(m.action_count == TermWorldActionCount, "action_count == 5");
+  _DCheck(m.observation_count == TermWorldObservationCount, "observation_count == 16");
+  _DCheck(m.action_count == TermWorldActionCount, "action_count == 6");
   _DCheck(m.max_episode_steps == TermWorldMaxSteps, "max_episode_steps == 100");
   _DCheck(m.environment_count_max == GymEnvMax, "environment_count_max == GymEnvMax");
 #ifdef _iGeekTerminalWorldCore
@@ -68,8 +69,8 @@ inline const CHA* Core(const CHA* args) {
   //     overflows the initial buffer) — no raw new here. ----
   TRoom<ROM_D>* room = world.Room();
   _DCheck(room != _NilP, "Gym owns a Room (the Environment)");
-  _DCheck(TSEquals(room->GetRoomName(), "terminal_world_room") != _NilP,
-         "Room name == terminal_world_room");
+  _DCheck(TSEquals(room->GetRoomName(), "terminal_room") != _NilP,
+         "Room name == terminal_room");
 
   // The batch arrays are carved out of the Room's Floor (the inline
   // TDic's values List). Verify the Floor budget: the five TArray blocks
@@ -83,12 +84,13 @@ inline const CHA* Core(const CHA* args) {
            "Floor has the 5 batch-array blocks (plus keys)");
   }
 
-  // The manifest dic: an ADic with the ManifestDic type params and a
-  // 1024-byte initial stack buffer (sized for the 17-field manifest).
-  // Stack-backed (no new); grows via Autoject copy-up if the schema
-  // overflows. This() returns the ManifestDic* the triples land in.
-  ::ADic<CHR, CHR, ISR, ISR, DTB, IUN, ManifestDicBytesInit> manifest_adic;
-  ::TDic<CHR, CHR, ISR, ISR, DTB, IUN>* manifest_dic = manifest_adic.This();
+  // The manifest dic: an ADic with the DIC_D type params (same list as
+  // ManifestDic) and a 1024-byte initial stack buffer (sized for the
+  // 17-field manifest). Stack-backed (no new); grows via Autoject copy-up
+  // if the schema overflows. This() returns the ManifestDic* the triples
+  // land in.
+  ::ADic<DIC_D, ManifestDicBytesInit> manifest_adic;
+  ManifestDic* manifest_dic = manifest_adic.This();
   _DCheck(!IsError(manifest_dic), "manifest dic (ADic) allocated");
 
   // Bridge the POD manifest into the dic (the 17 canonical
@@ -106,10 +108,10 @@ inline const CHA* Core(const CHA* args) {
     _DCheck(ManifestGetString(d, "name", buf, ManifestNameLen) &&
              TSEquals(buf, "terminal_world") != _NilP,
            "JSON name == terminal_world");
-    _DCheck(ManifestGetInt(d, "obs_count", &n) && n == TermWorldObsCount,
-           "JSON obs_count == 16");
+    _DCheck(ManifestGetInt(d, "observation_count", &n) && n == TermWorldObservationCount,
+           "JSON observation_count == 16");
     _DCheck(ManifestGetInt(d, "action_count", &n) && n == TermWorldActionCount,
-           "JSON action_count == 5");
+           "JSON action_count == 6");
     _DCheck(ManifestGetFloat(d, "reward_low", &f) && f == FPC(-1.0),
            "JSON reward_low == -1.0");
     _DCheck(ManifestGetInt(d, "manifest_version", &n) && n == ISC(1),
@@ -127,7 +129,7 @@ inline const CHA* Core(const CHA* args) {
     _DCheck(TSEquals(rt.modality, m.modality) != _NilP, "rt.modality matches");
     _DCheck(TSEquals(rt.world_name, m.world_name) != _NilP, "rt.world_name matches");
     _DCheck(rt.kind == m.kind && rt.domain == m.domain &&
-             rt.determinism == m.determinism && rt.obs_count == m.obs_count &&
+             rt.determinism == m.determinism && rt.observation_count == m.observation_count &&
              rt.action_count == m.action_count &&
              rt.max_episode_steps == m.max_episode_steps &&
              rt.environment_count_max == m.environment_count_max &&
@@ -157,7 +159,7 @@ inline const CHA* Core(const CHA* args) {
     CHA buf[ManifestNameLen];
     _DCheck(!ManifestGetInt(d, "no_such_key", &n),
            "missing key fails ManifestGetInt");
-    _DCheck(!ManifestGetString(d, "obs_count", buf, ManifestNameLen),
+    _DCheck(!ManifestGetString(d, "observation_count", buf, ManifestNameLen),
            "type mismatch (INT field) fails ManifestGetString");
     _DCheck(!ManifestGetFloat(d, "name", &f),
            "type mismatch (STR field) fails ManifestGetFloat");
@@ -186,6 +188,20 @@ inline const CHA* Core(const CHA* args) {
 
   // The manifest ADic is stack-backed and test-local; it is destroyed
   // automatically when the seam unit ends (no manual free).
+
+  // --- the kernel is wired: an action really executes a shell command ---
+  {
+    TerminalWorld::TerminalEnvironment env;
+    env.ResetBatch();
+    env.Actions()[0] = ISC(0);          //< CmdCharPwd
+    env.StepBatch();
+    _DCheck(env.Rewards()[0] > FPC(0.0f), "pwd produced output");
+    _DCheck(env.Observations()[0] != FPC(0.0f), "observation reflects the screen");
+    _DCheck(env.Terminals()[0] == FPC(0.0f), "pwd does not end the episode");
+    env.Actions()[0] = ISC(5);          //< CmdCharExit
+    env.StepBatch();
+    _DCheck(env.Terminals()[0] == FPC(1.0f), "exit ends the episode");
+  }
 
   return _NilP;
 #else

@@ -1,6 +1,18 @@
 # _Seams.yaml — Gym module seams.
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
 seams:
-  - name: _iGeekEnvironmentManifest
+  - name: _iGeekEnvironmentRolloutCompare
     depends: [_iGeekTypingWorldRelease]
-    file: 01.Manifest.hxx
-    label: "Testing Gym manifest..."
+    files: [01.Core.hxx, 03.RolloutCompare.hxx]
+    label: "Testing Gym environment core..."
+  - name: _iGeekEnvironmentJobQueue
+    depends: [_iGeekEnvironmentRolloutCompare]
+    file: 02.JobQueue.hxx
+    label: "Testing Gym Job Queue..."
+  - name: _iGeekEnvironmentRelease
+    depends: [_iGeekEnvironmentJobQueue]
+    file: 04.Release.hxx
+    label: "Testing Gym Release..."

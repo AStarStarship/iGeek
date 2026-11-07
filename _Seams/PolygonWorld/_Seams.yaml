@@ -1,6 +1,8 @@
 # _Seams.yaml — PolygonWorld module seams.
-# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
-# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
 seams:
   - name: _iGeekPolygonWorldCore
     depends: [_iGeekCore]

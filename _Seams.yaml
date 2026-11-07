@@ -1,14 +1,26 @@
 # _Seams.yaml — ROOT: module list (build-up order).
 #
-# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h. Do not hand-edit the
-# ordering here without re-running SyncSeams.py; the module order defines
-# the contiguous global seam numbering.
+# The module order here defines the contiguous global seam numbering, so it
+# must match the _Seams.cpp include order. Each module folder owns a
+# _Seams.yaml listing exactly the .hxx units it contains.
 #
-# Regenerate: python3 Hatch/SyncSeams.py _Seams.yaml
+# There is no generator in the tree: Hatch/SyncSeams.py is referenced by
+# history but is absent, so _Seams.cpp is hand-maintained. Reconcile this
+# file and the module files by hand until that tool lands.
 #
+# Regenerate: python3 Hatch/SyncSeams.py _Seams.yaml  (tool missing)
+
 project: iGeek
 mode: igeek
 release_module: TerminalWorld
+
+# Root-level seam gating the Environment/EnvironmentManifest headers. It has
+# no module folder because its code lives at the iGeek root, not under _Seams/.
+standalone_seams:
+  - name: _iGeekEnvironmentCore
+    depends: [_iGeekTypingWorldRelease]
+    headers: [../Environment.h, ../EnvironmentManifest.h, ../EnvironmentManifest.hpp]
+    label: "Testing Gym manifest..."
 
 modules:
   - name: Core
@@ -53,9 +65,9 @@ modules:
   - name: TypingWorld
     folder: _Seams/TypingWorld
     label: "TypingWorld module"
-  - name: EnvironmentManifest
-    folder: _Seams/EnvironmentManifest
-    label: "EnvironmentManifest module"
   - name: Gym
     folder: _Seams/Gym
     label: "Gym module"
+  - name: TerminalWorld
+    folder: _Seams/TerminalWorld
+    label: "TerminalWorld module (release)"

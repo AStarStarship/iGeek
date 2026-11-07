@@ -7,9 +7,8 @@
 #ifndef _iGeekGymHXX
 #define _iGeekGymHXX
 #include "Gym.h"
-#include <_Config.h>
-
 namespace iGeek {
+using namespace ::_;
 
 void Gym::StepBatch() {
   // Base does nothing; subclasses override.

@@ -25,7 +25,6 @@
 #define _CrabsPassword			23
 #define _CrabsRelease			24
 #define _iGeekCore			25
-#define _iGeekRelease			26
 #define _iGeekMazeWorldCore			27
 #define _iGeekMazeWorldRelease			28
 #define _iGeekArmWorldCore			29
@@ -34,8 +33,6 @@
 #define _iGeekBikeWorldRelease			32
 #define _iGeekCarWorldCore			33
 #define _iGeekCarWorldRelease			34
-#define _iGeekCardsWorldCore			35
-#define _iGeekCardsWorldRelease			36
 #define _iGeekClassicalCore			37
 #define _iGeekClassicalRelease			38
 #define _iGeekClassicalSearch			39
@@ -43,8 +40,8 @@
 #define _iGeekClassicalMdp			41
 #define _iGeekClassicalSat			42
 #define _iGeekClassicalGame			43
-#define _iGeekPackWorldCore			44
-#define _iGeekPackWorldRelease			45
+#define _iGeekPacWorldCore			44
+#define _iGeekPacWorldRelease			45
 #define _iGeekPolygonWorldCore			46
 #define _iGeekPolygonWorldRelease			47
 #define _iGeekPrisonerWorldCore			48
@@ -57,36 +54,37 @@
 #define _iGeekTileWorldRelease			55
 #define _iGeekTypingWorldCore			56
 #define _iGeekTypingWorldRelease		57
+#define _iGeekCardsWorldCore			58
 #define _iGeekCardsWorldBlackjack			59
 #define _iGeekCardsWorldRelease			60
-#define _iGeekEnvironmentManifest			61
-#define _iGeekTerminalWorldCore			62
-#define _iGeekTerminalWorldRelease			63
-#define _SeamN _iGeekTerminalWorldRelease
-/* Per-seam build: -DSEAM=<n> on the command line precedes every header.
-   Capture it here (before _Config.h, which unconditionally redefines
-   _Seam=_SeamN) and restore it after. No -DSEAM -> _SeamN: the full sown
-   tree (every world's Release). -DSEAM=<W>_CORE -> that world's unit-test
-   tree; -DSEAM=<W>_RELEASE -> its official output. */
-#ifdef _Seam
-#define _IgeekSeamOverride _Seam
-#undef _Seam
-#endif
-#include <_Config.h>
-#ifdef _IgeekSeamOverride
-#undef _Seam
-#define _Seam _IgeekSeamOverride
-#undef _IgeekSeamOverride
-#endif
-/* ASCIICrabs/_Config.h (pragma once) wipes _Seam and never restores it.
-   World headers re-include it; the restore below keeps every "#if _Seam
-   >= gate" in the tree alive for the rest of the translation unit. */
-#define _Seam _SeamN
+#define _iGeekEnvironmentCore			61
+#define _iGeekEnvironmentRolloutCompare			62
+#define _iGeekEnvironmentJobQueue      63
+/* Gym's official-output unit ships at the module's top seam; no number of its
+   own, so it stays in lockstep with the last Environment unit. */
+#define _iGeekEnvironmentRelease _iGeekEnvironmentJobQueue
+#define _iGeekTerminalWorldCore			64
+#define _iGeekTerminalWorldRelease			65
+#define _iGeekRelease			66
+#define _SeamN _iGeekRelease
+
+/* ASCIICrabs/_ConfigHeader.h unconditionally #undef's _Seam, so _Config.h has
+   to be pulled in *before* the restore below. World and seam headers re-include
+   it; restoring afterwards keeps every "#if _Seam >= gate" in the tree alive for
+   the rest of the translation unit. Without the restore, _Seam is undefined and
+   "#if _Seam >= _CrabsCore" degrades to "0 >= 0" (true), which compiles blocks
+   whose dependencies were never included. */
 #include "../../ASCIICrabs/_Config.h"
+#define _Seam _SeamN
+
+/* Preludes: ROut/RefOut, Error/IsError, String/CATypeCH and the math kernels
+   are used by Test.hpp and Dic.hpp with two-phase lookup, so they must be
+   declared before those headers are parsed. */
 #include "../../ASCIICrabs/Math.hxx"
 #include "../../ASCIICrabs/_Package.hxx"
 #include "../../ASCIICrabs/Test.hpp"
 #include "../_Package.hxx"
+
 #include "Core/_Seams.hxx"
 #include "MazeWorld/_Seams.hxx"
 #include "ArmWorld/_Seams.hxx"
@@ -105,7 +103,7 @@
 #include "TerminalWorld/_Seams.hxx"
 #include "Release.hxx"
 
-using namespace _;
+using namespace ::_;
 
 ISN main(ISN arg_count, CHA** args) {
   const CHA* argss = ArgsToString(arg_count, args);

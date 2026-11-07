@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../PrisonerWorld/PrisonerWorld.hxx"
+#include "../../Worlds/Prisoner/PrisonerWorld.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"
 namespace PrisonerWorldTest {

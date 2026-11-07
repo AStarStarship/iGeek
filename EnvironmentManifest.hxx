@@ -3,9 +3,12 @@
 #ifndef _iGeekEnvironmentManifest_HXX
 #define _iGeekEnvironmentManifest_HXX 1
 #include "EnvironmentManifest.h"
+#include "EnvironmentManifest.hpp"
 #include "List.hpp"
 #include "Stringf.hpp"
+#include "Environment.h"
 namespace iGeek {
+using namespace ::_;
 
 void EnvironmentManifestInit(EnvironmentManifest* m) {
   if (!m) return;
@@ -20,7 +23,7 @@ void EnvironmentManifestInit(EnvironmentManifest* m) {
   m->reward_low = FPC(0.0f);
   m->reward_high = FPC(1.0f);
   m->reward_higher_is_better = true;
-  m->obs_count = 0;
+  m->observation_count = 0;
   m->action_count = 0;
   m->max_episode_steps = 0;
   m->environment_count_max = 0;
@@ -42,7 +45,7 @@ BOL EnvironmentManifestValidate(const EnvironmentManifest* m) {
       m->determinism != ManifestDeterminismUnknown)
     return false;
   if (m->reward_low > m->reward_high) return false;
-  if (m->obs_count <= 0) return false;
+  if (m->observation_count <= 0) return false;
   if (m->action_count <= 0) return false;
   if (m->max_episode_steps <= 0) return false;
   if (m->environment_count_max <= 0) return false;
@@ -54,13 +57,13 @@ BOL EnvironmentManifestValidate(const EnvironmentManifest* m) {
 BOL ManifestGetString(const ManifestDic* dic, const CHS* key,
                       CHA* out, ISN out_len) {
   if (IsError(dic) || IsError(key) || IsError(out) || out_len < 1) return false;
-  ISR index = _::TDicFind<CHR, CHR, ISR, ISR, DTB, IUN>(
+  ISR index = _::TDicFind<DIC_D>(
       CRef<ManifestDic>(dic), key);
   if (index < 0) return false;
-  DTB type = _::TDicType_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic,
+  DTB type = _::TDicType_NC<DIC_D>(dic,
       dic->values.map.total, index);
   if (type != _::_STA) return false;
-  const void* val = _::TDicValue_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic, index);
+  const void* val = _::TDicValue_NC<DIC_D>(dic, index);
   if (IsError(val)) return false;
   const CHA* str = _::CRef<const CHA>(_::TRef<IUW>(val));
   if (IsError(str)) return false;
@@ -70,45 +73,45 @@ BOL ManifestGetString(const ManifestDic* dic, const CHS* key,
 
 BOL ManifestGetInt(const ManifestDic* dic, const CHS* key, ISC* out) {
   if (IsError(dic) || IsError(key) || IsError(out)) return false;
-  ISR index = _::TDicFind<CHR, CHR, ISR, ISR, DTB, IUN>(
+  ISR index = _::TDicFind<DIC_D>(
       CRef<ManifestDic>(dic), key);
   if (index < 0) return false;
-  DTB type = _::TDicType_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic,
+  DTB type = _::TDicType_NC<DIC_D>(dic,
       dic->values.map.total, index);
   if (type != _::_ISC) return false;
   *out = ISC(*_::TRef<const ISC>(
-      _::TDicValue_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic, index)));
+      _::TDicValue_NC<DIC_D>(dic, index)));
   return true;
 }
 
 BOL ManifestGetFloat(const ManifestDic* dic, const CHS* key, FPC* out) {
   if (IsError(dic) || IsError(key) || IsError(out)) return false;
-  ISR index = _::TDicFind<CHR, CHR, ISR, ISR, DTB, IUN>(
+  ISR index = _::TDicFind<DIC_D>(
       CRef<ManifestDic>(dic), key);
   if (index < 0) return false;
-  DTB type = _::TDicType_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic,
+  DTB type = _::TDicType_NC<DIC_D>(dic,
       dic->values.map.total, index);
   if (type != _::_FPC) return false;
   *out = FPC(*_::TRef<const FPC>(
-      _::TDicValue_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic, index)));
+      _::TDicValue_NC<DIC_D>(dic, index)));
   return true;
 }
 
 BOL ManifestSetString(ManifestDic* dic, const CHS* key, const CHA* value) {
   if (!dic || !key || !value) return false;
-  ISR index = _::TDicInsert<CHR, CHR, ISR, ISR, DTB, IUN>(dic, key, _::_STA, IUW(value));
+  ISR index = _::TDicInsert<DIC_D>(dic, key, _::_STA, IUW(value));
   return index >= 0;
 }
 
 BOL ManifestSetInt(ManifestDic* dic, const CHS* key, ISC value) {
   if (!dic || !key) return false;
-  ISR index = _::TDicInsert<CHR, CHR, ISR, ISR, DTB, IUN>(dic, key, _::_ISC, IUW(value));
+  ISR index = _::TDicInsert<DIC_D>(dic, key, _::_ISC, IUW(value));
   return index >= 0;
 }
 
 BOL ManifestSetFloat(ManifestDic* dic, const CHS* key, FPC value) {
   if (!dic || !key) return false;
-  ISR index = _::TDicInsert<CHR, CHR, ISR, ISR, DTB, IUN>(dic, key, _::_FPC, IUW(value));
+  ISR index = _::TDicInsert<DIC_D>(dic, key, _::_FPC, IUW(value));
   return index >= 0;
 }
 
@@ -128,7 +131,7 @@ BOL EnvironmentManifestPrintJson(const ManifestDic* dic, ::_::ROut& out) {
   out << '{';
   typedef _::TTable<CHR, CHR, ISR, ISR, IUN> KeysTable;
   const KeysTable* keys = _::CRef<const KeysTable>(
-      _::TDicKeys<CHR, CHR, ISR, ISR, DTB, IUN>(
+      _::TDicKeys<DIC_D>(
           _::CRef<ManifestDic>(dic)));
   ISC count = ISC(dic->values.map.count);
   BOL first = true;
@@ -140,9 +143,9 @@ BOL EnvironmentManifestPrintJson(const ManifestDic* dic, ::_::ROut& out) {
     first = false;
     PrintJsonKey(key, out);
     out << ':';
-    DTB type = _::TDicType_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic,
+    DTB type = _::TDicType_NC<DIC_D>(dic,
         dic->values.map.total, i);
-    const void* val = _::TDicValue_NC<CHR, CHR, ISR, ISR, DTB, IUN>(dic, i);
+    const void* val = _::TDicValue_NC<DIC_D>(dic, i);
     if (!val) { out << "null"; continue; }
     switch (type) {
       case _::_ISC: out << ISC(*_::TRef<const ISC>(val)); break;
@@ -189,7 +192,7 @@ BOL EnvironmentManifestToDic(const EnvironmentManifest* m, ManifestDic* dic) {
   ok = ok && ManifestSetInt(dic, "reward_higher_is_better",
                             m->reward_higher_is_better ? ISC(1) : ISC(0));
   ok = ok && ManifestSetInt(dic, "determinism", m->determinism);
-  ok = ok && ManifestSetInt(dic, "obs_count", m->obs_count);
+  ok = ok && ManifestSetInt(dic, "observation_count", m->observation_count);
   ok = ok && ManifestSetInt(dic, "action_count", m->action_count);
   ok = ok && ManifestSetInt(dic, "max_episode_steps", m->max_episode_steps);
   ok = ok && ManifestSetInt(dic, "environment_count_max", m->environment_count_max);
@@ -223,8 +226,8 @@ BOL ManifestDicToEnvironmentManifest(const ManifestDic* dic, EnvironmentManifest
   m->reward_higher_is_better = n != ISC(0);
   ok = ok && ManifestGetInt(dic, "determinism", &n);
   m->determinism = n;
-  ok = ok && ManifestGetInt(dic, "obs_count", &n);
-  m->obs_count = n;
+  ok = ok && ManifestGetInt(dic, "observation_count", &n);
+  m->observation_count = n;
   ok = ok && ManifestGetInt(dic, "action_count", &n);
   m->action_count = n;
   ok = ok && ManifestGetInt(dic, "max_episode_steps", &n);

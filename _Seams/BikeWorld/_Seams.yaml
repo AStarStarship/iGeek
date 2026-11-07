@@ -1,7 +1,9 @@
 # _Seams.yaml — BikeWorld module seams.
-# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
-# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
-engine: ["../../BikeWorld/Tests.hxx", "../../BikeWorld/PpoSmoke.hxx"]
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
+engine: ["../../Worlds/Bike/Tests.hxx", "../../Worlds/Bike/PpoSmoke.hxx"]
 seams:
   - name: _iGeekBikeWorldCore
     depends: [_iGeekCore]

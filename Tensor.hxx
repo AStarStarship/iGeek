@@ -2,24 +2,23 @@
 #pragma once
 #ifndef _iGeekTensorHXX
 #define _iGeekTensorHXX
-
 #include "Tensor.h"
 #include "../CrabsTK/Math/Blas.h"
-using namespace _;
-
 namespace iGeek {
+using namespace _;
+using namespace CTK;
 
-TTensor TTensorAlloc(ISC rows, ISC cols) {
-  TTensor t;
+TensorFPC TensorFPCAlloc(ISC rows, ISC columns) {
+  TensorFPC t;
   t.rows_ = rows;
-  t.cols_ = cols;
+  t.cols_ = columns;
   t.dtype_ = 0;
-  ISC n = rows * cols;
+  ISC n = rows * columns;
   t.data_ = (n > 0) ? new FPC[n]() : _NilP;  // () zero-initializes.
   return t;
 }
 
-void TTensorFree(TTensor& t) {
+void TensorFPCFree(TensorFPC& t) {
   if (t.data_ == _NilP) {
     return;  // safe double-free.
   }
@@ -31,7 +30,7 @@ void TTensorFree(TTensor& t) {
 
 /* --- Elementwise / linear ops (CPU FPC) -------------------------------- */
 
-void TTensorMatMul(TTensor A, TTensor B, TTensor& C) {
+void TensorFPCMatMul(TensorFPC A, TensorFPC B, TensorFPC& C) {
   // A: r x k, B: k x c, C: r x c.
   ISC r = A.rows_, k = A.cols_, c = B.cols_;
   for (ISC i = 0; i < r; ++i) {
@@ -45,7 +44,7 @@ void TTensorMatMul(TTensor A, TTensor B, TTensor& C) {
   }
 }
 
-void TTensorSoftmaxInPlace(TTensor& X) {
+void TensorFPCSoftmaxInPlace(TensorFPC& X) {
   // Stable row softmax: subtract row max before exp.
   for (ISC i = 0; i < X.rows_; ++i) {
     FPC maxv = X.At(i, 0);
@@ -64,7 +63,7 @@ void TTensorSoftmaxInPlace(TTensor& X) {
   }
 }
 
-void TTensorLayerNormInPlace(TTensor& X) {
+void TensorFPCLayerNormInPlace(TensorFPC& X) {
   // Row-wise: x = (x - mean) / SquareRoot(var + eps). eps = 1e-5.
   const FPC eps = 1e-5f;
   for (ISC i = 0; i < X.rows_; ++i) {
@@ -82,7 +81,7 @@ void TTensorLayerNormInPlace(TTensor& X) {
   }
 }
 
-void TTensorReluInPlace(TTensor& X) {
+void TensorFPCReluInPlace(TensorFPC& X) {
   for (ISC i = 0; i < X.rows_; ++i) {
     for (ISC j = 0; j < X.cols_; ++j) {
       FPC v = X.At(i, j);
@@ -91,7 +90,7 @@ void TTensorReluInPlace(TTensor& X) {
   }
 }
 
-void TTensorAdd(TTensor A, TTensor B, TTensor& C) {
+void TensorFPCAdd(TensorFPC A, TensorFPC B, TensorFPC& C) {
   for (ISC i = 0; i < A.rows_; ++i) {
     for (ISC j = 0; j < A.cols_; ++j) {
       C.At(i, j) = A.At(i, j) + B.At(i, j);
@@ -99,7 +98,7 @@ void TTensorAdd(TTensor A, TTensor B, TTensor& C) {
   }
 }
 
-void TTensorAddBiasInPlace(TTensor& X, TTensor bias) {
+void TensorFPCAddBiasInPlace(TensorFPC& X, TensorFPC bias) {
   // X: [B, K], bias: [K, 1]. X[i, j] += bias[j, 0].
   ISC B = X.rows_, K = X.cols_;
   for (ISC i = 0; i < B; ++i) {
@@ -109,7 +108,7 @@ void TTensorAddBiasInPlace(TTensor& X, TTensor bias) {
   }
 }
 
-void TTensorScale(TTensor A, FPC s, TTensor& C) {
+void TensorFPCScale(TensorFPC A, FPC s, TensorFPC& C) {
   for (ISC i = 0; i < A.rows_; ++i) {
     for (ISC j = 0; j < A.cols_; ++j) {
       C.At(i, j) = A.At(i, j) * s;
@@ -117,7 +116,7 @@ void TTensorScale(TTensor A, FPC s, TTensor& C) {
   }
 }
 
-void TTensorRowLogSumExp(TTensor A, TTensor& out) {
+void TensorFPCRowLogSumExp(TensorFPC A, TensorFPC& out) {
   // out[i, 0] = log(sum_j exp(A[i, j])), stable (subtract row max).
   for (ISC i = 0; i < A.rows_; ++i) {
     FPC maxv = A.At(i, 0);
@@ -132,5 +131,5 @@ void TTensorRowLogSumExp(TTensor A, TTensor& out) {
   }
 }
 
-} //< namespace iGeek
+}       //< namespace iGeek
 #endif  //< _iGeekTensorHXX

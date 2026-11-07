@@ -1,7 +1,9 @@
 # _Seams.yaml — PrisonerWorld module seams.
-# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
-# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
-engine: ../../PrisonerWorld/PrisonerWorld.hxx
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
+engine: ["../../Worlds/Prisoner/PrisonerWorld.hxx"]
 seams:
   - name: _iGeekPrisonerWorldCore
     depends: [_iGeekCore]

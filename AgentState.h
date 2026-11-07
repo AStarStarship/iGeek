@@ -5,9 +5,7 @@
 #include "../ASCIICrabs/_Config.h"
 #include "../ASCIICrabs/Autoject.h"
 namespace iGeek {
-using ::_::Autoject;
-using ::_::ObjectFactoryHeap;
-using ::_::ObjectFactoryStack;
+using namespace ::_;
 
 /* AgentState — the internal-state memory model for iGeek agents.
  *
@@ -71,7 +69,7 @@ class AgentState {
 
   /* Raw word pointer (for direct probing). Do not retain; the Autoject owns
   it and it is invalidated by destruction. */
-  const IUC* Words() { return words_; }
+  const IUC* Words();
 
  private:
 

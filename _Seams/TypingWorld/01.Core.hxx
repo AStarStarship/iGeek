@@ -239,6 +239,32 @@ inline const CHA* ResetRestores() {
   if (world.KeysMissed() != 0) {
     return "TYPINGWORLD_FAIL: KeysMissed != 0 after Reset";
   }
+  // --- Environment contract: every World carries a manifest ---
+  iGeek::TypingEnv typing_env(seed);
+  if (!EnvironmentManifestValidate(&typing_env.Manifest())) {
+    return "TYPINGWORLD_FAIL: manifest does not validate";
+  }
+  if (TSEquals(typing_env.Manifest().name, "typingworld") == _NilP) {
+    return "TYPINGWORLD_FAIL: manifest name != typingworld";
+  }
+  if (typing_env.Manifest().action_count != ISC(TypingEnv::ActionCount)) {
+    return "TYPINGWORLD_FAIL: manifest action_count mismatch";
+  }
+  // The env must actually run: type the target word and mine the first block.
+  {
+    CHA word[24];
+    ISC guard = 0;
+    for (; guard < 4096 && !typing_env.Done(); ++guard) {
+      const ISC n = typing_env.World().TargetWord(word);
+      CHA typed[24];
+      const ISC t = typing_env.World().TargetTyped(typed);
+      if (n <= 0 || t >= n) break;
+      typing_env.Step(ISC(word[t] - 'a'));
+    }
+    if (typing_env.World().MinedCount() < 1) {
+      return "TYPINGWORLD_FAIL: env never mined a block";
+    }
+  }
 #endif
   return _NilP;
 }

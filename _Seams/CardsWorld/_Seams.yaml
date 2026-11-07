@@ -1,11 +1,13 @@
 # _Seams.yaml — CardsWorld module seams.
-# AUTO-BOOTSTRAPPED by SeamsToYaml.py from _Seams.h.
-# Re-generate: python3 Hatch/SyncSeams.py _Seams.yaml
-engine: ["../../CardsWorld/Card.hxx", "../../CardsWorld/CardStack.hxx", "../../CardsWorld/Deck.hxx", "../../CardsWorld/Hand.hxx", "../../CardsWorld/Player.hxx", "../../CardsWorld/Dealer.hxx", "../../CardsWorld/Blackjack.hxx", "../../CardsWorld/BlackjackGym.hxx", "../../CardsWorld/BlackjackEnvironment.hxx"]
+# Must list exactly the .hxx units present in this folder; the
+# contiguous global seam numbering is derived from module order in
+# the root _Seams.yaml.
+
+engine: ["../../Worlds/Cards/Card.hxx", "../../Worlds/Cards/CardStack.hxx", "../../Worlds/Cards/Deck.hxx", "../../Worlds/Cards/Hand.hxx", "../../Worlds/Cards/Player.hxx", "../../Worlds/Cards/Dealer.hxx", "../../Worlds/Cards/Blackjack.hxx", "../../Worlds/Cards/BlackjackEnv.hxx", "../../Worlds/Cards/BlackjackDemo.hxx", "../../Worlds/Cards/BlackjackGym.hxx"]
 seams:
   - name: _iGeekCardsWorldCore
     depends: [_iGeekCore]
-    file: 01.Core.hxx
+    files: [01.Core.hxx, 02.Gym.hxx, 03.Policy.hxx, 04.PolicyBwd.hxx, 05.PPO.hxx, 06.Demo.hxx]
     label: "Testing CardsWorld core..."
   - name: _iGeekCardsWorldRelease
     depends: [_iGeekCardsWorldCore]

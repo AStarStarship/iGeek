@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../ArmWorld/ArmGym.hxx"
+#include "../../Worlds/Arm/ArmGym.hxx"
 #include "../../PPO.h"
 #include "../../LinearPolicy.hxx"
 #include "01.Core.hxx"

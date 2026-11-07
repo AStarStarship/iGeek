@@ -3,11 +3,12 @@
 #ifndef _iGeekEnvironmentH
 #define _iGeekEnvironmentH
 #include "EnvironmentGoal.h"
+#include "EnvironmentManifest.h"
+#include "../../ASCIICrabs/Room.hpp"
 namespace iGeek {
-using ::_::Crabs;
+using namespace ::_;
 
 /* Base class for an iGeek world environment.
-
 Migrated 2026-10-07 to the latest ASCIICrabs API:
   - STANDALONE (not `public TRoom`). Verified 2026-10-07: instantiating
     `TRoom<CHD, CHD>` against the latest ASCIICrabs FAILS to compile —
@@ -26,12 +27,20 @@ Migrated 2026-10-07 to the latest ASCIICrabs API:
 class Environment {
  public:
 
-  Environment(const CHA* env_name = "env", ISC state_count = 2)
-      : environment_name_(env_name), state_count_(state_count) {}
-  virtual ~Environment() {}
+  Environment(const CHA* env_name = "env", ISC state_count = 2);
+  virtual ~Environment();
 
-  const CHA* Name() { return environment_name_; }
-  ISC StateCount() { return state_count_; }
+  const CHA* Name();
+  ISC StateCount();
+
+  /* The environment manifest (the in-Room contract for a joining agent).
+  Describes ONE environment: name, domain, obs/action/reward contract. */
+  EnvironmentManifest& Manifest() { return manifest_; }
+  void SetManifest(EnvironmentManifest& m) { manifest_ = m; }
+
+  /* The Chinese Room IS the environment (the state substrate). Its Floor
+  is the inline memory; the batch arrays are carved out of it. */
+  TRoom<ROM_D>* Room() { return &room_; }
 
   /* Per-step reward. Achieved vs desired EnvironmentGoal -> scalar reward.
   vectorized-batch: reward is a single scalar per env per step (FPC); multi-
@@ -42,22 +51,24 @@ class Environment {
   @param info         Human-readable info string. May be _NilP.
   @return             The scalar reward for this step (FPC). */
   virtual FPC ComputeReward(Crabs* crabs, EnvironmentGoal achieved_goal,
-                            EnvironmentGoal desired_goal, const CHA* info) = 0;
+                            EnvironmentGoal desired_goal, const CHA* info);
 
   /* Number of parallel envs this Gym manages (vectorization width).
   Default 1 (single-agent). A vectorized Gym overrides this. */
-  virtual ISC EnvironmentCount() { return 1; }
+  virtual ISC EnvironmentCount(); 
 
   /* Reset the environment to a fresh episode. Deterministic per seed. */
-  virtual void Reset() {}
+  virtual void Reset();
 
   /* True when the current episode is over for this env. */
-  virtual BOL Done() { return false; }
+  virtual BOL Done();
 
  protected:
 
   const CHA* environment_name_;
   ISC state_count_;
+  EnvironmentManifest manifest_;
+  TRoom<ROM_D> room_;
 };
 
 template <typename Printer>

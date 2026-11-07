@@ -9,7 +9,7 @@ void CoreCheck(BOL ok, const CHA* what) {
   }
 }
 
-/* A minimal vectorized Gym: obs = [sin(step), cos(step)], one discrete
+/* A minimal vectorized Gym: observation = [sin(step), cos(step)], one discrete
 action, reward = 1 when action matches a target that flips every 8
 steps. Deterministic per step index (no RNG). Allocates the batch
 buffers in its ctor (the established Gym subclass pattern). */
@@ -17,9 +17,9 @@ class TCoreToyGym : public Gym {
  public:
   TCoreToyGym() : Gym("core_toy"), step_(0), target_(0) {
     env_count_ = 4;
-    obs_len_ = 2;
+    observation_len_ = 2;
     action_count_ = 2;
-    observations_ = new FPC[env_count_ * obs_len_]();
+    observations_ = new FPC[env_count_ * observation_len_]();
     actions_ = new ISC[env_count_]();
     rewards_ = new FPC[env_count_]();
     terminals_ = new FPC[env_count_]();
@@ -67,39 +67,39 @@ class TCoreToyGym : public Gym {
 };
 
 inline const CHA* Core(const CHA* args) {
-  //1. TTensor ops
-  TTensor A = TTensorAlloc(2, 2);
-  TTensor B = TTensorAlloc(2, 2);
-  TTensor C = TTensorAlloc(2, 2);
+  //1. TensorFPC ops
+  TensorFPC A = TensorFPCAlloc(2, 2);
+  TensorFPC B = TensorFPCAlloc(2, 2);
+  TensorFPC C = TensorFPCAlloc(2, 2);
   A.At(0, 0) = 1.0f; A.At(0, 1) = 2.0f;
   A.At(1, 0) = 3.0f; A.At(1, 1) = 4.0f;
   B.At(0, 0) = 5.0f; B.At(0, 1) = 6.0f;
   B.At(1, 0) = 7.0f; B.At(1, 1) = 8.0f;
-  TTensorMatMul(A, B, C);
+  TensorFPCMatMul(A, B, C);
   CoreCheck(C.At(0, 0) == 19.0f, "matmul(0,0)");
   CoreCheck(C.At(0, 1) == 22.0f, "matmul(0,1)");
   CoreCheck(C.At(1, 0) == 43.0f, "matmul(1,0)");
   CoreCheck(C.At(1, 1) == 50.0f, "matmul(1,1)");
-  TTensorFree(A); TTensorFree(B); TTensorFree(C);
+  TensorFPCFree(A); TensorFPCFree(B); TensorFPCFree(C);
 
-  TTensor S = TTensorAlloc(1, 3);
+  TensorFPC S = TensorFPCAlloc(1, 3);
   S.At(0, 0) = 1.0f; S.At(0, 1) = 1.0f; S.At(0, 2) = 1.0f;
-  TTensorSoftmaxInPlace(S);
+  TensorFPCSoftmaxInPlace(S);
   FPC sx = S.At(0, 0) + S.At(0, 1) + S.At(0, 2);
   CoreCheck(sx > 0.999f && sx < 1.001f, "softmax sums to 1");
-  TTensorFree(S);
+  TensorFPCFree(S);
 
   // 2. TLinearPolicy: forward deterministic, sampling valid
   TLinearPolicy policy(2, 2, IUD(12345));
-  TTensor obs = TTensorAlloc(2, 2);
-  obs.At(0, 0) = 0.1f; obs.At(0, 1) = 0.2f;
-  obs.At(1, 0) = 0.3f; obs.At(1, 1) = 0.4f;
-  TTensor logits = TTensorAlloc(2, 2);
-  TTensor values = TTensorAlloc(2, 1);
-  policy.Forward(obs, logits, values);
-  TTensor logits2 = TTensorAlloc(2, 2);
-  TTensor values2 = TTensorAlloc(2, 1);
-  policy.Forward(obs, logits2, values2);
+  TensorFPC observation = TensorFPCAlloc(2, 2);
+  observation.At(0, 0) = 0.1f; observation.At(0, 1) = 0.2f;
+  observation.At(1, 0) = 0.3f; observation.At(1, 1) = 0.4f;
+  TensorFPC logits = TensorFPCAlloc(2, 2);
+  TensorFPC values = TensorFPCAlloc(2, 1);
+  policy.Forward(observation, logits, values);
+  TensorFPC logits2 = TensorFPCAlloc(2, 2);
+  TensorFPC values2 = TensorFPCAlloc(2, 1);
+  policy.Forward(observation, logits2, values2);
   BOL fwd_same = true;
   for (ISC i = 0; i < 4; ++i) {
     if (logits.At(i / 2, i % 2) != logits2.At(i / 2, i % 2)) 
@@ -113,16 +113,16 @@ inline const CHA* Core(const CHA* args) {
   BOL acts_valid = (acts[0] >= 0 && acts[0] < 2) && 
                    (acts[1] >= 0 && acts[1] < 2);
   CoreCheck(acts_valid, "sampled actions in range");
-  TTensorFree(obs); TTensorFree(logits); TTensorFree(values);
-  TTensorFree(logits2); TTensorFree(values2);
+  TensorFPCFree(observation); TensorFPCFree(logits); TensorFPCFree(values);
+  TensorFPCFree(logits2); TensorFPCFree(values2);
 
-  // 3. TPPO over the toy Gym: finite stats, no crash
+  // 3. PPO over the toy Gym: finite stats, no crash
   TCoreToyGym gym;
   gym.ResetBatch();
 
   TLinearPolicy ppolicy(2, 2, IUD(777));
-  TPPO trainer(gym, ppolicy, /*horizon=*/8, /*epochs=*/1);
-  TPPOStats st = trainer.TrainStep();
+  PPO trainer(gym, ppolicy, /*horizon=*/8, /*epochs=*/1);
+  PPOStats st = trainer.TrainStep();
   BOL finite = iGeek::IsFinite(st.policy_loss_) && iGeek::IsFinite(st.value_loss_) &&
                iGeek::IsFinite(st.entropy_) && iGeek::IsFinite(st.approx_kl_);
   CoreCheck(finite, "ppo stats finite");
@@ -138,9 +138,9 @@ inline const CHA* Core(const CHA* args) {
     IUC a = agent.Action();
     CoreCheck(a == 1, "table agent lookup");
   }
-  // TReflexAgent: condition-action on current percept.
+  // ReflexAgent: condition-action on current percept.
   {
-    TReflexAgent agent(/*action_count=*/2, /*percept_len=*/1, /*rule_cap=*/4);
+    ReflexAgent agent(/*action_count=*/2, /*percept_len=*/1, /*rule_cap=*/4);
     IUC cond = 0;
     BOL added = agent.AddRule(&cond, 1);
     CoreCheck(added, "reflex rule added");
@@ -149,9 +149,9 @@ inline const CHA* Core(const CHA* args) {
     IUC a = agent.Action();
     CoreCheck(a == 1, "reflex agent rule fires");
   }
-  // TModelAgent: internal state accumulates.
+  // ModelAgent: internal state accumulates.
   {
-    TModelAgent agent(/*action_count=*/2, /*state_slots=*/4);
+    ModelAgent agent(/*action_count=*/2, /*state_slots=*/4);
     IUC percept = 7;
     agent.OnPercept(&percept, 1);
     agent.OnPercept(&percept, 1);

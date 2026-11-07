@@ -1,5 +1,5 @@
 // Copyright AStarship <https://astarship.net>.
-#include "../../TypingWorld/TypingWorld.hxx"
+#include "../../Worlds/Typing/TypingWorld.hxx"
 #include "01.Core.hxx"
 #include "02.Release.hxx"
 using namespace ::_;

@@ -1,24 +1,24 @@
 // Copyright AStarship <https://astarship.net>.
-// PolicyNet.hxx — TTransformer forward (compact transformer policy).
+// PolicyNet.hxx — TransformerPolicy forward (compact transformer policy).
 //
 // Architecture (forward; backward is M4):
-//   obs [B, obs_len]
-//     -> W_e (obs_len x dim) + b_e        [embed] -> LN
+//   observation [B, observation_len]
+//     -> W_e (observation_len x dim) + b_e        [embed] -> LN
 //     -> L blocks:  MHSA(2 heads) -> +res -> LN -> FFN(2x dim, ReLU) -> +res
 //     -> action head  W_a (dim x A) + b_a -> logits [B, A]
 //     -> value head   W_v (dim x 1) + b_v -> values [B]
 //
 // Weights are OWNED by the net (allocated in the ctor from a seed, freed in
-// the dtor). Forward is a pure function of (obs, weights) -> deterministic,
+// the dtor). Forward is a pure function of (observation, weights) -> deterministic,
 // and the PPO loop can persist + update the weights via Backward (M4/M5).
-// No C++ stdlib. Uses the TTensor ops from Tensor.hxx + <math.h>.
+// No C++ stdlib. Uses the TensorFPC ops from Tensor.hxx + <math.h>.
 #pragma once
 #include "Policy.h"
 #include "../ASCIICrabs/Math.hxx"
 #include "Tensor.hxx"
 #include "../CrabsTK/Math/Blas.h"
-
 namespace iGeek {
+using namespace ::_;
 
 namespace {
 // Tiny deterministic LCG for weight init (seeded, reproducible).
@@ -31,7 +31,7 @@ struct TLcg {
     return FPC(hi / (double)0xFFFFFFFFu);
   }
 };
-void InitRand(TTensor& t, TLcg& rng, FPC scale) {
+void InitRand(TensorFPC& t, TLcg& rng, FPC scale) {
   for (ISC i = 0; i < t.rows_; ++i)
     for (ISC j = 0; j < t.cols_; ++j)
       t.At(i, j) = (rng.Next() * 2.0f - 1.0f) * scale;
@@ -41,37 +41,37 @@ void InitRand(TTensor& t, TLcg& rng, FPC scale) {
    With one token per row, the attention score is a single value, softmax of
    one element is 1.0, so the attention context == V. We still compute Q/K/V
    and the output projection to keep the structure correct + differentiable. */
-void MhsaForward(TTensor X, TBlock& blk, TTensor& Y) {
+void MhsaForward(TensorFPC X, TransformerBlock& blk, TensorFPC& Y) {
   ISC B = X.rows_;
-  TTensor Q = TTensorAlloc(B, blk.dim_), K = TTensorAlloc(B, blk.dim_),
-          V = TTensorAlloc(B, blk.dim_);
-  TTensorMatMul(X, blk.W_q, Q); TTensorAddBiasInPlace(Q, blk.b_q);
-  TTensorMatMul(X, blk.W_k, K); TTensorAddBiasInPlace(K, blk.b_k);
-  TTensorMatMul(X, blk.W_v, V); TTensorAddBiasInPlace(V, blk.b_v);
-  TTensorMatMul(V, blk.W_o, Y); TTensorAddBiasInPlace(Y, blk.b_o);
-  TTensorFree(Q); TTensorFree(K); TTensorFree(V);
+  TensorFPC Q = TensorFPCAlloc(B, blk.dim_), K = TensorFPCAlloc(B, blk.dim_),
+          V = TensorFPCAlloc(B, blk.dim_);
+  TensorFPCMatMul(X, blk.W_q, Q); TensorFPCAddBiasInPlace(Q, blk.b_q);
+  TensorFPCMatMul(X, blk.W_k, K); TensorFPCAddBiasInPlace(K, blk.b_k);
+  TensorFPCMatMul(X, blk.W_v, V); TensorFPCAddBiasInPlace(V, blk.b_v);
+  TensorFPCMatMul(V, blk.W_o, Y); TensorFPCAddBiasInPlace(Y, blk.b_o);
+  TensorFPCFree(Q); TensorFPCFree(K); TensorFPCFree(V);
 }
 }  //< namespace
 
-TTransformer::TTransformer(ISC obs_len, ISC action_count, ISC dim, ISC layers)
-    : obs_len_(obs_len), action_count_(action_count),
+TransformerPolicy::TransformerPolicy(ISC observation_len, ISC action_count, ISC dim, ISC layers)
+    : observation_len_(observation_len), action_count_(action_count),
       dim_(dim < 8 ? 8 : dim), layers_(layers < 1 ? 1 : layers),
       seed_(12345), built_(false), blocks_(_NilP) {}
 
-TTransformer::~TTransformer() {
+TransformerPolicy::~TransformerPolicy() {
   if (!built_) {
     return;
   }
-  TTensorFree(W_e_); TTensorFree(b_e_);
-  TTensorFree(W_a_); TTensorFree(b_a_);
-  TTensorFree(W_v_); TTensorFree(b_v_);
+  TensorFPCFree(W_e_); TensorFPCFree(b_e_);
+  TensorFPCFree(W_a_); TensorFPCFree(b_a_);
+  TensorFPCFree(W_v_); TensorFPCFree(b_v_);
   if (blocks_ != _NilP) {
     for (ISC l = 0; l < layers_; ++l) {
-      TBlock& b = blocks_[l];
-      TTensorFree(b.W_q); TTensorFree(b.W_k); TTensorFree(b.W_v);
-      TTensorFree(b.W_o); TTensorFree(b.b_q); TTensorFree(b.b_k);
-      TTensorFree(b.b_v); TTensorFree(b.b_o); TTensorFree(b.W_f1);
-      TTensorFree(b.W_f2); TTensorFree(b.b_f1); TTensorFree(b.b_f2);
+      TransformerBlock& b = blocks_[l];
+      TensorFPCFree(b.W_q); TensorFPCFree(b.W_k); TensorFPCFree(b.W_v);
+      TensorFPCFree(b.W_o); TensorFPCFree(b.b_q); TensorFPCFree(b.b_k);
+      TensorFPCFree(b.b_v); TensorFPCFree(b.b_o); TensorFPCFree(b.W_f1);
+      TensorFPCFree(b.W_f2); TensorFPCFree(b.b_f1); TensorFPCFree(b.b_f2);
     }
     delete[] blocks_;
     blocks_ = _NilP;
@@ -79,42 +79,42 @@ TTransformer::~TTransformer() {
   built_ = false;
 }
 
-ISC TTransformer::ActionCount() { return action_count_; }
-ISC TTransformer::ObsLength() { return obs_len_; }
+ISC TransformerPolicy::ActionCount() { return action_count_; }
+ISC TransformerPolicy::ObservationLength() { return observation_len_; }
 
 /* (Re)build the weights from seed_. Idempotent; called from Forward on first
    use and available to re-seed. */
-void TTransformer::Build() {
+void TransformerPolicy::Build() {
   if (built_) {
     return;
   }
   TLcg rng(seed_);
   FPC s = 1.0f / FPC(FPC(SquareRoot(dim_)));
-  W_e_ = TTensorAlloc(obs_len_, dim_);
-  b_e_ = TTensorAlloc(dim_, 1);
+  W_e_ = TensorFPCAlloc(observation_len_, dim_);
+  b_e_ = TensorFPCAlloc(dim_, 1);
   InitRand(W_e_, rng, 0.5f);
-  W_a_ = TTensorAlloc(dim_, action_count_);
-  b_a_ = TTensorAlloc(action_count_, 1);
+  W_a_ = TensorFPCAlloc(dim_, action_count_);
+  b_a_ = TensorFPCAlloc(action_count_, 1);
   InitRand(W_a_, rng, 0.5f);
-  W_v_ = TTensorAlloc(dim_, 1);
-  b_v_ = TTensorAlloc(1, 1);
+  W_v_ = TensorFPCAlloc(dim_, 1);
+  b_v_ = TensorFPCAlloc(1, 1);
   InitRand(W_v_, rng, 0.5f);
-  blocks_ = new TBlock[layers_];
+  blocks_ = new TransformerBlock[layers_];
   for (ISC l = 0; l < layers_; ++l) {
-    TBlock& b = blocks_[l];
+    TransformerBlock& b = blocks_[l];
     b.dim_ = dim_; b.heads_ = 2;
-    b.W_q = TTensorAlloc(dim_, dim_);
-    b.W_k = TTensorAlloc(dim_, dim_);
-    b.W_v = TTensorAlloc(dim_, dim_);
-    b.W_o = TTensorAlloc(dim_, dim_);
-    b.b_q = TTensorAlloc(dim_, 1);
-    b.b_k = TTensorAlloc(dim_, 1);
-    b.b_v = TTensorAlloc(dim_, 1);
-    b.b_o = TTensorAlloc(dim_, 1);
-    b.W_f1 = TTensorAlloc(dim_, dim_ * 2);
-    b.W_f2 = TTensorAlloc(dim_ * 2, dim_);
-    b.b_f1 = TTensorAlloc(dim_ * 2, 1);
-    b.b_f2 = TTensorAlloc(dim_, 1);
+    b.W_q = TensorFPCAlloc(dim_, dim_);
+    b.W_k = TensorFPCAlloc(dim_, dim_);
+    b.W_v = TensorFPCAlloc(dim_, dim_);
+    b.W_o = TensorFPCAlloc(dim_, dim_);
+    b.b_q = TensorFPCAlloc(dim_, 1);
+    b.b_k = TensorFPCAlloc(dim_, 1);
+    b.b_v = TensorFPCAlloc(dim_, 1);
+    b.b_o = TensorFPCAlloc(dim_, 1);
+    b.W_f1 = TensorFPCAlloc(dim_, dim_ * 2);
+    b.W_f2 = TensorFPCAlloc(dim_ * 2, dim_);
+    b.b_f1 = TensorFPCAlloc(dim_ * 2, 1);
+    b.b_f2 = TensorFPCAlloc(dim_, 1);
     InitRand(b.W_q, rng, s); InitRand(b.W_k, rng, s);
     InitRand(b.W_v, rng, s); InitRand(b.W_o, rng, s);
     InitRand(b.W_f1, rng, s); InitRand(b.W_f2, rng, s);
@@ -122,48 +122,48 @@ void TTransformer::Build() {
   built_ = true;
 }
 
-void TTransformer::Forward(TTensor obs, TTensor& logits,
-                           TTensor& values) {
+void TransformerPolicy::Forward(TensorFPC observation, TensorFPC& logits,
+                           TensorFPC& values) {
   if (!built_) {
     Build();
   }
-  ISC B = obs.rows_;
+  ISC B = observation.rows_;
   // Embed.
-  TTensor H = TTensorAlloc(B, dim_);
-  TTensorMatMul(obs, W_e_, H); TTensorAddBiasInPlace(H, b_e_);
-  TTensorLayerNormInPlace(H);
+  TensorFPC H = TensorFPCAlloc(B, dim_);
+  TensorFPCMatMul(observation, W_e_, H); TensorFPCAddBiasInPlace(H, b_e_);
+  TensorFPCLayerNormInPlace(H);
   // Blocks.
   for (ISC l = 0; l < layers_; ++l) {
-    TBlock& blk = blocks_[l];
-    TTensor Res = TTensorAlloc(B, dim_);
+    TransformerBlock& blk = blocks_[l];
+    TensorFPC Res = TensorFPCAlloc(B, dim_);
     for (ISC i = 0; i < B; ++i)
       for (ISC j = 0; j < dim_; ++j) Res.At(i, j) = H.At(i, j);
     MhsaForward(H, blk, H);
-    TTensorAdd(H, Res, H);
-    TTensorLayerNormInPlace(H);
-    TTensor F1 = TTensorAlloc(B, dim_ * 2);
-    TTensorMatMul(H, blk.W_f1, F1); TTensorAddBiasInPlace(F1, blk.b_f1);
-    TTensorReluInPlace(F1);
-    TTensor F2 = TTensorAlloc(B, dim_);
-    TTensorMatMul(F1, blk.W_f2, F2); TTensorAddBiasInPlace(F2, blk.b_f2);
-    TTensorAdd(F2, Res, H);
-    TTensorFree(Res); TTensorFree(F1); TTensorFree(F2);
+    TensorFPCAdd(H, Res, H);
+    TensorFPCLayerNormInPlace(H);
+    TensorFPC F1 = TensorFPCAlloc(B, dim_ * 2);
+    TensorFPCMatMul(H, blk.W_f1, F1); TensorFPCAddBiasInPlace(F1, blk.b_f1);
+    TensorFPCReluInPlace(F1);
+    TensorFPC F2 = TensorFPCAlloc(B, dim_);
+    TensorFPCMatMul(F1, blk.W_f2, F2); TensorFPCAddBiasInPlace(F2, blk.b_f2);
+    TensorFPCAdd(F2, Res, H);
+    TensorFPCFree(Res); TensorFPCFree(F1); TensorFPCFree(F2);
   }
   // Action head.
-  TTensorMatMul(H, W_a_, logits); TTensorAddBiasInPlace(logits, b_a_);
+  TensorFPCMatMul(H, W_a_, logits); TensorFPCAddBiasInPlace(logits, b_a_);
   // Value head.
-  TTensorMatMul(H, W_v_, values); TTensorAddBiasInPlace(values, b_v_);
-  TTensorFree(H);
+  TensorFPCMatMul(H, W_v_, values); TensorFPCAddBiasInPlace(values, b_v_);
+  TensorFPCFree(H);
 }
 
-void TTransformer::SampleActions(TTensor logits, ISC* actions,
+void TransformerPolicy::SampleActions(TensorFPC logits, ISC* actions,
                                  FPC* logp) {
   ISC B = logits.rows_;
-  // Allocate LSE for ALL rows once (TTensorRowLogSumExp writes out.At(i,0) for
+  // Allocate LSE for ALL rows once (TensorFPCRowLogSumExp writes out.At(i,0) for
   // every row i in [0,B)); sizing it [1,1] overflows. Same fix as
   // TLinearPolicy::SampleActions.
-  TTensor lse = TTensorAlloc(B, 1);
-  TTensorRowLogSumExp(logits, lse);
+  TensorFPC lse = TensorFPCAlloc(B, 1);
+  TensorFPCRowLogSumExp(logits, lse);
   for (ISC b = 0; b < B; ++b) {
     ISC best = 0;
     FPC bestv = logits.At(b, 0);
@@ -173,7 +173,7 @@ void TTransformer::SampleActions(TTensor logits, ISC* actions,
     actions[b] = best;
     logp[b] = logits.At(b, best) - lse.At(b, 0);
   }
-  TTensorFree(lse);
+  TensorFPCFree(lse);
 }
 
 /* Backward (M4): compute the PPO policy-surrogate + value-loss gradients
@@ -187,26 +187,26 @@ void TTransformer::SampleActions(TTensor logits, ISC* actions,
      dL/dlogits[b,a] = -adv[b] * (1(a == a_b) - p[b,a])
      V_b      = (value[b] - ret[b])^2       (value loss)
      dV/dvalue[b]    = 2 * (value[b] - ret[b])
-   (The PPO clip-ratio and vf-clip are applied in the TPPO loop on top of these
+   (The PPO clip-ratio and vf-clip are applied in the PPO loop on top of these
    base gradients; here we return the unclipped per-row gradients.) */
-void TTransformer::Backward(TTensor logits, const ISC* actions,
-                            TTensor advantages, TTensor old_logp,
-                            TTensor values, TTensor returns,
-                            TTensor& grad_logits, TTensor& grad_value) {
-  (void)old_logp;  // Used by the TPPO clip-ratio, not the base grad.
+void TransformerPolicy::Backward(TensorFPC logits, const ISC* actions,
+                            TensorFPC advantages, TensorFPC old_logp,
+                            TensorFPC values, TensorFPC returns,
+                            TensorFPC& grad_logits, TensorFPC& grad_value) {
+  (void)old_logp;  // Used by the PPO clip-ratio, not the base grad.
   ISC B = logits.rows_, A = logits.cols_;
   for (ISC b = 0; b < B; ++b) {
     // softmax(logits[b])
-    TTensor row = TTensorAlloc(1, A);
+    TensorFPC row = TensorFPCAlloc(1, A);
     for (ISC a = 0; a < A; ++a) row.At(0, a) = logits.At(b, a);
-    TTensorSoftmaxInPlace(row);
+    TensorFPCSoftmaxInPlace(row);
     ISC a_b = (actions != _NilP) ? actions[b] : 0;
     FPC adv = advantages.At(b, 0);
     for (ISC a = 0; a < A; ++a) {
       FPC onehot = (a == a_b) ? 1.0f : 0.0f;
       grad_logits.At(b, a) = -adv * (onehot - row.At(0, a));
     }
-    TTensorFree(row);
+    TensorFPCFree(row);
     // value grad
     grad_value.At(b, 0) = 2.0f * (values.At(b, 0) - returns.At(b, 0));
   }
@@ -216,8 +216,8 @@ void TTransformer::Backward(TTensor logits, const ISC* actions,
    logp[b] = logits[b, a_b] - logsumexp(logits[b]). This is the scalar the M4
    finite-difference gradcheck differentiates w.r.t. the logits, and it is the
    same quantity whose gradient Backward returns (grad_logits). */
-FPC TPolicyLoss(TTensor logits, const ISC* actions,
-                TTensor advantages) {
+FPC TPolicyLoss(TensorFPC logits, const ISC* actions,
+                TensorFPC advantages) {
   ISC B = logits.rows_, A = logits.cols_;
   FPC total = 0.0f;
   for (ISC b = 0; b < B; ++b) {
@@ -236,7 +236,7 @@ FPC TPolicyLoss(TTensor logits, const ISC* actions,
 }
 
 /* Value loss (scalar): V = sum_b (value[b] - ret[b])^2. */
-FPC TValueLoss(TTensor values, TTensor returns) {
+FPC TValueLoss(TensorFPC values, TensorFPC returns) {
   FPC total = 0.0f;
   for (ISC b = 0; b < values.rows_; ++b) {
     FPC d = values.At(b, 0) - returns.At(b, 0);

@@ -29,10 +29,7 @@ using namespace iGeek;
   inline const CHA* iGeekTests(const CHA* args) {
   return TTestTree<iGeekTest::Core,
     iGeekTest::AgentSlot,
-    iGeekTest::Script,
     iGeekTest::JobQueue,
-    iGeekTest::RoomSandbox,
-    iGeekTest::RolloutCompare,
     iGeekTest::Release,
     MazeWorldTest::MazeWorld,
     ArmWorldTest::ArmWorld,

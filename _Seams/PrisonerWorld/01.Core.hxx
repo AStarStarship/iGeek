@@ -20,6 +20,21 @@ inline const CHA* Core(const CHA* args) {
   env.SetPayoffs(5, 3, 1, 0);  // T=5, R=3, P=1, S=0
   env.Reset();
 
+  // The manifest is the in-Room contract a joining agent reads before it plays.
+  {
+    const EnvironmentManifest& m = env.Manifest();
+    if (!EnvironmentManifestValidate(&m))
+      return "PRISONERWORLD_FAIL: manifest does not validate";
+    if (!TSEquals(m.name, "prisoner"))
+      return "PRISONERWORLD_FAIL: manifest name != prisoner";
+    if (m.action_count != 2 || m.observation_count != 2)
+      return "PRISONERWORLD_FAIL: manifest obs/action shape wrong";
+    if (m.reward_low != FPC(0) || m.reward_high != FPC(5))
+      return "PRISONERWORLD_FAIL: manifest reward range != [0,5]";
+    if (m.max_episode_steps != ISC(PrisonerEnvironment::MaxHistory))
+      return "PRISONERWORLD_FAIL: manifest max_episode_steps wrong";
+  }
+
   IUD actions[2] = {0, 0};
   FPC rewards[2];
   BOL terminals[2];
