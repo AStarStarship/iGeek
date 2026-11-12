@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright AStarship <https://astarship.net>. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="336" viewBox="0 0 240 336" role="img" aria-labelledby="title">
+<title id="title">Face-down playing card</title>
+<defs><pattern id="weave" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M12 0 L24 12 L12 24 L0 12 Z" fill="none" stroke="#b18a44" stroke-width="0.8"/><circle cx="12" cy="12" r="1.5" fill="#b18a44"/></pattern></defs>
+<rect x="1" y="1" width="238" height="334" rx="15" fill="#fffaf0" stroke="#d6c6a2" stroke-width="2"/>
+<rect x="11" y="11" width="218" height="314" rx="9" fill="#123c31"/>
+<rect x="18" y="18" width="204" height="300" rx="5" fill="url(#weave)" stroke="#d3b777" stroke-width="2"/>
+<path d="M120 79 L184 168 L120 257 L56 168 Z" fill="#123c31" stroke="#d3b777" stroke-width="3"/>
+<path d="M120 95 L171 168 L120 241 L69 168 Z" fill="none" stroke="#b18a44"/>
+<path d="M120 119 L131 154 L158 168 L131 182 L120 217 L109 182 L82 168 L109 154 Z" fill="#d3b777"/>
+<path d="M120 145 L139 168 L120 191 L101 168 Z" fill="#123c31"/>
+</svg>

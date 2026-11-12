@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArmWorld - 2-Link Reacher (Flask demo)</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #111; color: #eee; }
+    #c { display: block; width: 100%; height: 100vh; }
+    #controls {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.6); padding: 12px; border-radius: 6px;
+      z-index: 10; max-width: 220px;
+    }
+    .btn {
+      width: 100%; margin: 4px 0; padding: 6px;
+      background: #0066cc; color: #fff; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 14px;
+    }
+    .btn:hover { background: #0055aa; }
+    .readout { margin-top: 6px; font-family: monospace; font-size: 12px; }
+    .val { color: #0f0; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <div><b>ArmWorld</b> 2-Link Reacher</div>
+    <button class="btn" onclick="send(0,0)">Hold</button>
+    <button class="btn" onclick="send(1,0)">+J1 (torque)</button>
+    <button class="btn" onclick="send(-1,0)">-J1 (torque)</button>
+    <button class="btn" onclick="send(0,1)">+J2 (torque)</button>
+    <button class="btn" onclick="send(0,-1)">-J2 (torque)</button>
+    <div class="readout">j1: <span class="val" id="j1">0.0000</span> rad</div>
+    <div class="readout">j2: <span class="val" id="j2">0.0000</span> rad</div>
+    <div class="readout">tip: (<span class="val" id="tipx">0.0000</span>, <span class="val" id="tipy">0.0000</span>) m</div>
+    <div class="readout">reach: <span class="val" id="reach">0.0000</span> m</div>
+    <div class="readout">time: <span class="val" id="time">0.00</span> s</div>
+  </div>
+<canvas id="c"></canvas>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  const c = document.getElementById("c");
+  const ctx = c.getContext("2d");
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize();
+  window.addEventListener("resize", resize);
+
+  // Physics runs in meters with y-up; canvas is pixels with y-down.
+  const SCALE = 600;                    // pixels per meter
+  const state = { j1: 0, j2: 0, tip_x: 0.2, tip_y: 0, reach: 0.2, time: 0 };
+  const L1 = 0.20, L2 = 0.20;
+
+  const socket = io();
+  socket.on("state", function (d) {
+    Object.assign(state, d);
+    const set = (id, v) => document.getElementById(id).textContent = v;
+    set("j1", state.j1.toFixed(4));
+    set("j2", state.j2.toFixed(4));
+    set("tipx", state.tip_x.toFixed(4));
+    set("tipy", state.tip_y.toFixed(4));
+    set("reach", state.reach.toFixed(4));
+    set("time", state.time.toFixed(2));
+  });
+
+  function send(t1, t2) { socket.emit("torque", { tau1: t1, tau2: t2 }); }
+
+  function draw() {
+    const w = c.width, h = c.height;
+    const bx = w / 2, by = h * 0.75;             // base position on canvas
+    const toPx = (mx, my) => [bx + mx * SCALE, by - my * SCALE];
+    const p0 = toPx(0, 0);
+    const p1 = toPx(L1 * Math.cos(state.j1), L1 * Math.sin(state.j1));
+    const p2 = toPx(state.tip_x, state.tip_y);
+
+    ctx.clearRect(0, 0, w, h);
+
+    // ground line
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, by + 60);
+    ctx.lineTo(w, by + 60);
+    ctx.stroke();
+
+    // links
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#4db3ff";
+    ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.stroke();
+    ctx.strokeStyle = "#ffb347";
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+
+    // joints
+    ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(p0[0], p0[1], 8, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = "#4db3ff";
+    ctx.beginPath(); ctx.arc(p1[0], p1[1], 7, 0, 2 * Math.PI); ctx.fill();
+
+    // tip
+    ctx.fillStyle = "#f55";
+    ctx.beginPath(); ctx.arc(p2[0], p2[1], 10, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = "#8f8";
+    ctx.font = "13px monospace";
+    ctx.fillText("tip (" + state.tip_x.toFixed(3) + ", " + state.tip_y.toFixed(3) + ")",
+                 p2[0] + 14, p2[1] - 8);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Auto-hold so the arm settles to gravity position when idle
+  setInterval(() => send(0, 0), 2000);
+</script>
+</body>
+</html>

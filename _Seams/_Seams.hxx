@@ -15,7 +15,6 @@
 #include "CardsWorld/_Tests.hxx"
 #include "Classical/_Tests.hxx"
 #include "PacWorld/_Tests.hxx"
-#include "PolygonWorld/_Tests.hxx"
 #include "PrisonerWorld/_Tests.hxx"
 #include "SpaceWorld/_Tests.hxx"
 #include "SudokuWorld/_Tests.hxx"

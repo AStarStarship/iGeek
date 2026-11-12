@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpaceWorld — 6-DoF RCS</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    background: #05070b; color: #c9d1d9;
+    font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 8px 14px; border-bottom: 1px solid #1b2530; background: #0b1119;
+  }
+  h1 { font-size: 14px; margin: 0; letter-spacing: .08em; text-transform: uppercase; color: #e6edf3; }
+  .badge { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: #3fb950; border: 1px solid #1f5b2c; background: #0d2413; border-radius: 4px; padding: 2px 7px; }
+  .controls { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+  button, select {
+    background: #141c26; color: #e6edf3; border: 1px solid #263241; border-radius: 5px;
+    padding: 5px 9px; font: inherit; cursor: pointer;
+  }
+  button:hover, select:hover { background: #1d2836; }
+  button:active { transform: translateY(1px); }
+  main { position: relative; flex: 1; min-height: 0; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #error {
+    position: absolute; inset: 0; display: none; place-items: center;
+    color: #ff7b72; background: #05070b; text-align: center; padding: 24px;
+  }
+  footer {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    padding: 7px 14px; border-top: 1px solid #1b2530; background: #0b1119;
+    font-size: 12px; color: #8b949e;
+  }
+  footer b { color: #e6edf3; font-weight: 600; }
+  #message { color: #58a6ff; }
+  .pads { display: flex; gap: 18px; flex-wrap: wrap; padding: 7px 14px; border-top: 1px solid #1b2530; background: #0b1119; }
+  .pad { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .pad span { color: #6e7b8b; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+  .pad button { padding: 4px 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SpaceWorld</h1>
+  <span class="badge">native physics</span>
+  <div class="controls">
+    <select id="duration" title="Burn length">
+      <option value="30">0.5 s</option>
+      <option value="60" selected>1.0 s</option>
+      <option value="120">2.0 s</option>
+    </select>
+    <button id="stabilize2">Stabilize 2 s</button>
+    <button id="stabilize10">Stabilize 10 s</button>
+    <button id="reset" title="R">Reset</button>
+    <button id="new" title="N">New seed</button>
+  </div>
+</header>
+<main>
+  <canvas id="view"></canvas>
+  <div id="error">WebGL is unavailable in this browser. The demo needs WebGL 1.</div>
+</main>
+<div class="pads">
+  <div class="pad"><span>torque</span>
+    <button data-torque="5,0,0">pitch +</button>
+    <button data-torque="-5,0,0">pitch −</button>
+    <button data-torque="0,5,0">yaw +</button>
+    <button data-torque="0,-5,0">yaw −</button>
+    <button data-torque="0,0,5">roll +</button>
+    <button data-torque="0,0,-5">roll −</button>
+  </div>
+  <div class="pad"><span>force</span>
+    <button data-force="50,0,0">+X</button>
+    <button data-force="-50,0,0">−X</button>
+    <button data-force="0,50,0">+Y</button>
+    <button data-force="0,-50,0">−Y</button>
+    <button data-force="0,0,50">+Z</button>
+    <button data-force="0,0,-50">−Z</button>
+  </div>
+</div>
+<footer>
+  <span>pos <b id="pos">–</b></span>
+  <span>vel <b id="vel">–</b></span>
+  <span>spin <b id="spin">–</b></span>
+  <span>att <b id="att">–</b></span>
+  <span>t <b id="time">0.0</b>s</span>
+  <span id="message">loading…</span>
+</footer>
+<script>
+"use strict";
+
+const canvas = document.getElementById("view");
+const gl = canvas.getContext("webgl", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+if (!gl) {
+  document.getElementById("error").style.display = "grid";
+  throw new Error("WebGL unavailable");
+}
+
+const VertexShader = `
+attribute vec2 aPos;
+attribute vec4 aColor;
+attribute float aSize;
+varying vec4 vColor;
+void main() {
+  gl_Position = vec4(aPos, 0.0, 1.0);
+  gl_PointSize = aSize;
+  vColor = aColor;
+}`;
+const FragmentShader = `
+precision mediump float;
+varying vec4 vColor;
+void main() { gl_FragColor = vColor; }`;
+
+function Compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+const program = gl.createProgram();
+gl.attachShader(program, Compile(gl.VERTEX_SHADER, VertexShader));
+gl.attachShader(program, Compile(gl.FRAGMENT_SHADER, FragmentShader));
+gl.linkProgram(program);
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+gl.useProgram(program);
+
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+const aPos = gl.getAttribLocation(program, "aPos");
+const aColor = gl.getAttribLocation(program, "aColor");
+const aSize = gl.getAttribLocation(program, "aSize");
+const stride = 7 * 4;
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+gl.enableVertexAttribArray(aColor);
+gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 8);
+gl.enableVertexAttribArray(aSize);
+gl.vertexAttribPointer(aSize, 1, gl.FLOAT, false, stride, 24);
+
+// --- small vector helpers -------------------------------------------------
+const Sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const Dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const Cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const Normalize = (a) => { const n = Math.hypot(...a) || 1; return [a[0] / n, a[1] / n, a[2] / n]; };
+function Rotate(q, v) {
+  const [qx, qy, qz, qw] = q;
+  const tx = 2 * (qy * v[2] - qz * v[1]);
+  const ty = 2 * (qz * v[0] - qx * v[2]);
+  const tz = 2 * (qx * v[1] - qy * v[0]);
+  return [v[0] + qw * tx + (qy * tz - qz * ty),
+          v[1] + qw * ty + (qz * tx - qx * tz),
+          v[2] + qw * tz + (qx * ty - qy * tx)];
+}
+
+// --- starfield ------------------------------------------------------------
+const stars = [];
+let seed = 1234567;
+const Rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+for (let i = 0; i < 220; i++) {
+  const r = 18 + Rand() * 30;
+  const theta = Rand() * Math.PI * 2, phi = Math.acos(2 * Rand() - 1);
+  stars.push([r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta)]);
+}
+
+let state = null;
+let spec = null;
+
+function Camera(radius, time) {
+  const az = 0.7 + time * 0.10, el = 0.42;
+  const eye = [radius * Math.cos(el) * Math.sin(az), radius * Math.sin(el), radius * Math.cos(el) * Math.cos(az)];
+  const forward = Normalize([-eye[0], -eye[1], -eye[2]]);
+  const right = Normalize(Cross(forward, [0, 1, 0]));
+  const up = Cross(right, forward);
+  const tanHalf = Math.tan(0.5 * 0.82);
+  const aspect = canvas.width / Math.max(1, canvas.height);
+  return (point) => {
+    const d = Sub(point, eye);
+    const z = Dot(d, forward);
+    if (z < 0.05) return null;
+    return [Dot(d, right) / (z * tanHalf * aspect), Dot(d, up) / (z * tanHalf)];
+  };
+}
+
+function Line(out, project, a, b, color) {
+  const pa = project(a), pb = project(b);
+  if (!pa || !pb) return;
+  out.push(pa[0], pa[1], ...color, 1, pb[0], pb[1], ...color, 1);
+}
+
+function Arrow(out, project, from, to, color) {
+  Line(out, project, from, to, color);
+  const direction = Normalize(Sub(to, from));
+  const side = Normalize(Cross(direction, [0, 1, 0]));
+  const side2 = Cross(direction, side);
+  const back = Sub(to, direction.map((v) => v * 0.22));
+  Line(out, project, to, back.map((v, i) => v + side[i] * 0.1), color);
+  Line(out, project, to, back.map((v, i) => v + side2[i] * 0.1), color);
+}
+
+let starsBytes = 0;
+let triBytes = 0;
+let linesBytes = 0;
+
+function PushTriangle(out, project, a, b, c, color) {
+  const pa = project(a), pb = project(b), pc = project(c);
+  if (!pa || !pb || !pc) return;
+  out.push(pa[0], pa[1], ...color, 1, pb[0], pb[1], ...color, 1,
+           pc[0], pc[1], ...color, 1);
+}
+
+function BuildFrame() {
+  if (!state || !state.quaternion) return;
+  const project = Camera(6.2, performance.now() / 1000);
+  const q = state.quaternion;
+  const half = spec ? spec.half : [0.5, 0.5, 1.0];
+
+  const starsOut = [];
+  for (const star of stars) {
+    const p = project(star);
+    if (p) starsOut.push(p[0], p[1], 0.75, 0.82, 0.95, 0.75, 2.2);
+  }
+
+  const corners = [];
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1])
+    corners.push(Rotate(q, [sx * half[0], sy * half[1], sz * half[2]]));
+
+  // Translucent hull so the 3-D body reads clearly against the starfield.
+  const triangles = [];
+  const hull = [0.22, 0.30, 0.38, 0.30];
+  const faces = [[0,1,3,2],[4,6,7,5],[0,4,5,1],[2,3,7,6],[0,2,6,4],[1,5,7,3]];
+  for (const [a, b, c, d] of faces) {
+    PushTriangle(triangles, project, corners[a], corners[b], corners[c], hull);
+    PushTriangle(triangles, project, corners[a], corners[c], corners[d], hull);
+  }
+
+  const lines = [];
+  const edges = [[0,1],[0,2],[0,4],[1,3],[1,5],[2,3],[2,6],[3,7],[4,5],[4,6],[5,7],[6,7]];
+  for (const [i, j] of edges) Line(lines, project, corners[i], corners[j], [0.55, 0.65, 0.76, 1]);
+
+  // Body axes (rotated by attitude): X red, Y green, Z blue.
+  Arrow(lines, project, [0, 0, 0], Rotate(q, [1.6, 0, 0]), [1.0, 0.36, 0.36, 1]);
+  Arrow(lines, project, [0, 0, 0], Rotate(q, [0, 1.6, 0]), [0.36, 1.0, 0.54, 1]);
+  Arrow(lines, project, [0, 0, 0], Rotate(q, [0, 0, 1.6]), [0.36, 0.60, 1.0, 1]);
+
+  // World velocity vector, exaggerated for visibility.
+  if (state.speed > 1e-6) {
+    const v = state.velocity;
+    const scale = Math.min(4.0, 6.0 / (state.speed || 1));
+    Arrow(lines, project, [0, 0, 0], v.map((x) => x * scale), [1.0, 0.82, 0.40, 1]);
+  }
+
+  const all = new Float32Array(starsOut.length + triangles.length + lines.length);
+  let offset = 0;
+  all.set(starsOut, offset); offset += starsOut.length;
+  all.set(triangles, offset); offset += triangles.length;
+  all.set(lines, offset);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, all, gl.STATIC_DRAW);
+  starsBytes = starsOut.length / 7;
+  triBytes = triangles.length / 7;
+  linesBytes = lines.length / 7;
+}
+
+function Resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, canvas.clientWidth * dpr);
+  const height = Math.max(1, canvas.clientHeight * dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+}
+
+function Frame() {
+  Resize();
+  BuildFrame();
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0.02, 0.03, 0.05, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (state) {
+    if (starsBytes) gl.drawArrays(gl.POINTS, 0, starsBytes);
+    if (triBytes) gl.drawArrays(gl.TRIANGLES, starsBytes, triBytes);
+    if (linesBytes) gl.drawArrays(gl.LINES, starsBytes + triBytes, linesBytes);
+  }
+  requestAnimationFrame(Frame);
+}
+
+function Format(value, digits) { return value.toFixed(digits); }
+
+function Paint() {
+  if (!state) return;
+  document.getElementById("pos").textContent = state.position.map((v) => Format(v, 1)).join(", ");
+  document.getElementById("vel").textContent = Format(state.speed, 2) + " m/s";
+  document.getElementById("spin").textContent = Format(state.spin, 2) + " rad/s";
+  document.getElementById("att").textContent =
+    state.attitude.map((v) => (v * 180 / Math.PI).toFixed(0) + "°").join(" ");
+  document.getElementById("time").textContent = Format(state.time, 1);
+  document.getElementById("message").textContent = state.message;
+}
+
+let pending = false;
+async function Call(path, body) {
+  if (pending) return;
+  pending = true;
+  try {
+    const response = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: body === undefined ? {} : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("message").textContent = data.error || "request failed";
+      return;
+    }
+    state = data;
+    Paint();
+  } catch (error) {
+    document.getElementById("message").textContent = "network error: " + error.message;
+  } finally {
+    pending = false;
+  }
+}
+
+function Steps() { return parseInt(document.getElementById("duration").value, 10); }
+function Burn(force, torque) { Call("/api/action", { action: "burn", force, torque, steps: Steps() }); }
+function Stabilize(steps) { Call("/api/action", { action: "stabilize", steps }); }
+function Reset() { Call("/api/action", { action: "reset" }); }
+function NewRun() { Call("/api/new", { seed: Math.floor(Math.random() * 9007199254740990) + 1 }); }
+
+for (const button of document.querySelectorAll("[data-torque]")) {
+  button.addEventListener("click", () => {
+    const t = button.dataset.torque.split(",").map(Number);
+    Burn([0, 0, 0], t);
+  });
+}
+for (const button of document.querySelectorAll("[data-force]")) {
+  button.addEventListener("click", () => {
+    const f = button.dataset.force.split(",").map(Number);
+    Burn(f, [0, 0, 0]);
+  });
+}
+document.getElementById("stabilize2").addEventListener("click", () => Stabilize(120));
+document.getElementById("stabilize10").addEventListener("click", () => Stabilize(600));
+document.getElementById("reset").addEventListener("click", Reset);
+document.getElementById("new").addEventListener("click", NewRun);
+window.addEventListener("keydown", (event) => {
+  if (event.key === "r" || event.key === "R") Reset();
+  if (event.key === "n" || event.key === "N") NewRun();
+  if (event.key === " ") { event.preventDefault(); Stabilize(120); }
+});
+
+(async () => {
+  await Call("/api/state");
+  try {
+    const response = await fetch("/api/spec", { credentials: "same-origin" });
+    if (response.ok) spec = await response.json();
+  } catch (error) {
+    document.getElementById("message").textContent = "spec load failed: " + error.message;
+  }
+})();
+requestAnimationFrame(Frame);
+</script>
+</body>
+</html>

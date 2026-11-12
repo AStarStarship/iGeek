@@ -21,7 +21,8 @@ static IUD TArmHash(IUD x) {
   x = x * 0xC2B2AE3D27D4EB4Full; x ^= x >> 27;
   return x;
 }
-AArmEnv::AArmEnv(ArmParams& params, IUD seed)
+AArmEnv::AArmEnv() : AArmEnv(ArmParams(), 7) {}
+AArmEnv::AArmEnv(const ArmParams& params, IUD seed)
     : Environment("armworld", 2), params_(params), seed_(seed) {
   /* The arm env IS the Environment, so it owns the Room and the manifest that
      a joining agent reads. The Gym only batches it. */
@@ -47,12 +48,11 @@ AArmEnv::AArmEnv(ArmParams& params, IUD seed)
 }
 void AArmEnv::DrawTarget() {
   IUD h = TArmHash(seed_ + 0x5851F42D4C957F2Dull);
-  // Angle in [25 deg, 65 deg], radius in [0.30, 0.32] m — the reachable
-  // annulus for j∈[0,π/2] with good coverage (verified 2026-10-20).
-  FPD angle = 0.4363323129985824 + FPD(h % 41) / 40 * 0.6981317007977318;  // rad (25..65 deg)
-  FPD radius = 0.30 + FPD((h >> 16) % 21) / 20 * 0.02;
-  target_x_ = radius * Cosine(angle);
-  target_y_ = radius * Sine(angle);
+  // Sample legal joint configurations, not a polar annulus that includes
+  // unreachable points. This also respects non-default, unequal link lengths.
+  FPD j1 = 0.2617993877991494 + FPD(h % 1001) / 1000 * 1.0471975511965976;
+  FPD j2 = 0.2617993877991494 + FPD((h >> 32) % 1001) / 1000 * 1.0471975511965976;
+  ArmFK(params_, j1, j2, target_x_, target_y_);
 }
 void AArmEnv::Reset() {
   arm_ = initial_;
@@ -63,6 +63,8 @@ void AArmEnv::Reset() {
     Observe();
     return;
   }
+  ArmFK(params_, arm_.j1, arm_.j2, arm_.tip_x, arm_.tip_y);
+  arm_.reach = hypot(arm_.tip_x, arm_.tip_y);
   DrawTarget();
   tip_error_ = hypot(arm_.tip_x - target_x_, arm_.tip_y - target_y_);
   prev_error_ = tip_error_;
@@ -114,7 +116,7 @@ FPC AArmEnv::StepControl(ArmControl& control) {
     return -10;
   }
   ++metrics_.frames;
-  metrics_.physics_steps += 4;
+  metrics_.physics_steps += IUD(TArmSubsteps(params_));
   FPD tip_speed = hypot(arm_.tip_x - old_tip_x, arm_.tip_y - old_tip_y) /
       params_.dt;
   metrics_.max_tip_speed = tip_speed > metrics_.max_tip_speed

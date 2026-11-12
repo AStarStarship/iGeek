@@ -5,6 +5,38 @@ builds on Linux g++. Not a Gym subclass; no PPO loop. A* solver is
 correct (unique shortest path in a perfect maze) but has no learned
 component.
 
+## Browser demo (WebGL, port 5006)
+
+Playable, interactive WebGL maze in the browser. The layout, wall collision
+and A* solve run in the **native** `MazeWorld` code: `maze_bridge.py` compiles a
+verbatim slice of `MazeWorld.h`/`MazeWorld.hxx` (the pure struct, selected by
+structural markers) into a shared library and calls it through ctypes, the same
+pattern the Sudoku world uses. **Not compiled:** the `MazeEnv`/`Environment`
+layer; its reward arithmetic (`-0.05` wall, `-0.01` step, `+1.0` exit) is
+mirrored in Python for the HUD and is not a native reward equivalence proof.
+
+Files:
+
+- `maze_bridge.py` — slice + `g++ -shared` build into `$TMPDIR`, ctypes ABI.
+- `maze_server.py` — Flask app; `POST /api/new`, `POST /api/action`
+  (`move`/`solve`/`reset`), `GET /api/state`, `GET /api/manifest`.
+- `maze.html` — raw WebGL 1 renderer (no CDN, no framework).
+- `test_maze.py` — 23 retained tests (native bridge + HTTP contract).
+
+Run (Flask and g++ required):
+
+```
+cd iGeek
+python3 -m venv .venv-maze && . .venv-maze/bin/activate
+pip install flask pytest
+python -m pytest Worlds/Maze2D/test_maze.py -v
+python Worlds/Maze2D/maze_server.py        # http://127.0.0.1:5006/
+```
+
+Controls: arrows/WASD move, `S` solve, `R` reset, `N` new seeded maze.
+State is per-browser (HttpOnly cookie, in-memory); restart clears mazes.
+
+
 ASCII terminal maze-solver environment. A seeded recursive-backtracker generates
 a perfect (tree) maze; an A* solver finds the unique shortest path from start
 `S` to exit `E`. Headless (no Windows console I/O, no `GetAsyncKeyState`) so it

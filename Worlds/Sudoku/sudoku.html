@@ -1,0 +1,394 @@
+<!doctype html>
+<!-- Copyright AStarship <https://astarship.net>. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101e1a">
+<title>Sudoku World · iGeek</title>
+<style>
+  :root { color-scheme: dark; --ink: #f7f0df; --muted: #b8c9bf; --gold: #dec184; --line: #40594c; --night: #101e1a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--ink); font: 15px/1.5 "Trebuchet MS", Arial, sans-serif; }
+  header, main, footer { max-width: 1120px; margin: auto; }
+  header { padding: 26px 28px 20px; display: flex; justify-content: space-between; align-items: end; gap: 16px; }
+  .eyebrow { color: var(--gold); font-size: 10px; text-transform: uppercase; letter-spacing: .22em; }
+  h1 { font: normal 36px/1.2 Georgia, serif; margin: 5px 0 0; }
+  .renderer { font-size: 12px; color: var(--muted); }
+  main { padding: 0 28px; }
+  .ledger { display: flex; flex-wrap: wrap; gap: 12px 28px; border-block: 1px solid var(--line); padding: 12px 0; font-size: 12px; color: var(--muted); }
+  .ledger strong { color: var(--ink); font-size: 16px; margin-left: 6px; font-variant-numeric: tabular-nums; }
+  #completion { margin-left: auto; color: var(--gold); }
+  .workspace { display: grid; grid-template-columns: minmax(0, 640px) minmax(240px, 1fr); gap: 32px; padding-top: 24px; align-items: start; }
+  .board-wrap { position: relative; width: 100%; aspect-ratio: 1; box-shadow: 0 12px 35px #0003; }
+  #board { display: block; width: 100%; height: 100%; }
+  #grid { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(9, 1fr); }
+  .grid-row { display: grid; grid-template-columns: repeat(9, 1fr); min-height: 0; }
+  button, input, select { font: inherit; }
+  button, input, select { min-height: 44px; border: 1px solid #718774; border-radius: 4px; background: #1c372b; color: var(--ink); padding: 8px 12px; }
+  button { cursor: pointer; touch-action: manipulation; }
+  button:hover:not(:disabled) { background: #2c4a38; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  #grid .cell { background: transparent; border: 0; border-radius: 0; min-height: 0; min-width: 0; padding: 0; display: grid; place-items: center; position: relative; color: #f7f0df; font-size: clamp(19px, 3.2vw, 35px); font-variant-numeric: tabular-nums; }
+  #grid .cell.user-digit { color: #f3d08a; }
+  #grid .cell:focus-visible { outline: 3px solid #f3d792; outline-offset: -5px; }
+  .pencil { position: absolute; inset: 8%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); font-size: clamp(8px, 1.1vw, 13px); color: #c2d4c6; align-items: center; }
+  .pencil span { text-align: center; }
+  #graphics-error { position: absolute; inset: 0; z-index: 2; background: #18251f; padding: 28px; display: grid; place-content: center; text-align: center; border: 1px solid #dfaa92; }
+  [hidden] { display: none !important; }
+  .board-note { color: var(--muted); font-size: 12px; margin: 12px 0; }
+  h2 { font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: .15em; margin: 0 0 12px; }
+  #selection { font: normal 24px Georgia, serif; margin: 0 0 6px; }
+  #candidate-info { font-size: 13px; color: var(--muted); min-height: 42px; margin: 0 0 16px; }
+  .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .numpad button { font-size: 22px; min-height: 50px; }
+  .numpad .erase { grid-column: 1 / -1; font-size: 14px; }
+  .toggle { display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 13px; }
+  .toggle input { min-height: 20px; width: 18px; height: 18px; accent-color: var(--gold); }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #hint { background: var(--gold); border-color: var(--gold); color: #18271c; }
+  #hint:hover:not(:disabled) { background: #f1d69f; }
+  #solve { grid-column: 1 / -1; }
+  .solver-note { color: var(--muted); font-size: 11px; margin: 8px 0 20px; }
+  .new-form { border-top: 1px solid var(--line); padding-top: 18px; display: grid; grid-template-columns: 1fr 100px; gap: 8px; }
+  .new-form label { display: grid; gap: 5px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .new-form input, .new-form select { width: 100%; min-width: 0; }
+  #new-puzzle { grid-column: 1 / -1; }
+  .message-row { display: flex; align-items: center; gap: 12px; min-height: 62px; }
+  #message { margin: 12px 0; }
+  #message[data-error="true"] { color: #ffbdaf; }
+  footer { padding: 14px 28px 28px; color: var(--muted); font-size: 12px; }
+  footer p { margin: 4px 0; }
+  @media (max-width: 720px) {
+    header { padding: 20px 16px 16px; }
+    h1 { font-size: 29px; }
+    main { padding: 0 12px; }
+    .workspace { grid-template-columns: 1fr; gap: 22px; padding-top: 16px; }
+    aside { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+    aside .inspect { grid-column: 1 / -1; }
+    .new-form { align-content: start; }
+    #grid .cell { font-size: clamp(19px, 5vw, 35px); }
+    .pencil { font-size: clamp(8px, 2.2vw, 13px); }
+    #completion { margin-left: 0; }
+    footer { padding-inline: 16px; }
+  }
+  @media (max-width: 380px) { aside { display: block; } .renderer { max-width: 100px; text-align: right; } }
+</style>
+</head>
+<body>
+<header>
+  <div><div class="eyebrow">iGeek / Play environments</div><h1>Sudoku World</h1></div>
+  <div class="renderer" id="renderer-status">WebGL · initializing</div>
+</header>
+<main>
+  <section class="ledger" aria-label="Puzzle progress">
+    <span>Puzzle <strong id="puzzle-name">—</strong></span>
+    <span>Filled <strong id="filled">—</strong></span>
+    <span>Moves <strong id="moves">0</strong></span>
+    <span>Hints <strong id="hints">0</strong></span>
+    <span id="completion" role="status">Connecting…</span>
+  </section>
+  <div class="workspace">
+    <section aria-label="Sudoku board">
+      <div class="board-wrap">
+        <canvas id="board" aria-hidden="true"></canvas>
+        <div id="grid" role="grid" aria-label="Sudoku, nine rows and nine columns" aria-describedby="keyboard-help" aria-rowcount="9" aria-colcount="9" aria-busy="true"></div>
+        <div id="graphics-error" role="alert" hidden></div>
+      </div>
+      <p class="board-note" id="keyboard-help">Select a cell. Arrow keys navigate · 1–9 enter · Delete / Backspace erase.</p>
+    </section>
+    <aside aria-label="Puzzle controls">
+      <div class="inspect"><h2>Selected cell</h2><p id="selection">Row 1 · Column 1</p><p id="candidate-info">Waiting for puzzle…</p></div>
+      <div>
+        <div class="numpad" id="numpad" aria-label="Enter a digit"></div>
+        <label class="toggle"><input type="checkbox" id="candidates-toggle">Show legal candidates</label>
+        <div class="actions"><button id="hint" disabled>Hint cell</button><button id="reset" disabled>Reset</button><button id="solve" disabled>Solve with search</button></div>
+        <p class="solver-note">Deterministic backtracking search, not a trained AI. Hints use the search solver.</p>
+      </div>
+      <form class="new-form" id="new-form">
+        <label for="puzzle">Puzzle<select id="puzzle"><option value="classic">Classic</option><option value="generated">Generated</option></select></label>
+        <label for="seed">Seed<input id="seed" type="number" step="1" min="0" max="4294967295" value="42" required></label>
+        <button id="new-puzzle" type="submit">New puzzle</button>
+      </form>
+    </aside>
+  </div>
+  <div class="message-row"><p id="message" role="status" aria-live="polite">Connecting to the Sudoku service…</p><button id="retry" hidden>Reconnect</button></div>
+</main>
+<footer>
+  <p>Fill every row, column and 3 × 3 box with the digits 1–9, without repeats. Given digits are locked.</p>
+  <p>GPU-rendered cells, grid and highlights · accessible HTML digit overlay. Generated puzzles are seeded; uniqueness is not promised.</p>
+</footer>
+<script>
+  'use strict';
+  const ById = (id) => document.getElementById(id);
+  const Board = ById('board');
+  const Grid = ById('grid');
+  let state = null;
+  let selected = 0;
+  let pending = false;
+  let gl = null;
+  let program = null;
+  let buffer = null;
+  let position_location = -1;
+  let color_location = -1;
+  let graphics_ready = false;
+  const Cells = [];
+  const DigitButtons = [];
+
+  function Message(text, error = false) {
+    ById('message').textContent = text;
+    ById('message').dataset.error = String(error);
+  }
+
+  function GraphicsError(text) {
+    graphics_ready = false;
+    ById('graphics-error').textContent = text;
+    ById('graphics-error').hidden = false;
+    ById('renderer-status').textContent = 'WebGL unavailable';
+    Grid.hidden = true;
+    UpdateControls();
+  }
+
+  function Compile(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(shader) || 'Shader compilation failed');
+    }
+    return shader;
+  }
+
+  function InitGraphics() {
+    try {
+      gl = Board.getContext('webgl', { alpha: false, antialias: true });
+      if (!gl) throw new Error('WebGL is not supported or enabled in this browser.');
+      program = gl.createProgram();
+      const vertex_shader = Compile(gl.VERTEX_SHADER, 'attribute vec2 a_position; attribute vec3 a_color; varying vec3 v_color; void main(){gl_Position=vec4(a_position.x/4.5-1.0,1.0-a_position.y/4.5,0.0,1.0);v_color=a_color;}');
+      const fragment_shader = Compile(gl.FRAGMENT_SHADER, 'precision mediump float; varying vec3 v_color; void main(){gl_FragColor=vec4(v_color,1.0);}');
+      gl.attachShader(program, vertex_shader);
+      gl.attachShader(program, fragment_shader);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('WebGL shader link failed.');
+      gl.deleteShader(vertex_shader);
+      gl.deleteShader(fragment_shader);
+      buffer = gl.createBuffer();
+      position_location = gl.getAttribLocation(program, 'a_position');
+      color_location = gl.getAttribLocation(program, 'a_color');
+      graphics_ready = true;
+      Grid.hidden = false;
+      ById('graphics-error').hidden = true;
+      ById('renderer-status').textContent = 'WebGL · live';
+      Draw();
+      UpdateControls();
+    } catch (error) {
+      GraphicsError(`${error.message} A WebGL-capable browser is required; no substitute board is rendered.`);
+    }
+  }
+
+  function Draw() {
+    if (!graphics_ready || gl.isContextLost()) return;
+    const size = Math.max(1, Math.round(Board.clientWidth * Math.min(window.devicePixelRatio || 1, 3)));
+    if (Board.width !== size || Board.height !== size) { Board.width = size; Board.height = size; }
+    gl.viewport(0, 0, size, size);
+    const vertices = [];
+    function Rect(x, y, width, height, color) {
+      for (const point of [[x,y], [x+width,y], [x,y+height], [x,y+height], [x+width,y], [x+width,y+height]]) {
+        vertices.push(point[0], point[1], ...color);
+      }
+    }
+    const row = Math.floor(selected / 9);
+    const col = selected % 9;
+    for (let cell = 0; cell < 81; ++cell) {
+      const r = Math.floor(cell / 9);
+      const c = cell % 9;
+      let color = (Math.floor(r / 3) + Math.floor(c / 3)) % 2 ? [.095,.18,.14] : [.11,.205,.16];
+      if (r === row || c === col || (Math.floor(r / 3) === Math.floor(row / 3) && Math.floor(c / 3) === Math.floor(col / 3))) color = [.15,.26,.20];
+      if (state && state.board[selected] && state.board[cell] === state.board[selected]) color = [.23,.32,.22];
+      if (cell === selected) color = [.36,.37,.23];
+      Rect(c, r, 1, 1, color);
+    }
+    for (let i = 0; i <= 9; ++i) {
+      const width = i % 3 === 0 ? .045 : .015;
+      const color = i % 3 === 0 ? [.62,.65,.49] : [.29,.39,.31];
+      Rect(Math.max(0, i - width / 2), 0, width, 9, color);
+      Rect(0, Math.max(0, i - width / 2), 9, width, color);
+    }
+    const edge = .04;
+    const gold = [.94,.80,.49];
+    Rect(col, row, 1, edge, gold);
+    Rect(col, row + 1 - edge, 1, edge, gold);
+    Rect(col, row, edge, 1, gold);
+    Rect(col + 1 - edge, row, edge, 1, gold);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(position_location);
+    gl.vertexAttribPointer(position_location, 2, gl.FLOAT, false, 20, 0);
+    gl.enableVertexAttribArray(color_location);
+    gl.vertexAttribPointer(color_location, 3, gl.FLOAT, false, 20, 8);
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 5);
+  }
+
+  function UpdateControls() {
+    const locked = pending || !state || !graphics_ready;
+    for (const button of DigitButtons) button.disabled = locked || state.givens[selected] || state.done;
+    ById('hint').disabled = locked || state.givens[selected] || state.done;
+    ById('reset').disabled = pending || !state;
+    ById('solve').disabled = pending || !state || state.done;
+    ById('new-puzzle').disabled = pending;
+    ById('retry').disabled = pending;
+    Grid.setAttribute('aria-busy', String(pending));
+  }
+
+  function Render() {
+    for (let cell = 0; cell < 81; ++cell) {
+      const element = Cells[cell];
+      const digit = state ? state.board[cell] : 0;
+      const given = state && state.givens[cell];
+      element.textContent = digit || '';
+      element.classList.toggle('user-digit', !!digit && !given);
+      element.tabIndex = cell === selected ? 0 : -1;
+      element.setAttribute('aria-selected', String(cell === selected));
+      element.setAttribute('aria-readonly', String(!!given));
+      let label = `Row ${Math.floor(cell / 9) + 1}, column ${cell % 9 + 1}, ${digit || 'empty'}${given ? ', given, locked' : ''}`;
+      if (state && !digit) label += `, candidates ${state.candidates[cell].join(', ') || 'none'}`;
+      element.setAttribute('aria-label', label);
+      if (state && !digit && ById('candidates-toggle').checked) {
+        const pencil = document.createElement('span');
+        pencil.className = 'pencil';
+        pencil.setAttribute('aria-hidden', 'true');
+        for (let number = 1; number <= 9; ++number) {
+          const mark = document.createElement('span');
+          mark.textContent = state.candidates[cell].includes(number) ? number : '';
+          pencil.append(mark);
+        }
+        element.append(pencil);
+      }
+    }
+    ById('selection').textContent = `Row ${Math.floor(selected / 9) + 1} · Column ${selected % 9 + 1}`;
+    if (state) {
+      ById('candidate-info').textContent = state.givens[selected] ? 'Given digit · this cell is locked.' : state.board[selected] ? `Entered ${state.board[selected]}. Erase or replace this digit.` : `Legal candidates: ${state.candidates[selected].join(' · ') || 'none — revisit earlier entries'}`;
+      ById('puzzle-name').textContent = state.puzzle;
+      ById('filled').textContent = `${state.board.filter(Boolean).length} / 81`;
+      ById('moves').textContent = state.moves;
+      ById('hints').textContent = state.hints;
+      ById('completion').textContent = state.done ? 'Complete · valid solution' : 'In progress';
+    }
+    UpdateControls();
+    Draw();
+  }
+
+  function SelectCell(cell, focus = false) {
+    selected = cell;
+    Render();
+    if (focus) Cells[cell].focus({ preventScroll: true });
+  }
+
+  async function Request(path, payload) {
+    if (pending) return;
+    pending = true;
+    UpdateControls();
+    Message('Working…');
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    try {
+      const options = { method: payload ? 'POST' : 'GET', signal: controller.signal, cache: 'no-store' };
+      if (payload) { options.headers = { 'Content-Type': 'application/json' }; options.body = JSON.stringify(payload); }
+      const response = await fetch(path, options);
+      const result = await response.json();
+      if (!response.ok || result.error) throw new Error(result.error || result.message || `Request failed (${response.status})`);
+      if (!Array.isArray(result.board) || result.board.length !== 81 || !Array.isArray(result.givens) || result.givens.length !== 81 || !Array.isArray(result.candidates) || result.candidates.length !== 81) throw new Error('Invalid puzzle response from service.');
+      state = result;
+      ById('retry').hidden = true;
+      Render();
+      Message(result.message || (state.done ? 'Puzzle complete.' : 'Puzzle ready.'));
+    } catch (error) {
+      Message(error.name === 'AbortError' ? 'Service timed out. Reconnect to check the latest board before continuing.' : error.message, true);
+      ById('retry').hidden = false;
+      if (!state) ById('completion').textContent = 'Not connected';
+    } finally {
+      clearTimeout(timer);
+      pending = false;
+      UpdateControls();
+    }
+  }
+
+  function Place(digit) {
+    if (pending || !state || !graphics_ready) return;
+    if (state.givens[selected]) { Message('Given digits are locked. Select an empty or editable cell.', true); return; }
+    if (state.done) return;
+    Request('/api/action', { action: 'place', cell: selected, digit });
+  }
+
+  for (let row = 0; row < 9; ++row) {
+    const row_element = document.createElement('div');
+    row_element.className = 'grid-row';
+    row_element.setAttribute('role', 'row');
+    row_element.setAttribute('aria-rowindex', row + 1);
+    for (let col = 0; col < 9; ++col) {
+      const cell = row * 9 + col;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'cell';
+      button.dataset.cell = cell;
+      button.setAttribute('role', 'gridcell');
+      button.setAttribute('aria-colindex', col + 1);
+      button.addEventListener('click', () => SelectCell(cell, true));
+      button.addEventListener('focus', () => { if (selected !== cell) SelectCell(cell); });
+      row_element.append(button);
+      Cells.push(button);
+    }
+    Grid.append(row_element);
+  }
+  for (let digit = 1; digit <= 10; ++digit) {
+    const value = digit === 10 ? 0 : digit;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = value || 'Erase cell';
+    button.setAttribute('aria-label', value ? `Enter ${value}` : 'Erase selected cell');
+    button.dataset.digit = value;
+    if (!value) button.className = 'erase';
+    button.addEventListener('click', () => Place(value));
+    ById('numpad').append(button);
+    DigitButtons.push(button);
+  }
+  Grid.addEventListener('keydown', (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    const row = Math.floor(selected / 9);
+    const col = selected % 9;
+    let next = selected;
+    if (event.key === 'ArrowUp') next = Math.max(0, row - 1) * 9 + col;
+    else if (event.key === 'ArrowDown') next = Math.min(8, row + 1) * 9 + col;
+    else if (event.key === 'ArrowLeft') next = row * 9 + Math.max(0, col - 1);
+    else if (event.key === 'ArrowRight') next = row * 9 + Math.min(8, col + 1);
+    else if (/^[1-9]$/.test(event.key)) Place(Number(event.key));
+    else if (event.key === 'Delete' || event.key === 'Backspace' || event.key === '0') Place(0);
+    else return;
+    event.preventDefault();
+    if (next !== selected) SelectCell(next, true);
+  });
+  ById('hint').addEventListener('click', () => Request('/api/action', { action: 'hint', cell: selected }));
+  ById('solve').addEventListener('click', () => Request('/api/action', { action: 'solve' }));
+  ById('reset').addEventListener('click', () => Request('/api/action', { action: 'reset' }));
+  ById('retry').addEventListener('click', () => Request('/api/state'));
+  ById('candidates-toggle').addEventListener('change', Render);
+  ById('new-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const seed = Number(ById('seed').value);
+    if (!Number.isSafeInteger(seed) || seed < 0 || seed > 4294967295) { Message('Seed must be an integer from 0 to 4294967295.', true); return; }
+    Request('/api/new', { puzzle: ById('puzzle').value, seed });
+  });
+  Board.addEventListener('webglcontextlost', (event) => {
+    event.preventDefault();
+    GraphicsError('WebGL context lost. Waiting for the browser to restore graphics; your puzzle is preserved.');
+  });
+  Board.addEventListener('webglcontextrestored', InitGraphics);
+  window.addEventListener('resize', Draw);
+  Render();
+  InitGraphics();
+  Request('/api/state');
+</script>
+</body>
+</html>

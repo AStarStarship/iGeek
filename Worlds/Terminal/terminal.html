@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Terminal World — iGeek Demo</title>
+<style>
+  body {font-family: "Courier New", monospace; background:#111; color:#eee; margin:0; padding:0;}
+  #terminal {background:#222; color:#eee; font-family: "Courier New", monospace; width:80ch; height:24rem; padding:10px; white-space:pre; overflow:auto; user-select:none;}
+  .prompt {color:#ffd;}
+  .command {color:#9f9;}
+  .output {color:#cf4f4f;}
+  .controls {background:#222; padding:10px; margin:10px 0; border:1px solid #444; border-radius:6px;}
+  .controls select, .controls button {font-family: inherit; font-size: 1rem; padding: 4px 8px; margin-right: 4px; background:#333; color:#eee; border:none; border-radius:4px; cursor:pointer;}
+  .controls button:hover {background:#444;}
+  .controls button:disabled {background:#111; cursor:default;}
+  .log {font-size:0.75rem; color:#aaa; margin-top:4px; max-height:80px; overflow-y:auto;}
+</style>
+</head>
+<body>
+<h1>Terminal World — iGeek Demo</h1>
+<div id="terminal" class="prompt">TerminalWorld mini-Linux (Star-reducer kernel)
+user@host:~/$ </div>
+
+<div class="controls">
+  <select id="command">
+    <option value="pwd">pwd</option>
+    <option value="ls">ls</option>
+    <option value="echo">echo</option>
+    <option value="cd">cd</option>
+    <option value="clear">clear</option>
+    <option value="exit">exit</option>
+  </select>
+  <button onclick="sendCommand()">Execute</button>
+  <button onclick="resetSession()">New Session</button>
+  <span id="round"></span>
+</div>
+
+<div class="log" id="log"></div>
+
+<script>
+function fetchJSON(url, opts = {}) {
+  return fetch(url, opts).then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  });
+}
+
+async function sendCommand() {
+  const cmdSelect = document.getElementById('command');
+  const action = cmdSelect.value;
+  try {
+    const data = await fetchJSON('/api/action', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action})
+    });
+    updateUI(data);
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadState() {
+  try {
+    const data = await fetchJSON('/api/state');
+    const term = document.getElementById('terminal');
+    const roundEl = document.getElementById('round');
+    if (term) term.textContent = data.observation.screen || '---';
+    if (roundEl) roundEl.textContent = `Round: ${data.round}`;
+    const log = document.getElementById('log');
+    if (log) {
+      log.innerHTML = '';
+      if (data.info) {
+        const entry = document.createElement('div');
+        entry.textContent = `${data.info.cmd_name} (round ${data.round})`;
+        log.appendChild(entry);
+      }
+    }
+    // Reprompt after each action
+    if (data.observation.running) {
+      setTimeout(refreshPrompt, 100);
+    }
+  } catch(e) {
+    console.error(e);
+    setTimeout(loadState, 500);
+  }
+}
+
+function refreshPrompt() {
+  fetchJSON('/api/action', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action: 'pwd'})
+  }).then(data => {
+    updateUI(data);
+    const term = document.getElementById('terminal');
+    if (term) {
+      // Insert prompt at cursor position (simulated)
+      term.textContent = data.observation.cwd + ' $ ';
+    }
+  }).catch(() => {});
+}
+
+function updateUI(data) {
+  const term = document.getElementById('terminal');
+  if (term) {
+    // Show screen summary and cwd
+    term.textContent = data.observation.screen || data.observation.cwd || '---';
+    // Append a prompt line
+    term.textContent += '\nuser@host:~/$ ';
+  }
+  const log = document.getElementById('log');
+  if (log) {
+    const entry = document.createElement('div');
+    entry.className = 'output';
+    entry.textContent = data.info?.cmd_name || '?';
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+async function resetSession() {
+  try {
+    await fetchJSON('/api/new', {method:'POST'});
+    loadState();
+  } catch(e) {
+    alert('New session failed: ' + e.message);
+  }
+}
+
+// Initialize
+loadState();
+</script>
+</body>
+</html>

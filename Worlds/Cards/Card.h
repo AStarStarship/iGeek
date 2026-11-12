@@ -1,7 +1,7 @@
 // Copyright AStarship <https://astarship.net>.
-  #pragma once
-#ifndef _iGeekCardsWorldCoreSCARD_DECL
-#define _iGeekCardsWorldCoreSCARD_DECL
+#pragma once
+#ifndef _iGeekCardsWorldCardH
+#define _iGeekCardsWorldCardH
 #include <_Config.h>
 #if _Seam >= _iGeekCardsWorldCore
 namespace iGeek {
@@ -74,4 +74,4 @@ struct Card {
 }       //< namespace CardsWorld
 }       //< namespace iGeek
 #endif  //< _Seam >= _iGeekCardsWorldCore
-#endif  //< _iGeekCardsWorldCoreSCARD_DECL
+#endif  //< _iGeekCardsWorldCardH

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PolygonWorld — genetic shape matching</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    background: #0b0f14; color: #c9d1d9;
+    font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 14px; border-bottom: 1px solid #21262d; background: #11161c;
+  }
+  h1 { font-size: 14px; margin: 0; letter-spacing: .08em; text-transform: uppercase; color: #e6edf3; }
+  .port {
+    font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: #f0b429; border: 1px solid #6b4a12; background: #2a1f08;
+    border-radius: 4px; padding: 2px 7px;
+  }
+  .controls { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+  button, select {
+    background: #1b2129; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px;
+    padding: 6px 12px; font: inherit; cursor: pointer;
+  }
+  button:hover, select:hover { background: #262d36; }
+  button:active { transform: translateY(1px); }
+  main { position: relative; flex: 1; min-height: 0; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #error {
+    position: absolute; inset: 0; display: none; place-items: center;
+    padding: 24px; text-align: center; color: #ff7b72; background: #0b0f14;
+  }
+  footer {
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    padding: 8px 14px; border-top: 1px solid #21262d; background: #11161c;
+    font-size: 12px; color: #8b949e;
+  }
+  footer b { color: #e6edf3; font-weight: 600; }
+  .bar { width: 150px; height: 6px; background: #1b2129; border-radius: 3px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #1f6feb, #3fb950); }
+  .legend { display: flex; gap: 12px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+  #message { color: #58a6ff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PolygonWorld</h1>
+  <span class="port" title="Native GA is inert; see /api/native-probe">port GA</span>
+  <div class="controls">
+    <select id="target" title="Target shape">
+      <option value="circle">circle</option>
+      <option value="square">square</option>
+      <option value="triangle">triangle</option>
+      <option value="star">star</option>
+    </select>
+    <button id="evolve1" title="Space">Evolve x1</button>
+    <button id="evolve10" title="E">Evolve x10</button>
+    <button id="reset" title="R">Reset</button>
+    <button id="new" title="N">New seed</button>
+  </div>
+</header>
+<main>
+  <canvas id="view"></canvas>
+  <div id="error">WebGL is unavailable in this browser. The demo needs WebGL 1.</div>
+</main>
+<footer>
+  <span>gen <b id="gen">0</b>/<b id="maxgen">200</b></span>
+  <span>best <b id="fitness">–</b></span>
+  <span class="bar"><i id="fitbar"></i></span>
+  <span>seed <b id="seed">–</b></span>
+  <span class="legend">
+    <span><span class="swatch" style="background:#3fd0e0"></span>best</span>
+    <span><span class="swatch" style="background:#f2b733"></span>target</span>
+    <span><span class="swatch" style="background:#5a6b7c"></span>population</span>
+  </span>
+  <span id="message">loading…</span>
+</footer>
+<script>
+"use strict";
+
+const canvas = document.getElementById("view");
+const gl = canvas.getContext("webgl", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+if (!gl) {
+  document.getElementById("error").style.display = "grid";
+  throw new Error("WebGL unavailable");
+}
+
+const VertexShader = `
+attribute vec2 aPos;
+attribute vec4 aColor;
+uniform vec2 uScale;
+varying vec4 vColor;
+void main() {
+  gl_Position = vec4(aPos * uScale, 0.0, 1.0);
+  vColor = aColor;
+}`;
+const FragmentShader = `
+precision mediump float;
+varying vec4 vColor;
+void main() { gl_FragColor = vColor; }`;
+
+function Compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+const program = gl.createProgram();
+gl.attachShader(program, Compile(gl.VERTEX_SHADER, VertexShader));
+gl.attachShader(program, Compile(gl.FRAGMENT_SHADER, FragmentShader));
+gl.linkProgram(program);
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+gl.useProgram(program);
+
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+const aPos = gl.getAttribLocation(program, "aPos");
+const aColor = gl.getAttribLocation(program, "aColor");
+const uScale = gl.getUniformLocation(program, "uScale");
+const stride = 6 * 4;
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+gl.enableVertexAttribArray(aColor);
+gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 8);
+
+const PopulationColor = [0.35, 0.42, 0.50, 0.05];
+const BestColor = [0.25, 0.82, 0.88, 0.30];
+const TargetColor = [0.95, 0.72, 0.20, 1.0];
+
+let state = null;
+let triangleVerts = 0;
+let lineVerts = 0;
+
+function PushTriangle(out, ax, ay, bx, by, cx, cy, color) {
+  out.push(ax, ay, color[0], color[1], color[2], color[3],
+           bx, by, color[0], color[1], color[2], color[3],
+           cx, cy, color[0], color[1], color[2], color[3]);
+}
+
+function PushPolygon(out, flat, color) {
+  // flat = [x0,y0,x1,y1,...]; triangle fan around the centroid.
+  const n = flat.length / 2;
+  let cx = 0, cy = 0;
+  for (let i = 0; i < n; i++) { cx += flat[i * 2]; cy += flat[i * 2 + 1]; }
+  cx /= n; cy /= n;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    PushTriangle(out, cx, cy, flat[i * 2], flat[i * 2 + 1], flat[j * 2], flat[j * 2 + 1], color);
+  }
+}
+
+function BuildGeometry() {
+  if (!state) return;
+  const triangles = [];
+  for (const genome of state.population) PushPolygon(triangles, genome, PopulationColor);
+  PushPolygon(triangles, state.best, BestColor);
+  triangleVerts = triangles.length / 6;
+
+  const lines = [];
+  for (const point of state.target) lines.push(point[0], point[1], ...TargetColor);
+  lineVerts = state.target.length;
+
+  const all = new Float32Array(triangles.length + lines.length);
+  all.set(triangles, 0);
+  all.set(lines, triangles.length);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, all, gl.STATIC_DRAW);
+  Draw();
+}
+
+function Resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, canvas.clientWidth * dpr);
+  const height = Math.max(1, canvas.clientHeight * dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  Draw();
+}
+
+function Draw() {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0.043, 0.059, 0.078, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (!state) return;
+  const aspect = canvas.width / canvas.height;
+  const k = 0.88;
+  let sx, sy;
+  if (aspect >= 1) { sy = k; sx = k / aspect; } else { sx = k; sy = k * aspect; }
+  gl.uniform2f(uScale, sx, -sy);
+  gl.drawArrays(gl.TRIANGLES, 0, triangleVerts);
+  gl.drawArrays(gl.LINE_LOOP, triangleVerts, lineVerts);
+}
+
+function Paint() {
+  if (!state) return;
+  document.getElementById("gen").textContent = state.generation;
+  document.getElementById("maxgen").textContent = state.max_generations;
+  document.getElementById("fitness").textContent = state.best_fitness.toFixed(4);
+  document.getElementById("fitbar").style.width = Math.max(0, Math.min(100, state.best_fitness * 100)) + "%";
+  document.getElementById("seed").textContent = state.seed;
+  document.getElementById("target").value = state.target_name;
+  document.getElementById("message").textContent = state.message;
+  BuildGeometry();
+}
+
+let pending = false;
+async function Call(path, body) {
+  if (pending) return;
+  pending = true;
+  try {
+    const response = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: body === undefined ? {} : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("message").textContent = data.error || "request failed";
+      return;
+    }
+    state = data;
+    Paint();
+  } catch (error) {
+    document.getElementById("message").textContent = "network error: " + error.message;
+  } finally {
+    pending = false;
+  }
+}
+
+const Evolve = (g) => Call("/api/action", { action: "evolve", generations: g });
+const Reset = () => Call("/api/action", { action: "reset" });
+function NewRun() {
+  Call("/api/new", {
+    target: document.getElementById("target").value,
+    seed: Math.floor(Math.random() * 9007199254740990) + 1,
+  });
+}
+function SwitchTarget() {
+  Call("/api/new", {
+    target: document.getElementById("target").value,
+    seed: state ? state.seed : 1,
+  });
+}
+
+document.getElementById("evolve1").addEventListener("click", () => Evolve(1));
+document.getElementById("evolve10").addEventListener("click", () => Evolve(10));
+document.getElementById("reset").addEventListener("click", Reset);
+document.getElementById("new").addEventListener("click", NewRun);
+document.getElementById("target").addEventListener("change", SwitchTarget);
+window.addEventListener("resize", Resize);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === " ") { event.preventDefault(); Evolve(1); }
+  if (event.key === "e" || event.key === "E") Evolve(10);
+  if (event.key === "r" || event.key === "R") Reset();
+  if (event.key === "n" || event.key === "N") NewRun();
+});
+
+Resize();
+Call("/api/state");
+</script>
+</body>
+</html>

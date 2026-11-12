@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TileWorld - FOV Navigation (Flask demo)</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0a0a12; color: #eee; }
+    #wrap { display: flex; flex-direction: column; align-items: center; padding: 16px; }
+    #c { display: block; background: #0d0d16; border-radius: 8px; }
+    #controls {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.6); padding: 12px; border-radius: 6px;
+      z-index: 10; max-width: 230px;
+    }
+    .btn {
+      width: 100%; margin: 4px 0; padding: 6px;
+      background: #0066cc; color: #fff; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 14px;
+    }
+    .btn:hover { background: #0055aa; }
+    .btn.active { background: #00c07f; }
+    .readout { margin-top: 6px; font-family: monospace; font-size: 13px; }
+    .val { color: #ffe600; }
+    #banner { margin-top: 8px; font-weight: bold; font-size: 15px; min-height: 20px; }
+    .help { margin-top: 8px; font-size: 11px; color: #999; }
+    .enemy { margin-top: 4px; font-family: monospace; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <div><b>TileWorld</b> (Flask demo)</div>
+    <div class="help">Arrows/WASD to move<br>Goal: bring all 3 enemies into
+      your field of view</div>
+    <button class="btn active" id="m-human" onclick="setMode('human')">Human</button>
+    <button class="btn" id="m-seek" onclick="setMode('seek')">Seek bot</button>
+    <button class="btn" id="m-random" onclick="setMode('random')">Random bot</button>
+    <button class="btn" onclick="reset()">Reset episode</button>
+    <div id="banner"></div>
+    <div class="enemy" id="e0">E1: never</div>
+    <div class="enemy" id="e1">E2: never</div>
+    <div class="enemy" id="e2">E3: never</div>
+    <div class="readout">seen: <span class="val" id="seen">0</span> / 3</div>
+    <div class="readout">steps: <span class="val" id="steps">0</span> / 512</div>
+    <div class="readout">reward: <span class="val" id="reward">0</span></div>
+  </div>
+  <div id="wrap"><canvas id="c"></canvas></div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    const CELL = 24;
+    let state = null;
+    const seenEver = [false, false, false];
+
+    const socket = io();
+    socket.on("state", function (s) {
+      const resetHud = s.steps < state?.steps && s.seen === 0;
+      if (resetHud || !state) { seenEver[0]=seenEver[1]=seenEver[2]=false; }
+      state = s;
+      canvas.width = s.width * CELL;
+      canvas.height = s.height * CELL;
+      s.enemies.forEach(function (e, i) { if (e[2]) seenEver[i] = true; });
+      updateHud(s);
+      draw();
+    });
+
+    function updateHud(s) {
+      document.getElementById("seen").textContent =
+        (s.seen & 1) + ((s.seen & 2) >> 1) + ((s.seen & 4) >> 2);
+      document.getElementById("steps").textContent = s.steps;
+      document.getElementById("reward").textContent = s.reward;
+      document.getElementById("m-human").classList.toggle("active", s.mode === "human");
+      document.getElementById("m-seek").classList.toggle("active", s.mode === "seek");
+      document.getElementById("m-random").classList.toggle("active", s.mode === "random");
+      for (let i = 0; i < 3; i++) {
+        const el = document.getElementById("e" + i);
+        const seen = !!(s.seen & (1 << i));
+        const now = !!s.enemies[i][3];
+        el.textContent = "E" + (i+1) + ": " +
+          (seen ? (now ? "in view" : "lost") : (seenEver[i] ? "seen before" : "never"));
+        el.style.color = seen ? (now ? "#4ade80" : "#888") : "#666";
+      }
+      const b = document.getElementById("banner");
+      if (s.done) {
+        b.textContent = (s.seen & 7) === 7 ? "ALL ENEMIES SEEN +1.0" : "STEP BUDGET EXHAUSTED";
+        b.style.color = (s.seen & 7) === 7 ? "#4ade80" : "#ef4444";
+      } else b.textContent = "";
+    }
+
+    function setMode(m) { socket.emit("setmode", { mode: m }); fetch("/setmode/" + m); }
+    function reset() { fetch("/reset"); }
+
+    function draw() {
+      if (!state) return;
+      const { width, height, walls, visible, player, enemies } = state;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const px = x * CELL, py = y * CELL;
+          if (walls[y][x]) {
+            ctx.fillStyle = "#2b2b45";
+            ctx.fillRect(px, py, CELL, CELL);
+          } else if (visible[y * width + x]) {
+            ctx.fillStyle = "#181826";
+            ctx.fillRect(px, py, CELL, CELL);
+          } else {
+            ctx.fillStyle = "#0c0c14";
+            ctx.fillRect(px, py, CELL, CELL);
+          }
+        }
+      }
+      // enemies — only rendered while in the player's field of view
+      for (const e of enemies) {
+        if (!e[3]) continue;
+        const cx = e[0] * CELL + CELL / 2, cy = e[1] * CELL + CELL / 2;
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath(); ctx.arc(cx, cy, CELL * 0.36, 0, 2 * Math.PI); ctx.fill();
+        ctx.fillStyle = "#1a0505";
+        ctx.beginPath(); ctx.arc(cx - 4, cy - 2, 2.5, 0, 2 * Math.PI); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 4, cy - 2, 2.5, 0, 2 * Math.PI); ctx.fill();
+      }
+      // player
+      const px = player[0] * CELL + CELL / 2, py = player[1] * CELL + CELL / 2;
+      ctx.fillStyle = "#ffe600";
+      ctx.fillRect(px - CELL * 0.3, py - CELL * 0.3, CELL * 0.6, CELL * 0.6);
+    }
+
+    const KEYMAP = {
+      ArrowUp: 0, ArrowDown: 1, ArrowLeft: 2, ArrowRight: 3,
+      w: 0, s: 1, a: 2, d: 3, W: 0, S: 1, A: 2, D: 3,
+    };
+    document.addEventListener("keydown", function (e) {
+      const d = KEYMAP[e.key];
+      if (d === undefined) return;
+      e.preventDefault();
+      if (state && state.mode === "human") socket.emit("move", { dir: d });
+    });
+  </script>
+</body>
+</html>

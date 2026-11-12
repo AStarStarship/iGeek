@@ -40,10 +40,11 @@
 #define _iGeekClassicalMdp			41
 #define _iGeekClassicalSat			42
 #define _iGeekClassicalGame			43
-#define _iGeekPacWorldCore			44
-#define _iGeekPacWorldRelease			45
 #define _iGeekPolygonWorldCore			46
 #define _iGeekPolygonWorldRelease			47
+
+#define _iGeekPacWorldCore			44
+#define _iGeekPacWorldRelease			45
 #define _iGeekPrisonerWorldCore			48
 #define _iGeekPrisonerWorldRelease			49
 #define _iGeekSpaceWorldCore			50
@@ -68,6 +69,7 @@
 #define _iGeekRelease			66
 #define _SeamN _iGeekRelease
 
+
 /* ASCIICrabs/_ConfigHeader.h unconditionally #undef's _Seam, so _Config.h has
    to be pulled in *before* the restore below. World and seam headers re-include
    it; restoring afterwards keeps every "#if _Seam >= gate" in the tree alive for
@@ -75,12 +77,14 @@
    "#if _Seam >= _CrabsCore" degrades to "0 >= 0" (true), which compiles blocks
    whose dependencies were never included. */
 #include "../../ASCIICrabs/_Config.h"
-#define _Seam _SeamN
 
 /* Preludes: ROut/RefOut, Error/IsError, String/CATypeCH and the math kernels
    are used by Test.hpp and Dic.hpp with two-phase lookup, so they must be
    declared before those headers are parsed. */
 #include "../../ASCIICrabs/Math.hxx"
+/* Restored after Math.hxx: that include pulls _Config.h, whose _ConfigHeader.h
+   #undefs _Seam, so setting it once before the includes does not survive. */
+#define _Seam _SeamN
 #include "../../ASCIICrabs/_Package.hxx"
 #include "../../ASCIICrabs/Test.hpp"
 #include "../_Package.hxx"

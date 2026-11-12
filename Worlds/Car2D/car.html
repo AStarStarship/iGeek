@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarWorld 2D — native ACarEnv</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    background: #0d1117; color: #c9d1d9;
+    font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    touch-action: none;
+  }
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 14px; border-bottom: 1px solid #21262d; background: #161b22;
+  }
+  h1 { font-size: 14px; margin: 0; letter-spacing: .08em; text-transform: uppercase; color: #e6edf3; }
+  .badge { color: #8b949e; font-size: 12px; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  select, button {
+    background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px;
+    padding: 6px 12px; font: inherit; cursor: pointer;
+  }
+  button:hover, select:hover { background: #30363d; }
+  button:active { transform: translateY(1px); }
+  main { position: relative; flex: 1; min-height: 0; }
+  canvas#view { display: block; width: 100%; height: 100%; }
+  canvas#wheel {
+    position: absolute; left: 16px; bottom: 16px;
+    width: 150px; height: 150px; border-radius: 50%;
+    opacity: .82; cursor: grab; touch-action: none;
+  }
+  canvas#wheel:active { cursor: grabbing; }
+  .hint {
+    position: absolute; left: 16px; top: 12px; max-width: 240px;
+    padding: 10px 12px; background: rgba(22,27,34,.85); border: 1px solid #21262d;
+    border-radius: 8px; font-size: 12px; color: #8b949e; line-height: 1.6;
+  }
+  .hint b { color: #e6edf3; }
+  footer {
+    display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+    padding: 8px 14px; border-top: 1px solid #21262d; background: #161b22;
+    font-size: 12px; color: #8b949e;
+  }
+  footer b { color: #e6edf3; font-weight: 600; }
+  #message { color: #58a6ff; }
+  #done { color: #3fb950; font-weight: 700; }
+  #lap { color: #d2a8ff; }
+  #error {
+    position: absolute; inset: 0; display: none; place-items: center;
+    padding: 24px; text-align: center; color: #ff7b72; background: #0d1117;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>CarWorld 2D</h1>
+  <span class="badge">native ACarEnv + reverse gear / port 5005</span>
+  <div class="controls">
+    <select id="scenario" title="scenario"></select>
+    <button id="pilot" title="Space">Auto pilot</button>
+    <button id="newseed" title="N">New seed</button>
+  </div>
+</header>
+<main>
+  <canvas id="view"></canvas>
+  <canvas id="wheel"></canvas>
+  <div class="hint">
+    <b>Drive:</b> drag the wheel to steer.<br>
+    <b>W</b>/<b>&#8593;</b> forward &nbsp; <b>D</b>/<b>&#8595;</b> reverse<br>
+    <b>&#8592;</b>/<b>&#8594;</b> steer &middot; <b>Space</b> autopilot &middot; <b>N</b> new seed
+  </div>
+  <div id="error">WebGL is unavailable in this browser. The demo needs WebGL 1.</div>
+</main>
+<footer>
+  <span>scenario <b id="sc">–</b></span>
+  <span>seed <b id="seed">–</b></span>
+  <span>speed <b id="speed">–</b> m/s</span>
+  <span>gear <b id="gear">–</b></span>
+  <span id="lap">LAP –</span>
+  <span id="done"></span>
+  <span id="message">loading…</span>
+</footer>
+<script>
+"use strict";
+
+const canvas = document.getElementById("view");
+const gl = canvas.getContext("webgl", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+if (!gl) {
+  document.getElementById("error").style.display = "grid";
+  throw new Error("WebGL unavailable");
+}
+
+const VertexShader = `
+attribute vec2 aPos;
+attribute vec3 aColor;
+uniform vec2 uScale;
+uniform vec2 uOffset;
+varying vec3 vColor;
+void main() {
+  gl_Position = vec4(aPos * uScale + uOffset, 0.0, 1.0);
+  vColor = aColor;
+}`;
+
+const FragmentShader = `
+precision mediump float;
+varying vec3 vColor;
+void main() { gl_FragColor = vec4(vColor, 1.0); }`;
+
+function Compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error(gl.getShaderInfoLog(shader));
+  }
+  return shader;
+}
+
+const program = gl.createProgram();
+gl.attachShader(program, Compile(gl.VERTEX_SHADER, VertexShader));
+gl.attachShader(program, Compile(gl.FRAGMENT_SHADER, FragmentShader));
+gl.linkProgram(program);
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+  throw new Error(gl.getProgramInfoLog(program));
+}
+gl.useProgram(program);
+
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+const aPos = gl.getAttribLocation(program, "aPos");
+const aColor = gl.getAttribLocation(program, "aColor");
+const uScale = gl.getUniformLocation(program, "uScale");
+const uOffset = gl.getUniformLocation(program, "uOffset");
+const stride = 5 * 4;
+
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+gl.enableVertexAttribArray(aColor);
+gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, stride, 8);
+
+// Tile material -> colour (VehicleMap.hxx: Asphalt 100 .. Wall 106).
+const Material = {
+  100: [0.20, 0.22, 0.25], // asphalt
+  101: [0.42, 0.34, 0.24], // gravel
+  102: [0.55, 0.76, 0.86], // ice
+  103: [0.16, 0.36, 0.18], // grass
+  104: [0.34, 0.30, 0.20], // uphill
+  105: [0.26, 0.31, 0.22], // downhill
+  106: [0.11, 0.11, 0.13], // wall
+};
+const CarColor = [0.95, 0.55, 0.15];
+const NoseColor = [0.93, 0.97, 1.00];
+const RouteColor = [0.12, 0.44, 0.92];
+
+const WorldW = 120, WorldH = 64;
+
+let map = null;      // {width, height, tiles, route}
+let state = null;    // car state
+let vertexCount = 0;
+
+function PushQuad(ax, ay, bx, by, c) {
+  return [
+    ax, ay, c[0], c[1], c[2],
+    bx, ay, c[0], c[1], c[2],
+    bx, by, c[0], c[1], c[2],
+    ax, ay, c[0], c[1], c[2],
+    bx, by, c[0], c[1], c[2],
+    ax, by, c[0], c[1], c[2],
+  ];
+}
+
+// Rotated rectangle centred on (cx, cy), length L along +x local, width W.
+function PushCar(cx, cy, heading, L, W, color) {
+  const cos = Math.cos(heading), sin = Math.sin(heading);
+  const hx = L / 2, hy = W / 2;
+  const corners = [[hx, hy], [hx, -hy], [-hx, -hy], [-hx, hy]];
+  const pts = corners.map(([lx, ly]) => [
+    cx + lx * cos - ly * sin,
+    cy + lx * sin + ly * cos,
+  ]);
+  const verts = [];
+  verts.push(...PushQuad(pts[0][0], pts[0][1], pts[2][0], pts[2][1], color));
+  // nose triangle for heading
+  const nx = cx + (hx + 0.7) * cos, ny = cy + (hx + 0.7) * sin;
+  verts.push(nx, ny, NoseColor[0], NoseColor[1], NoseColor[2],
+             pts[0][0], pts[0][1], NoseColor[0], NoseColor[1], NoseColor[2],
+             pts[1][0], pts[1][1], NoseColor[0], NoseColor[1], NoseColor[2]);
+  return verts;
+}
+
+// Thick segment (thin quad) between two route points.
+function PushSegment(ax, ay, bx, by, width, color) {
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.hypot(dx, dy) || 1;
+  const px = -dy / len * width / 2, py = dx / len * width / 2;
+  return PushQuad(ax + px, ay + py, bx + px, by + py, color);
+}
+
+function BuildGeometry() {
+  if (!map) return;
+  const verts = [];
+  const { tiles, route } = map;
+  for (let y = 0; y < WorldH; y++) {
+    for (let x = 0; x < WorldW; x++) {
+      const t = tiles[y * WorldW + x];
+      const color = Material[t] || Material[100];
+      verts.push(...PushQuad(x, y, x + 1, y + 1, color));
+    }
+  }
+  if (route && route.length > 1) {
+    for (let i = 0; i < route.length - 1; i++) {
+      const a = route[i], b = route[i + 1];
+      verts.push(...PushSegment(a[0], a[1], b[0], b[1], 0.35, RouteColor));
+    }
+    // Close the loop visually for the track (route is one lap).
+    if (state && state.scenario === "track") {
+      const a = route[route.length - 1], b = route[0];
+      verts.push(...PushSegment(a[0], a[1], b[0], b[1], 0.35, RouteColor));
+    }
+  }
+  if (state) {
+    verts.push(...PushCar(state.x, state.y, state.heading, 4.6, 2.0, CarColor));
+  }
+  vertexCount = verts.length / 5;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
+  Draw();
+}
+
+function Resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, canvas.clientWidth * dpr);
+  const height = Math.max(1, canvas.clientHeight * dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  Draw();
+}
+
+function Draw() {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0.05, 0.06, 0.08, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (!map || !vertexCount) return;
+  const ppm = Math.min(canvas.width / WorldW, canvas.height / WorldH) * 0.98;
+  const drawnW = WorldW * ppm, drawnH = WorldH * ppm;
+  const offsetX = (canvas.width - drawnW) / 2;
+  const offsetY = (canvas.height - drawnH) / 2;
+  gl.uniform2f(uScale, 2 * ppm / canvas.width, 2 * ppm / canvas.height);
+  gl.uniform2f(uOffset, 2 * offsetX / canvas.width - 1,
+                         2 * offsetY / canvas.height - 1);
+  gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+}
+
+// ---- Steering wheel ----
+const wheelCanvas = document.getElementById("wheel");
+const wctx = wheelCanvas.getContext("2d");
+const MaxWheelAngle = 1.5; // rad at full steer
+const wheel = { angle: 0, dragging: false, lastX: 0 };
+const control = { throttle: 0, reverse: 0 };
+
+function wheelSteer() { return wheel.angle / MaxWheelAngle * 0.55; }
+
+function drawWheel() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = wheelCanvas.clientWidth, h = wheelCanvas.clientHeight;
+  if (wheelCanvas.width !== w * dpr || wheelCanvas.height !== h * dpr) {
+    wheelCanvas.width = w * dpr;
+    wheelCanvas.height = h * dpr;
+  }
+  wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  wctx.clearRect(0, 0, w, h);
+  const cx = w / 2, cy = h / 2, r = w / 2 - 8;
+  // rim
+  wctx.beginPath(); wctx.arc(cx, cy, r, 0, Math.PI * 2);
+  wctx.strokeStyle = "#30363d"; wctx.lineWidth = 10; wctx.stroke();
+  wctx.save(); wctx.translate(cx, cy); wctx.rotate(wheel.angle);
+  wctx.beginPath();
+  wctx.moveTo(0, -r + 6); wctx.lineTo(0, r - 6);
+  wctx.moveTo(-r + 6, 0); wctx.lineTo(r - 6, 0);
+  wctx.strokeStyle = "#8b949e"; wctx.lineWidth = 4; wctx.stroke();
+  wctx.restore();
+  // neutral tick at 12 o'clock
+  wctx.beginPath(); wctx.arc(cx, cy - r + 4, 4, 0, Math.PI * 2);
+  wctx.fillStyle = "#58a6ff"; wctx.fill();
+}
+
+wheelCanvas.addEventListener("pointerdown", (e) => {
+  wheel.dragging = true; wheel.lastX = e.clientX;
+  wheelCanvas.setPointerCapture(e.pointerId);
+});
+wheelCanvas.addEventListener("pointermove", (e) => {
+  if (!wheel.dragging) return;
+  wheel.angle += (e.clientX - wheel.lastX) * 0.015;
+  wheel.lastX = e.clientX;
+  wheel.angle = Math.max(-MaxWheelAngle, Math.min(MaxWheelAngle, wheel.angle));
+  drawWheel();
+});
+wheelCanvas.addEventListener("pointerup", () => { wheel.dragging = false; });
+wheelCanvas.addEventListener("pointercancel", () => { wheel.dragging = false; });
+
+// Spring the wheel back to centre when released.
+function springBack() {
+  if (!wheel.dragging && wheel.angle !== 0) {
+    wheel.angle *= 0.80;
+    if (Math.abs(wheel.angle) < 0.005) wheel.angle = 0;
+    drawWheel();
+  }
+}
+
+// ---- Lap timing (track) ----
+let inStartBox = true, laps = 0, lapStart = performance.now();
+
+function updateLap(st) {
+  if (st.scenario !== "track") return;
+  const inBox = Math.abs(st.x - 60) < 4 && Math.abs(st.y - 48) < 6;
+  if (inBox && !inStartBox) {
+    laps++;
+    inStartBox = true;
+    lapStart = performance.now();
+  } else if (!inBox && inStartBox) {
+    inStartBox = false;
+  }
+}
+
+function fmtLap() {
+  const ms = performance.now() - lapStart;
+  const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60;
+  return (m ? m + ":" : "") + s + "." + Math.floor(ms % 1000 / 100);
+}
+
+// ---- State / paint ----
+function Paint() {
+  if (state) {
+    document.getElementById("sc").textContent = state.scenario;
+    document.getElementById("seed").textContent = state.seed;
+    document.getElementById("speed").textContent = state.speed.toFixed(2);
+    document.getElementById("gear").textContent = state.forward < -0.1 ? "R" : "D";
+    document.getElementById("done").textContent =
+      state.done ? ("STATUS: " + state.status.toUpperCase()) : "";
+    updateLap(state);
+    document.getElementById("lap").textContent =
+      state.scenario === "track" ? ("LAP " + laps + " · " + fmtLap()) : "LAP –";
+  }
+  BuildGeometry();
+}
+
+let pending = false;
+
+async function Call(path, body) {
+  if (pending) return;
+  pending = true;
+  try {
+    const response = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: body === undefined ? {} : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("message").textContent = data.error || "request failed";
+      return;
+    }
+    if (body !== undefined && data.state === undefined && data.map === undefined) {
+      const st = await fetch("/api/state", { credentials: "same-origin" }).then(r => r.json());
+      if (st.state) state = st.state;
+      if (st.map) map = st.map;
+    } else {
+      if (data.state) { state = data.state; }
+      if (data.map) { map = data.map; }
+    }
+    document.getElementById("message").textContent = "";
+    Paint();
+  } catch (error) {
+    document.getElementById("message").textContent = "network error: " + error.message;
+  } finally {
+    pending = false;
+  }
+}
+
+const Scenarios = ["straight", "curves", "obstacle", "gravel", "ice",
+                   "uphill", "downhill", "launch", "ice_curves", "track"];
+
+const select = document.getElementById("scenario");
+Scenarios.forEach((s) => {
+  const opt = document.createElement("option");
+  opt.value = s; opt.textContent = s;
+  select.appendChild(opt);
+});
+select.value = "track";
+
+function NewSeed() {
+  const scenario = select.value;
+  const seed = Math.floor(Math.random() * 4294967295);
+  laps = 0; inStartBox = true; lapStart = performance.now();
+  Call("/api/new", { scenario, seed });
+}
+
+select.addEventListener("change", () => NewSeed());
+document.getElementById("newseed").addEventListener("click", NewSeed);
+document.getElementById("pilot").addEventListener("click", () => Call("/api/action", { action: "pilot", frames: 10 }));
+
+// Continuous manual control from wheel + pedals.
+function sendManual() {
+  const steer = wheelSteer();
+  const throttle = control.throttle;
+  const reverse = control.reverse;
+  if (throttle || Math.abs(steer) > 0.005) {
+    Call("/api/action", { action: "manual", frames: 5, steer, throttle, reverse });
+  }
+}
+setInterval(sendManual, 100);
+setInterval(springBack, 30);
+
+window.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "w": case "W": case "ArrowUp":
+      control.throttle = 1; control.reverse = 0; event.preventDefault(); break;
+    case "d": case "D": case "ArrowDown":
+      control.throttle = 1; control.reverse = 1; event.preventDefault(); break;
+    case "ArrowLeft": case "a": case "A":
+      wheel.angle = -MaxWheelAngle; event.preventDefault(); break;
+    case "ArrowRight":
+      wheel.angle = MaxWheelAngle; event.preventDefault(); break;
+    case " ":
+      Call("/api/action", { action: "pilot", frames: 10 }); event.preventDefault(); break;
+    case "n": case "N": NewSeed(); break;
+  }
+});
+window.addEventListener("keyup", (event) => {
+  switch (event.key) {
+    case "w": case "W": case "ArrowUp":
+    case "d": case "D": case "ArrowDown":
+      control.throttle = 0; break;
+    case "ArrowLeft": case "a": case "A":
+    case "ArrowRight":
+      if (!wheel.dragging) wheel.angle = 0; break;
+  }
+});
+
+window.addEventListener("resize", Resize);
+
+Resize();
+drawWheel();
+NewSeed();
+</script>
+</body>
+</html>

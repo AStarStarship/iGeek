@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prisoner's Dilemma — iGeek Demo</title>
+<style>
+  body {font-family: Arial, sans-serif; background:#111; color:#eee; margin:0; padding:20px;}
+  h1 {font-size:1.4rem; margin-bottom:10px;}
+  .panel {background:#222; border:1px solid #444; border-radius:6px; padding:12px; margin:12px 0;}
+  .agent {display:flex; align-items:center; justify-content:space-between;}
+  .score {font-family:monospace; font-size:0.85rem; margin-top:4px;}
+  .action-buttons {margin-top:8px; display:grid; grid-template-columns:repeat(2,120px); gap:8px;}
+  .btn {padding:6px 10px; font-size:0.85rem; cursor:pointer; background:#333; color:#eee; border:none; border-radius:4px;}
+  .btn:hover {background:#444;}
+  .btn:disabled {background:#111; cursor:default;}
+  .log {font-family:monospace; font-size:0.75rem; color:#aaa; margin-top:6px; max-height:120px; overflow-y:auto;}
+  .round-counter {font-size:1rem; margin:8px 0;}
+  #ai-strategy {font-weight:bold; color:#ffd;}
+</style>
+</head>
+<body>
+<h1>Prisoner's Dilemma — iGeek Demo</h1>
+
+<div class="round-counter">Round: <span id="round">0</span> / <span id="maxrounds">64</span></div>
+
+<div class="panel">
+  <div class="agent">
+    <span>You (Player)</span>
+    <span id="player-total" class="score">0</span>
+  </div>
+  <div class="agent">
+    <span>AI Opponent</span>
+    <span id="ai-total" class="score">0</span>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="agent">
+    <span>Your Action</span>
+    <button class="btn" onclick="doAction('cooperate')">Cooperate</button>
+    <button class="btn" onclick="doAction('defect')">Defect</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div>Current round outcome</div>
+  <div class="log" id="log"></div>
+</div>
+
+<div class="panel">
+  <div>Last 20 round rewards (bars)</div>
+  <div id="history"></div>
+</div>
+
+<script>
+function fetchJSON(url, opts = {}) {
+  return fetch(url, opts).then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  });
+}
+
+async function loadState() {
+  try {
+    const data = await fetchJSON('/api/state');
+    document.getElementById('round').textContent = data.round;
+    document.getElementById('ai-total').textContent = data.ai_total;
+    document.getElementById('player-total').textContent = data.player_total;
+    const strategyEl = document.getElementById('ai-strategy');
+    if (strategyEl) strategyEl.textContent = data.ai_strategy || 'tit-for-tat';
+    document.getElementById('maxrounds').textContent = data.max_rounds || 64;
+
+    const log = document.getElementById('log');
+    if (log) {
+      log.innerHTML = '';
+      if (data.last_valid_state) {
+        const s = data.last_valid_state;
+        const outcomes = {
+          CC: 'Both Cooperate → R=3',
+          DD: 'Both Defect → P=1',
+          CD: 'You Cooperate, AI Defect → You S=0, AI T=5',
+          DC: 'You Defect, AI Cooperate → You T=5, AI S=0',
+        };
+        const last = data.last_valid_state;
+        const keyStr = ['CC','DD','CD','DC']
+          [(last.player_action===0&&last.ai_action===0)?0:(last.player_action===1&&last.ai_action===1)?1:(last.player_action===0&&last.ai_action===1)?2:3];
+        const key = keyStr || '?';
+        log.textContent = `Round ${s.round}: you ${s.player_action}, AI ${s.ai_action} → ${outcomes[key]} (you ${s.player_reward}, AI ${s.ai_reward})`;
+      }
+    }
+
+    // render last 20 round reward bars
+    const histDiv = document.getElementById('history');
+    if (histDiv) {
+      histDiv.innerHTML = '';
+      if (data.history && data.history.length > 0) {
+        const maxR = Math.max(...data.history.map(h => h.player_reward + h.ai_reward)) || 1;
+        data.history.slice(-20).forEach((h, i) => {
+          const barP = Math.round((h.player_reward / maxR) * 60);
+          const barA = Math.round((h.ai_reward / maxR) * 60);
+          const entry = document.createElement('div');
+          entry.style.display = 'flex'; entry.style.gap = '4px'; entry.style.alignItems = 'flex-end';
+          entry.innerHTML = `
+            <div style="width:${barP}px;height:8px;background:#4f9f4f;"></div>
+            <div style="width:${barA}px;height:8px;background:#cf4f4f;"></div>
+            <span style="font-size:0.65rem;margin-left:4px;">R${i+1}</span>
+          `;
+          histDiv.appendChild(entry);
+        });
+      }
+    }
+  } catch(e) {
+    console.error(e);
+    setTimeout(loadState, 500);
+  }
+}
+
+async function doAction(action) {
+  try {
+    const data = await fetchJSON('/api/action', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action})
+    });
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    loadState();
+  } catch(e) {
+    alert('Action failed: ' + e.message);
+  }
+}
+
+async function startNew() {
+  try {
+    const data = await fetchJSON('/api/new', {method:'POST'});
+    loadState();
+  } catch(e) {
+    alert('New session failed: ' + e.message);
+  }
+}
+
+// Initialize
+loadState();
+</script>
+</body>
+</html>
