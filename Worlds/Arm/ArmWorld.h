@@ -21,13 +21,18 @@ struct ArmMetrics {
 };
 /* Two-link planar reacher environment. Deterministic per seed:
 Reset draws the target from the seed; Step advances physics.
-Target is inside the joint-bounded quarter workspace (r in [0.25, 0.38],
-angle in [15 deg, 75 deg]) so the task is always solvable.  */
+Targets are FK images of joint angles in [15 deg, 75 deg], so every
+sample has a legal configuration, including with unequal link lengths.
+Kinematic reachability does not guarantee feasibility under torque limits. */
 class AArmEnv : public Environment {
  public:
   enum { ObservationLength = 6, MaxFrames = 2000 };
   static constexpr FPC GoalRadius = 0.02f;
-  AArmEnv(ArmParams& params, IUD seed = 7);
+  AArmEnv();
+  AArmEnv(const ArmParams& params, IUD seed = 7);
+  /* Swap in a new parameter set and re-seed. Lets a caller (e.g. a demo)
+     default-construct the env, then supply params before the first Reset. */
+  void ResetParams(const ArmParams& params) { params_ = params; }
   void Reset();
   void ResetSeed(IUD seed) { seed_ = seed; Reset(); }
   BOL Done() { return status_ != ArmRunning; }

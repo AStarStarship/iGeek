@@ -1,0 +1,265 @@
+<!doctype html>
+<!-- Copyright AStarship <https://astarship.net>. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#09281f">
+<title>Cards World · iGeek</title>
+<style>
+  :root { color-scheme: dark; --ink: #f7f0df; --muted: #bdd0c2; --gold: #dec184; --line: #65816a; --night: #081c16; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--ink); font: 15px/1.5 "Trebuchet MS", Arial, sans-serif; }
+  button, select { font: inherit; }
+  button, select, summary { -webkit-tap-highlight-color: transparent; }
+  button, select { min-height: 46px; border: 1px solid #738b76; border-radius: 5px; color: var(--ink); background: #163d30; padding: 10px 20px; }
+  button { cursor: pointer; transition: background .15s, transform .15s; }
+  button:hover:not(:disabled) { background: #27533e; transform: translateY(-1px); }
+  button:disabled, select:disabled { opacity: .48; cursor: not-allowed; }
+  :focus-visible { outline: 3px solid #f3d792; outline-offset: 4px; }
+  header { max-width: 1280px; margin: auto; padding: 24px 32px 18px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+  .eyebrow { text-transform: uppercase; font-size: 10px; letter-spacing: .24em; color: var(--gold); font-weight: bold; }
+  h1 { font: normal 32px/1.15 Georgia, serif; margin: 4px 0 0; letter-spacing: -.03em; }
+  .mode { display: flex; align-items: center; gap: 12px; }
+  .mode label { font-size: 12px; color: var(--muted); }
+  main { max-width: 1280px; margin: auto; padding: 0 32px; }
+  .ledger { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #345342; padding: 13px 2px; gap: 16px; }
+  .ledger p { margin: 0; color: var(--muted); font-size: 12px; }
+  .ledger strong { font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; margin-left: 10px; }
+  #connection { font-size: 12px; color: var(--muted); }
+  #connection[data-error="true"] { color: #ffbdaf; }
+  #retry { min-height: 34px; padding: 4px 12px; margin-left: 10px; font-size: 12px; }
+  .table { position: relative; isolation: isolate; min-height: 575px; border: 1px solid #8b7950; border-radius: 120px; padding: 27px 50px 30px; background: radial-gradient(ellipse at 50% 38%, #235b43 0%, #123f2e 60%, #0c3025 100%); box-shadow: inset 0 0 0 8px #102c22, inset 0 0 0 9px #6a6744, 0 16px 45px #0003; }
+  .table::before { content: ""; position: absolute; inset: 18px; z-index: -1; border: 1px solid #c6b77d33; border-radius: 106px; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Cpath d='M0 0h1v1H0zM3 3h1v1H3z' fill='%23fff' opacity='.035'/%3E%3C/svg%3E"); }
+  .seat { text-align: center; }
+  .seat-title { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 0 0 9px; font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: #d0ddc9; }
+  .total { letter-spacing: 0; border: 1px solid #a5b79266; border-radius: 20px; padding: 1px 9px; color: #fff6dd; font-size: 12px; }
+  .hand { min-height: 118px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px; }
+  .card { display: block; width: clamp(64px, 7.4vw, 87px); height: auto; border-radius: 6px; box-shadow: 0 5px 8px #0005; }
+  .community { text-align: center; margin: 15px auto 18px; }
+  .table-mark { color: #d8ceaa; font: italic 18px Georgia, serif; letter-spacing: .02em; margin: 7px 0 11px; }
+  #board { min-height: 0; }
+  #board:not(:empty) { margin: 12px 0; }
+  .pot { display: inline-flex; align-items: center; gap: 9px; padding: 5px 15px; border: 1px solid #d3bd7d77; border-radius: 30px; color: #e7d8af; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
+  #pot { font-size: 16px; letter-spacing: 0; color: #fff1d1; font-variant-numeric: tabular-nums; }
+  .chip { width: 21px; height: 21px; border: 3px dashed #f3d79a; border-radius: 50%; background: #9e733a; box-shadow: inset 0 0 0 2px #654b2d; }
+  .controls { text-align: center; padding: 21px 0 16px; }
+  #phase { color: var(--gold); }
+  #message { margin: 5px auto 16px; min-height: 24px; font-size: 16px; max-width: 750px; }
+  .action-row { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
+  #actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  #actions button { min-width: 92px; }
+  #new-round { background: var(--gold); border-color: var(--gold); color: #152b20; font-weight: bold; }
+  #new-round:hover:not(:disabled) { background: #f0d69d; }
+  .support { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 16px 0 25px; border-top: 1px solid #345342; color: var(--muted); font-size: 12px; }
+  details { max-width: 760px; }
+  summary { cursor: pointer; min-height: 30px; color: #e5d4ac; }
+  #rules { white-space: pre-line; margin: 6px 0 0; }
+  footer { text-align: right; }
+  [hidden] { display: none !important; }
+  @media (min-width: 900px) { .table { min-height: 575px; } .hand { min-height: 122px; } }
+  @media (max-width: 640px) {
+    header { padding: 20px 18px 14px; align-items: flex-start; }
+    h1 { font-size: 27px; }
+    .mode { display: block; }
+    .mode label { display: block; margin-bottom: 4px; }
+    select { max-width: 166px; padding: 8px; font-size: 13px; }
+    main { padding: 0 12px; }
+    .ledger { flex-wrap: wrap; gap: 6px 12px; padding: 10px 6px; }
+    .ledger strong { font-size: 16px; margin-left: 5px; }
+    .connection-wrap { flex-basis: 100%; }
+    .table { border-radius: 45px; padding: 24px 16px; min-height: 490px; }
+    .table::before { border-radius: 33px; inset: 13px; }
+    .card { width: clamp(47px, 14vw, 72px); }
+    .hand { min-height: 103px; gap: 6px; }
+    .community { margin: 18px 0; }
+    .table-mark { font-size: 16px; }
+    #message { font-size: 14px; }
+    #actions button { min-width: 75px; padding: 10px 14px; }
+    .support { flex-direction: column; gap: 12px; padding-left: 6px; padding-right: 6px; }
+    footer { text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div><div class="eyebrow">iGeek / Play environments</div><h1>Cards World</h1></div>
+  <div class="mode"><label for="game-select">Choose your table</label><select id="game-select" disabled><option value="blackjack">Blackjack</option><option value="poker">Texas Hold’em</option></select></div>
+</header>
+<main>
+  <section class="ledger" aria-label="Table balances and connection">
+    <p>Your bankroll <strong id="bankroll">—</strong></p>
+    <p id="opponent-balance-wrap">Opponent <strong id="opponent-bankroll">—</strong></p>
+    <div class="connection-wrap"><span id="connection" role="status" aria-live="polite">Connecting to table…</span><button id="retry" hidden>Reconnect</button></div>
+  </section>
+  <section class="table" aria-label="Playing table" aria-busy="true" id="table">
+    <section class="seat" aria-labelledby="opponent-label">
+      <h2 class="seat-title"><span id="opponent-label">Dealer</span><span class="total" id="opponent-total" hidden></span></h2>
+      <div id="opponent" class="hand" aria-label="Opponent’s cards"></div>
+    </section>
+    <section class="community" aria-label="Community cards and pot">
+      <p class="table-mark" id="table-mark">The house of cards</p>
+      <div id="board" class="hand" aria-label="Community cards"></div>
+      <div class="pot"><span class="chip" aria-hidden="true"></span>Pot <strong id="pot">—</strong></div>
+    </section>
+    <section class="seat" aria-labelledby="player-label">
+      <h2 class="seat-title"><span id="player-label">Your hand</span><span class="total" id="player-total" hidden></span></h2>
+      <div id="player" class="hand" aria-label="Your cards"></div>
+    </section>
+  </section>
+  <section class="controls" aria-label="Round controls">
+    <div id="phase" class="eyebrow">Take a seat</div>
+    <p id="message" role="status" aria-live="polite">Loading your table…</p>
+    <div class="action-row"><div id="actions" aria-label="Available actions"></div><button id="new-round" disabled>New round</button></div>
+  </section>
+  <div class="support">
+    <details><summary>Table rules</summary><p id="rules">Rules will appear when the table connects.</p></details>
+    <footer>For play. No real money.<br>Copyright AStarship · iGeek</footer>
+  </div>
+</main>
+<script>
+'use strict';
+const Ranks = {A: 'Ace', J: 'Jack', Q: 'Queen', K: 'King'};
+const Suits = {c: 'clubs', d: 'diamonds', h: 'hearts', s: 'spades'};
+const Labels = {hit: 'Hit', stand: 'Stand', double: 'Double', fold: 'Fold', check: 'Check', call: 'Call', raise: 'Raise'};
+let state = null;
+let pending = false;
+let connected = false;
+
+function Element(id) {
+  return document.getElementById(id);
+}
+
+function CardLabel(id) {
+  if (id === 'back') return 'Face-down card';
+  const rank = id.slice(0, -1);
+  return `${Ranks[rank] || rank} of ${Suits[id.slice(-1)]}`;
+}
+
+function RenderCards(id, cards) {
+  const target = Element(id);
+  target.replaceChildren();
+  for (const card of cards) {
+    const image = document.createElement('img');
+    image.className = 'card';
+    image.src = `/assets/cards/${card}.svg`;
+    image.alt = CardLabel(card);
+    image.width = 240;
+    image.height = 336;
+    image.draggable = false;
+    target.append(image);
+  }
+}
+
+function SetControls() {
+  const blocked = pending || !connected || !state;
+  Element('game-select').disabled = blocked;
+  Element('new-round').disabled = blocked || !state.done;
+  Element('retry').disabled = pending;
+  Element('table').setAttribute('aria-busy', String(pending));
+  for (const button of Element('actions').querySelectorAll('button')) {
+    button.disabled = blocked || state.done;
+  }
+}
+
+function ValidateState(next) {
+  if (!next || !['blackjack', 'poker'].includes(next.game) ||
+      typeof next.done !== 'boolean' || typeof next.message !== 'string' ||
+      typeof next.phase !== 'string' || typeof next.rules !== 'string') {
+    throw new Error('Invalid table response.');
+  }
+  for (const name of ['player', 'opponent', 'board']) {
+    if (!Array.isArray(next[name]) || !next[name].every(card =>
+      typeof card === 'string' && /^(back|(?:A|[2-9]|10|J|Q|K)[cdhs])$/.test(card))) {
+      throw new Error('Invalid card data.');
+    }
+  }
+  if (!Array.isArray(next.actions) || !next.actions.every(action => Object.hasOwn(Labels, action))) {
+    throw new Error('Invalid table actions.');
+  }
+  for (const name of ['bankroll', 'opponent_bankroll', 'pot']) {
+    if (!Number.isFinite(next[name])) throw new Error('Invalid balance data.');
+  }
+  for (const name of ['player_total', 'opponent_total']) {
+    if (next[name] !== null && !Number.isFinite(next[name])) throw new Error('Invalid hand total.');
+  }
+  return next;
+}
+
+function Render() {
+  Element('game-select').value = state.game;
+  Element('bankroll').textContent = state.bankroll.toLocaleString();
+  Element('opponent-bankroll').textContent = state.opponent_bankroll.toLocaleString();
+  Element('pot').textContent = state.pot.toLocaleString();
+  Element('opponent-label').textContent = state.game === 'blackjack' ? 'Dealer' : 'Opponent';
+  Element('table-mark').textContent = state.game === 'blackjack' ? 'Blackjack · Twenty-one' : 'Texas Hold’em · Heads-up fixed limit';
+  Element('phase').textContent = state.phase.replaceAll('_', ' ');
+  Element('message').textContent = state.message;
+  Element('rules').textContent = state.rules;
+  for (const name of ['player', 'opponent', 'board']) RenderCards(name, state[name]);
+  for (const name of ['player', 'opponent']) {
+    const total = Element(`${name}-total`);
+    const value = state[`${name}_total`];
+    total.hidden = value === null;
+    total.textContent = value === null ? '' : `Total ${value}`;
+  }
+  Element('actions').replaceChildren();
+  for (const action of new Set(state.actions)) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = Labels[action];
+    button.dataset.action = action;
+    button.addEventListener('click', () => Request('/api/action', {action}));
+    Element('actions').append(button);
+  }
+}
+
+async function Request(path, payload) {
+  if (pending) return;
+  pending = true;
+  SetControls();
+  Element('connection').textContent = 'Updating table…';
+  Element('connection').dataset.error = 'false';
+  Element('retry').hidden = true;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const options = {method: payload ? 'POST' : 'GET', cache: 'no-store', signal: controller.signal};
+    if (payload) {
+      options.headers = {'Content-Type': 'application/json'};
+      options.body = JSON.stringify(payload);
+    }
+    const response = await fetch(path, options);
+    if (!response.ok) throw new Error(`Table request failed (HTTP ${response.status}).`);
+    state = ValidateState(await response.json());
+    connected = true;
+    Render();
+    Element('connection').textContent = 'Connected · Table live';
+  } catch (error) {
+    connected = false;
+    if (state) Element('game-select').value = state.game;
+    Element('connection').textContent = error.name === 'AbortError'
+      ? 'Connection timed out. Reconnect to sync the table.'
+      : `${error.message} Reconnect to sync the table.`;
+    Element('connection').dataset.error = 'true';
+    Element('retry').hidden = false;
+    Element('message').textContent = 'Table paused — reconnect before your next move.';
+  } finally {
+    clearTimeout(timeout);
+    pending = false;
+    SetControls();
+  }
+}
+
+Element('new-round').addEventListener('click', () => {
+  if (state && state.done) Request('/api/new', {game: state.game});
+});
+Element('game-select').addEventListener('change', event => {
+  Request('/api/new', {game: event.target.value});
+});
+Element('retry').addEventListener('click', () => Request('/api/state'));
+Request('/api/state');
+</script>
+</body>
+</html>

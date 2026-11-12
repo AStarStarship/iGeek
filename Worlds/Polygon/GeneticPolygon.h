@@ -2,129 +2,111 @@
 #pragma once
 #ifndef _iGeekPolygonWorldGeneticPolygonH
 #define _iGeekPolygonWorldGeneticPolygonH
-namespace iGeek {
+#include "../../Gym.h"
+#include "../../EnvironmentManifest.h"
 
-/* A class that represents a this that can morph through a genetic algorithm with other shapes.
- */
-class GeneticPolygon : public Polygon {
-  public:
-  static const FPD maxRandomPoints     = 5.00,     //< And this was for what again?
-                   defaultAngle        = 0.00,     //< The default angle of orientation.
-                   matingPercent       = 0.10,     //< The percent of the population that mates durring each generation.
-                   minorMutationVector = 0.50,     //< Note sure if I need this or what its for because I didn't document it right.
-                   majorMutationVector = 1.00,     //< The 
-                   minorScalar         = 0.10,     //< The scale of minor mutations.
-                   majorScalar         = 0.15,     //< The scale of major mutations.
-                   minorMutation       = 0.10,     //< The probability of a minor mutation.
-                   majorMutation       = 0.05,     //< The probability of a major mutation.
-                   angularMutation     = 0.10;     //< The angular mutation TArray.
-                                                  /*< When a GP sprouts a new point, the system tries to even out
-                                                      the points at equal angles. The angular mutation is the amount that
-                                                      the point will move over time. */
-    
-    static const ISC defaultNumPoints = 5,              /< The default number of points for a VIrus.
-                     defaultLifespan  = 30000,          /< The default life span in milliseconds.
-                     defaultSize      = 50,             /< The default size in pixels.
-                     minSize          = defaultSize / 2,/< The minimum size in pixels.
-                     maxSize          = 2 * defaultSize;
-   // The maximum size of pixels.
-        ISC lifespan,
-        width, / < The width of this GP in pixels.
-        height;
-    //< The height of this GP in pixels. */
+/* Headless genetic-algorithm polygon. No Java, no Graphics, no bitmap.
+ *
+ * A genetic polygon is a closed set of control points in the unit
+ * [-1, 1]^2 square. The shape it traces is its genome: the population is
+ * evolved by selection, crossover, and mutation, and fitness is measured
+ * against a target shape. The whole thing is deterministic given a seed, so a
+ * run is reproducible and comparable to an RL policy trained on the same
+ * objective. */
+namespace PolygonWorld {
+using namespace ::_;
+using namespace ::iGeek;
 
-        FPD age,
-        / < This variable represents the age a GP in generations.
-            /*< Initially the age is set to the GP's life span, and is decremented. */
-            angle;
-    / < The angle of this GP in radians.
-
-        Color color;
-    / < The ARGB color of this GP.
-
-        long numPixels;
-    / < The number of pixels in this image.
-
-        BufferedImage bitmap;
-    / < The bitmap rendering of this object.
-
-        GeneticPolygon mother,
-        / < The thisMother of this GP.father, / < The father of this GP.grandparents;
-    / < The grandparents of this GP.
-
-        static Color
-        getDefaultColor(ISC numPoints);
-
-    GeneticPolygon();
-
-    GeneticPolygon(ISC point_count, ISC color);
-
-    GeneticPolygon(ISC point_count, ISC width, ISC height, ISC color, ISC lifespan, FPD angle);
-
-    GeneticPolygon(GeneticPolygon thisMother, GeneticPolygon thisFather);
-
-    void rebound();
-
-    void printGeometry();
-
-    void setupPoints(ISC numberOfPoints);
-
-    BOL age(ISC ageTime);
-
-    static Color mixColors(Color motherColor, Color fatherColor);
-
-    Color breedColor(Color motherColor, Color fatherColor, Color matGrandColor,
-                     Color patGrandColor);
-
-    ISC mutateInt(ISC thisValue, ISC mutateDirection);
-
-    FPD mutateFloat(FPD thisValue, ISC mutateDirection);
-
-    ISC breedInt(ISC motherInt, ISC fatherInt, ISC matGrandInt, ISC patGrandInt);
-
-    BOL containsGeneticPolygon(GeneticPolygon that);
-
-    FPD breedFloat(FPD motherInt, FPD fatherInt, FPD matGrandInt, FPD patGrandInt);
-
-    /*  @brief  Function that returns the BufferedImage for this this. */
-    BufferedImage getBitmap();
-
-    ISC Width();
-
-    ISC Height();
-
-    FPD getAngle();
-
-    Color getColor();
-
-    long getNumPixels();
-
-    ISC getLifespan();
-
-    ISC getNumPoints();
-
-    // Function that prints out the this to a bitstream.
-    void PrintGenes(ISC[] stream, ISC currentIndex);
-
-    BOL Intersects(Polygon thatPolygon);
-
-    BOL Intersects(GeneticPolygon thatPolygon);
-
-    BOL Intersects(Polygon thatPolygon, FPD offsetX, FPD offsetY);
-
-    BOL Intersects(Polygon thatPolygon, ISC offsetX, ISC offsetY);
-
-    void EqualizePoints();
-
-    void RenderBitmap();
-
-    static FPD CrossOver(FPD dominant, FPD recessive);
-#endif  //< _iGeekPolygonWorldGeneticPolygonH
-    void Rotate();
-
-    FPD BoundBetween0and1(FPD inputValue);
-
-    FPD RandomizeDouble(FPD inputValue);
-
-    ISC RandomizeInt(ISC inputValue);
+enum {
+  PolygonWorldPoints = 16,          //< control points per polygon (closed loop)
+  PolygonWorldPopulation = 32,      //< population size
+  PolygonWorldMaxGenerations = 200,
+  PolygonWorldElitism = 2,          //< top-N copied verbatim each generation
+  PolygonWorldTournament = 3,       //< tournament size for selection
+  PolygonWorldObservationCount = PolygonWorldPoints * 2,  //< x,y of every point
+  PolygonWorldActionCount = 4,      //< 0 none, 1 mutate, 2 crossover, 3 evaluate
+  PolygonWorldMaxSteps = PolygonWorldMaxGenerations,
+  PolygonWorldConvergeNumerator = 99,  //< 0.99 as a fraction (avoids a float in the enum)
+  PolygonWorldConvergeDenominator = 100
 };
+
+/* A single polygon genome: PolygonWorldPoints (x, y) control points. */
+struct TGenome {
+  FPC x_[PolygonWorldPoints] = {};
+  FPC y_[PolygonWorldPoints] = {};
+};
+
+/* The GA population. Owns the genome slots and the fitness bookkeeping. */
+class AGenomePopulation {
+ public:
+  AGenomePopulation(IUD seed = 1);
+  void Reset(IUD seed);
+  /* Fill the population with random polygons. */
+  void Randomize();
+  /* One generational step: select, crossover, mutate. Returns the
+     generation's best fitness. */
+  FPC Evolve();
+  /* Fitness of one genome against a target polygon (1.0 = identical). */
+  FPC Fitness(TGenome& target) const;
+  /* Fitness of the whole population (mean of per-genome fitness). */
+  FPC PopulationFitness(TGenome& target) const;
+  /* The best genome so far. */
+  const TGenome& Best() const { return best_; }
+  ISC BestIndex() const { return best_index_; }
+  FPC BestFitness() const { return best_fitness_; }
+  FPC LastGenerationFitness() const { return last_fitness_; }
+  ISC Generation() const { return generation_; }
+  /* Write the best genome out as the observation vector (x,y interleaved). */
+  void Observe(FPC* obs) const;
+  IUD Seed() const { return seed_; }
+ private:
+  /* Seeded LCG; the only source of randomness so runs are reproducible. */
+  IUD rand_state_;
+  ISC rand32();
+  FPC rand01();
+  TGenome RandomGenome();
+  TGenome Crossover(TGenome& mother, TGenome& father);
+  TGenome Mutate(TGenome& parent);
+  ISC SelectIndex(TGenome& target);
+  IUD seed_;
+  ISC generation_;
+  TGenome pop_[PolygonWorldPopulation];
+  FPC fitness_[PolygonWorldPopulation] = {};
+  TGenome best_;
+  FPC best_fitness_ = 0.0f;
+  ISC best_index_ = 0;
+  FPC last_fitness_ = 0.0f;
+};
+
+/* The Environment: owns the population and exposes the GA contract to
+ * agents and the manifest. Step action semantics:
+ *   0 = advance one generation (the default, what an agent does per frame)
+ *   1 = force a mutation pass on the current generation
+ *   2 = force a crossover pass (re-derive children from the top pairs)
+ *   3 = re-evaluate fitness against the stored target
+ * Reward: delta of best fitness between steps (positive = progress).
+ * Terminal: best fitness reaches PolygonWorldConverge (0.99) or the step
+ * budget is exhausted. */
+class APolygonEnv : public Environment {
+ public:
+  APolygonEnv(IUD seed = 1);
+  void Reset();
+  FPC Step(ISC action);
+  void Observe();
+  BOL Done() { return done_; }
+  ISC Steps() { return steps_; }
+  const FPC* Observation() { return observation_; }
+  AGenomePopulation& Population() { return pop_; }
+  const TGenome& Target() const { return target_; }
+  void SetTarget(TGenome& target);
+ private:
+  AGenomePopulation pop_;
+  TGenome target_;
+  FPC observation_[PolygonWorldObservationCount] = {};
+  FPC prev_best_fitness_ = 0.0f;
+  ISC steps_ = 0;
+  BOL done_ = false;
+  IUD seed_;
+};
+}  //< namespace PolygonWorld
+#endif  //< _iGeekPolygonWorldGeneticPolygonH

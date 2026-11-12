@@ -10,19 +10,19 @@ using namespace ::_;
 
 /* Base class for an iGeek world environment.
 Migrated 2026-10-07 to the latest ASCIICrabs API:
-  - STANDALONE (not `public TRoom`). Verified 2026-10-07: instantiating
-    `TRoom<CHD, CHD>` against the latest ASCIICrabs FAILS to compile —
-    `TRoom::Main()`/`Star()` carry pre-existing upstream bugs
-    (nil `this_->ExecAll()` -> `TDoor` has no `ExecAll`; `OpFirst/OpLast`
-    const-ISC* vs const-DTB* mismatch; `OpPush` undeclared) at
-    ../ASCIICrabs/Room.hpp:297,310,332,341,348. The same blocker forced the
-    card world's `BlackjackEnv` to be standalone. So the iGeek env/gym base
-    is standalone too; the ASCIICrabs Operand "data node" role (storing percepts/actions
-    as Crabs datums) is opt-in per world, NOT the base class. Logged to
-    ../ASCIICrabs/AGENT_PLAN.md.
-  - `STA*` (dead type; in memory `const CHA*`) replaced with `const CHA*`.
-  - `FPC` (float32) is the per-step scalar reward — matches the fused-kernel
-    `Agent.rewards` and the Qualia plan's "single scalar reward" decision.
+- STANDALONE (not `public TRoom`). Verified 2026-10-07: instantiating
+  -`TRoom<CHD, CHD>` against the latest ASCIICrabs FAILS to compile —
+  `TRoom::Main()`/`Star()` carry pre-existing upstream bugs
+  (nil `this_->ExecAll()` -> `TDoor` has no `ExecAll`; `OpFirst/OpLast`
+  const-ISC* vs const-DTB* mismatch; `OpPush` undeclared) at
+  ../ASCIICrabs/Room.hpp:297,310,332,341,348. The same blocker forced the
+  card world's `BlackjackEnv` to be standalone. So the iGeek env/gym base
+  is standalone too; the ASCIICrabs Operand "data node" role (storing percepts/actions
+  as Crabs datums) is opt-in per world, NOT the base class. Logged to
+  ../ASCIICrabs/AGENT_PLAN.md.
+- `STA*` (dead type; in memory `const CHA*`) replaced with `const CHA*`.
+- `FPC` (float32) is the per-step scalar reward — matches the fused-kernel
+  `Agent.rewards` and the Qualia plan's "single scalar reward" decision.
 */
 class Environment {
  public:
@@ -76,5 +76,5 @@ Printer& PrintTo(Printer& p, Environment& env) {
   return p << "\nEnv";
 }
 
-} //< namespace iGeek
-#endif
+}       //< namespace iGeek
+#endif  // _iGeekEnvironmentH

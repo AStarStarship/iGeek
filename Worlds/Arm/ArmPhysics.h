@@ -11,9 +11,9 @@ using namespace ::CTK;
 /* Two-link planar arm, SI units, FP64. Joint angles are absolute (rad), clamped to [0, pi/2] at the physics layer so the policy cannot escape the declared workspace. Torques are clamped to |tau| <= max_torque. */
 struct ArmParams
 {
-  FPD length_1 = 0.20, length_2 = 0.20;      //< Link lengths, m (0.5 m reach).
-  FPD mass_1 = 2.0, mass_2 = 1.0;            //< Link point masses, kg.
-  FPD inertia_1 = 0.05, inertia_2 = 0.0167;  //< I = m*l^2/3, kg m^2.
+  FPD length_1 = 0.20, length_2 = 0.20;      //< Link lengths, m (0.4 m default reach).
+  FPD mass_1 = 2.0, mass_2 = 1.0;            //< Link masses, kg; COM at half length.
+  FPD inertia_1 = 0.05, inertia_2 = 0.0167;  //< COM inertias, kg m^2 (independent parameters).
   FPD max_torque = 3.0;                      //< |tau| cap, N m.
   FPD damping = 0.01;                        //< Viscous joint damping, N m s.
   FPD dt = 0.02;                             //< Control frame, s.
@@ -29,7 +29,10 @@ struct alignas(ACPUCacheLineSize) ArmState {
   FPD reach = 0;             //< |tip|, m.
 };
 
-/* Per-frame actuator command: joint torques, N m. Clamped in ArmStep. */
+/* Generalized torques conjugate to ABSOLUTE link angles, N m.
+These are not directly shoulder/elbow motor torques: motor inputs (u1,u2)
+map to (u1-u2,u2). Damping likewise acts on absolute angular velocities.
+Clamped independently in ArmStep; existing action semantics are preserved. */
 struct ArmControl {
   FPD tau_1 = 0, tau_2 = 0;
 };
@@ -48,7 +51,10 @@ void ArmFK(ArmParams& params, FPD j1, FPD j2, FPD& tip_x, FPD& tip_y);
 BOL ArmForces(ArmParams& params, ArmState& state,
               ArmDynamicsTerms& forces);
 
-/* One 0.02 s frame = four 0.01 s RK4 substeps of the torque model.
+/* Substeps = ceil(dt/half_step), limited to 4096 by ArmParamsValid. */
+ISC TArmSubsteps(ArmParams& params);
+
+/* One frame advances dt with RK4 substeps no larger than half_step.
 Joint angles are clamped to [0, pi/2]; velocity zeros at the bound.
 @return false for invalid inputs; state is untouched. */
 BOL ArmStep(ArmState& state, ArmParams& params,

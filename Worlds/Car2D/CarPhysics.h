@@ -20,7 +20,7 @@ struct TCarParams
 };
 struct TCarControl
 {
-  FPD steer = 0, throttle = 0, brake = 0;
+  FPD steer = 0, throttle = 0, brake = 0, reverse = 0;
 };
 struct TCarContacts
 {

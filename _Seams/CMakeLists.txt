@@ -4,9 +4,9 @@ project (iGeek)
 set (CMAKE_CXX_STANDARD 23)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set (SEAM "" CACHE STRING "Seam index to build at (default: SEAM_N = full sown tree)")
-if (SEAM)
-  add_compile_definitions (_Seam=${SEAM})
+set (_Seam "" CACHE STRING "Seam index to build at (default: _SeamN = full sown tree)")
+if (_Seam)
+  add_compile_definitions (_Seam=${_Seam})
 endif ()
 
 # Single-TU rule: one .cpp = one .exe. The entry lives in _Seams/_Seams.cpp
@@ -20,5 +20,53 @@ include_directories (
   "${CMAKE_CURRENT_SOURCE_DIR}/../../ASCIICrabs"
   "${CMAKE_CURRENT_SOURCE_DIR}/../../ASCIICrabs/_Seams"
   "${CMAKE_CURRENT_SOURCE_DIR}/../../CrabsTK"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../CrabsTK/Exo"
 )
 add_executable(iGeek "_Seams.cpp")
+
+# Reuse the current seam identifiers without compiling the unrelated world
+# rollup into the standalone demo. Keep all implementation in one TU.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/_Seams.cpp" ARM_SEAM_DEFINES
+     REGEX "^#define ")
+string(REPLACE ";" "\n" ARM_SEAM_DEFINES "${ARM_SEAM_DEFINES}")
+set(ARM_PRELUDE "${ARM_SEAM_DEFINES}\n
+#include <ASCIICrabs/_Config.h>
+#include <ASCIICrabs/Math.hxx>
+#define _Seam _SeamN
+#include <ASCIICrabs/_Package.hxx>
+#include <CrabsTK/Exo/_Package.hxx>
+#include \"${CMAKE_CURRENT_SOURCE_DIR}/../EnvironmentManifest.hxx\"
+#include \"${CMAKE_CURRENT_SOURCE_DIR}/../Environment.hxx\"
+#include \"${CMAKE_CURRENT_SOURCE_DIR}/../Worlds/Arm/ArmWorld.hxx\"
+")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ArmHeadless.cpp"
+     "${ARM_PRELUDE}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/../Worlds/Arm/Arm2DDemoHeadless.cpp\"\n")
+add_executable(ArmHeadless "${CMAKE_CURRENT_BINARY_DIR}/ArmHeadless.cpp")
+
+# --- windowed demo ----------------------------------------------------------
+# Same sim, the same one Room, presented through CrabsTK/Exo's SDL3 window and
+# GL blit. Needs SDL3 + OpenGL at build time and a display at run time, so the
+# target only exists where both are found; ArmHeadless proves the sim and the
+# canvas without either.
+find_package(OpenGL QUIET)
+find_package(PkgConfig QUIET)
+if (PkgConfig_FOUND)
+  pkg_check_modules(SDL3 QUIET IMPORTED_TARGET sdl3)
+endif ()
+if (SDL3_FOUND AND OPENGL_FOUND)
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/Arm2DGui.cpp"
+       "${ARM_PRELUDE}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/../Worlds/Arm/Arm2DWebGL.hxx\"\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/../Worlds/Arm/Arm2DDemoMain.cpp\"\n")
+  add_executable(Arm2DGui "${CMAKE_CURRENT_BINARY_DIR}/Arm2DGui.cpp")
+  target_link_libraries(Arm2DGui PRIVATE PkgConfig::SDL3 OpenGL::GL)
+  message(STATUS "Arm2DGui enabled (SDL3 + OpenGL found)")
+else ()
+  message(STATUS "Arm2DGui skipped (SDL3 and OpenGL are required)")
+endif ()
+
+enable_testing()
+add_test(NAME ArmHeadless COMMAND ArmHeadless)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ArmPhysicsChecks.cpp"
+     "${ARM_PRELUDE}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/ArmWorld/PhysicsChecks.cpp\"\n")
+add_executable(ArmPhysicsChecks "${CMAKE_CURRENT_BINARY_DIR}/ArmPhysicsChecks.cpp")
+add_test(NAME ArmPhysicsChecks COMMAND ArmPhysicsChecks)

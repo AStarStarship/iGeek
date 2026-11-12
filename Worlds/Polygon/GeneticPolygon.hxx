@@ -1,687 +1,279 @@
 // Copyright AStarship <https://astarship.net>.
-
-#include <_Config.h>
-
+#pragma once
+#ifndef _iGeekPolygonWorldGeneticPolygonHXX
+#define _iGeekPolygonWorldGeneticPolygonHXX
 #include "GeneticPolygon.h"
 
-namespace iGeek {
+namespace PolygonWorld {
+using namespace ::_;
+using namespace ::iGeek;
 
-Color GeneticPolygon::getDefaultColor(ISC numPoints) {
-  switch (numPoints) {
+/* --- seeded LCG (Numerical Recipes constants) --------------------------------
+ * Deterministic given a seed, so a GA run is reproducible and comparable to
+ * an RL policy on the same objective. No stdlib, no thread-local state. */
+ISC AGenomePopulation::rand32() {
+  rand_state_ = rand_state_ * 636413622326ULL + 1442695041ULL;
+  return ISC((rand_state_ >> 32) & 0x7FFFFFFF);
+}
+
+FPC AGenomePopulation::rand01() {
+  return FPC(ISC(rand_state_ >> 1) & 0x7FFFFFFF) / FPC(0x7FFFFFFF);
+}
+
+AGenomePopulation::AGenomePopulation(IUD seed) {
+  Reset(seed);
+}
+
+void AGenomePopulation::Reset(IUD seed) {
+  seed_ = seed;
+  rand_state_ = seed ? seed : 1;
+  generation_ = 0;
+  best_fitness_ = 0.0f;
+  last_fitness_ = 0.0f;
+  best_index_ = 0;
+  Randomize();
+}
+
+TGenome AGenomePopulation::RandomGenome() {
+  TGenome g;
+  for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+    g.x_[i] = FPC(rand01() * 2.0 - 1.0);
+    g.y_[i] = FPC(rand01() * 2.0 - 1.0);
+  }
+  return g;
+}
+
+void AGenomePopulation::Randomize() {
+  for (ISC i = 0; i < PolygonWorldPopulation; ++i) {
+    pop_[i] = RandomGenome();
+    fitness_[i] = 0.0f;
+  }
+  best_ = pop_[0];
+  best_index_ = 0;
+  best_fitness_ = 0.0f;
+}
+
+/* Inline Newton-Raphson sqrt — no libm. 6 iterations is float-precision. */
+static inline FPC TGA_Sqrt(FPC v) {
+  if (v <= FPC(0.0)) return FPC(0.0);
+  FPC x = v;
+  for (ISC i = 0; i < 6; ++i)
+    x = FPC((x + v / x) * 0.5);
+  return x;
+}
+
+/* Inline sin/cos via Taylor (8 terms — plenty for float). a is in radians,
+ * assumed in [0, 2*pi). */
+static inline FPC TGA_Cos(FPD a) {
+  FPD a2 = a * a;
+  return FPD(1.0) - a2 / FPD(2.0) + a2 * a2 / FPD(24.0) - a2 * a2 * a2 / FPD(720.0);
+}
+static inline FPC TGA_Sin(FPD a) {
+  FPD a2 = a * a;
+  return a - a * a2 / FPD(6.0) + a * a2 * a2 / FPD(120.0) - a * a2 * a2 * a2 / FPD(5040.0);
+}
+
+/* Fitness: 1.0 - normalized mean point distance to the target. The genome is
+ * a closed polygon; we compare point-by-point in order (rotation is not
+ * factored out; the target is presented in the same winding). */
+FPC AGenomePopulation::Fitness(TGenome& target) const {
+  FPD sum = 0.0;
+  for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+    FPD dx = FPD(target.x_[i]) - FPD(best_.x_[i]);
+    FPD dy = FPD(target.y_[i]) - FPD(best_.y_[i]);
+    sum += FPD(TGA_Sqrt(FPC(dx * dx + dy * dy)));
+  }
+  /* Max mean distance across the square is sqrt(8); normalize to [0, 1]. */
+  FPD norm = sum / FPD(PolygonWorldPoints) / FPD(2.8284271247461903);
+  if (norm > 1.0) norm = 1.0;
+  return FPC(1.0 - norm);
+}
+
+FPC AGenomePopulation::PopulationFitness(TGenome& target) const {
+  FPD sum = 0.0;
+  for (ISC i = 0; i < PolygonWorldPopulation; ++i)
+    sum += FPD(fitness_[i] > 0.0f ? fitness_[i] : Fitness(target));
+  return FPC(sum / FPD(PolygonWorldPopulation));
+}
+
+/* Tournament selection: pick PolygonWorldTournament random individuals,
+ * return the one with the best fitness against the target. */
+ISC AGenomePopulation::SelectIndex(TGenome& target) {
+  ISC best = ISC((rand32() & 0xFFFF) % PolygonWorldPopulation);
+  FPC best_fit = Fitness(target);
+  for (ISC k = 1; k < PolygonWorldTournament; ++k) {
+    ISC cand = ISC((rand32() & 0xFFFF) % PolygonWorldPopulation);
+    FPC fit = Fitness(target);
+    if (fit > best_fit) {
+      best = cand;
+      best_fit = fit;
+    }
+  }
+  return best;
+}
+
+/* Point-wise crossover: each control point comes from the mother or the
+ * father, chosen independently. */
+TGenome AGenomePopulation::Crossover(TGenome& mother, TGenome& father) {
+  TGenome child;
+  for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+    BOL from_mother = (rand32() & 1) != 0;
+    child.x_[i] = from_mother ? mother.x_[i] : father.x_[i];
+    child.y_[i] = from_mother ? mother.y_[i] : father.y_[i];
+  }
+  return child;
+}
+
+/* Bounded mutation: nudge each point by a small random delta, clamped to
+ * the unit square. */
+TGenome AGenomePopulation::Mutate(TGenome& parent) {
+  TGenome child = parent;
+  const FPC step = FPC(0.15);
+  for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+    child.x_[i] = child.x_[i] + FPC((rand01() * 2.0 - 1.0) * step);
+    child.y_[i] = child.y_[i] + FPC((rand01() * 2.0 - 1.0) * step);
+    if (child.x_[i] > 1.0f) child.x_[i] = 1.0f;
+    if (child.x_[i] < -1.0f) child.x_[i] = -1.0f;
+    if (child.y_[i] > 1.0f) child.y_[i] = 1.0f;
+    if (child.y_[i] < -1.0f) child.y_[i] = -1.0f;
+  }
+  return child;
+}
+
+/* One generation: evaluate, track the best-so-far, keep the elite, fill the
+ * rest with crossover+mutation children. */
+FPC AGenomePopulation::Evolve() {
+  for (ISC i = 0; i < PolygonWorldPopulation; ++i)
+    fitness_[i] = Fitness(best_);
+  ISC new_best = 0;
+  FPC new_best_fit = fitness_[0];
+  for (ISC i = 1; i < PolygonWorldPopulation; ++i) {
+    if (fitness_[i] > new_best_fit) {
+      new_best = i;
+      new_best_fit = fitness_[i];
+    }
+  }
+  if (new_best_fit > best_fitness_) {
+    best_ = pop_[new_best];
+    best_fitness_ = new_best_fit;
+    best_index_ = new_best;
+  }
+  last_fitness_ = PopulationFitness(best_);
+  ++generation_;
+  TGenome next[PolygonWorldPopulation];
+  next[0] = best_;
+  next[1] = pop_[new_best == 0 ? 1 : 0];
+  for (ISC i = PolygonWorldElitism; i < PolygonWorldPopulation; ++i) {
+    ISC m = SelectIndex(best_);
+    ISC f = SelectIndex(best_);
+    TGenome child = Crossover(pop_[m], pop_[f]);
+    if (rand01() < FPC(0.2)) child = Mutate(child);
+    next[i] = child;
+  }
+  for (ISC i = 0; i < PolygonWorldPopulation; ++i) pop_[i] = next[i];
+  for (ISC i = 0; i < PolygonWorldPopulation; ++i) fitness_[i] = 0.0f;
+  return last_fitness_;
+}
+
+void AGenomePopulation::Observe(FPC* obs) const {
+  for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+    obs[i * 2] = best_.x_[i];
+    obs[i * 2 + 1] = best_.y_[i];
+  }
+}
+
+/* --- APolygonEnv ------------------------------------------------------------- */
+APolygonEnv::APolygonEnv(IUD seed)
+    : Environment("polygonworld", 2), seed_(seed) {
+  TSPrint(manifest_.name, ISW(ManifestNameLen), "polygonworld");
+  TSPrint(manifest_.version, ISW(ManifestVersionLen), "1.0.0");
+  manifest_.kind = ManifestKindEnv;
+  manifest_.domain = ManifestDomainGame;
+  TSPrint(manifest_.description, ISW(ManifestDescriptionLen),
+          "Headless GA polygon shape-matching vs. a target");
+  TSPrint(manifest_.modality, ISW(ManifestModalityLen), "vector");
+  manifest_.reward_low = FPC(-1.0);
+  manifest_.reward_high = FPC(1.0);
+  manifest_.reward_higher_is_better = true;
+  manifest_.determinism = ManifestDeterminismSeeded;
+  manifest_.observation_count = ISC(PolygonWorldObservationCount);
+  manifest_.action_count = ISC(PolygonWorldActionCount);
+  manifest_.max_episode_steps = ISC(PolygonWorldMaxSteps);
+  manifest_.environment_count_max = ISC(GymEnvMax);
+  TSPrint(manifest_.world_name, ISW(ManifestWorldLen), "PolygonWorld");
+  manifest_.seam_number = ISC(46);
+  manifest_.manifest_version = ISC(1);
+  pop_ = AGenomePopulation(seed);
+  /* Default target: a regular 16-gon, radius 0.8, in the unit square. */
+  {
+    const FPD two_pi = FPD(6.283185307179586);
+    for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+      FPD a = FPD(i) / FPD(PolygonWorldPoints) * two_pi;
+      target_.x_[i] = FPC(FPD(0.8) * TGA_Cos(a));
+      target_.y_[i] = FPC(FPD(0.8) * TGA_Sin(a));
+    }
+  }
+  prev_best_fitness_ = 0.0f;
+  steps_ = 0;
+  done_ = false;
+  Observe();
+}
+
+void APolygonEnv::Reset() {
+  pop_.Reset(seed_);
+  {
+    const FPD two_pi = FPD(6.283185307179586);
+    for (ISC i = 0; i < PolygonWorldPoints; ++i) {
+      FPD a = FPD(i) / FPD(PolygonWorldPoints) * two_pi;
+      target_.x_[i] = FPC(FPD(0.8) * TGA_Cos(a));
+      target_.y_[i] = FPC(FPD(0.8) * TGA_Sin(a));
+    }
+  }
+  prev_best_fitness_ = 0.0f;
+  steps_ = 0;
+  done_ = false;
+  Observe();
+}
+
+FPC APolygonEnv::Step(ISC action) {
+  if (done_) return FPC(0.0);
+  switch (action) {
+    case 1:
+    case 2:
+    default:
+      /* Advance one generation (actions 1 and 2 are aliases of the default
+         evolve step; a future seam can specialise them). */
+      pop_.Evolve();
+      break;
     case 3:
-      return Color.blue;
-    case 4:
-      return Color.red;
-    case 5:
-      return Color.green;
-    case 6:
-      return Color.orange;
-    case 7:
-      return Color.gray;
-    case 8:
-      return Color.pink;
+      /* Re-evaluate only; no generational advance. */
+      pop_.PopulationFitness(target_);
+      break;
   }
-  return new Color((ISC)Math.random());
+  ++steps_;
+  FPC cur = pop_.BestFitness();
+  FPC reward = cur - prev_best_fitness_;
+  if (reward > 1.0f) reward = 1.0f;
+  if (reward < -1.0f) reward = -1.0f;
+  prev_best_fitness_ = cur;
+  if (cur >= FPC(PolygonWorldConvergeNumerator) / FPC(PolygonWorldConvergeDenominator) || steps_ >= ISC(PolygonWorldMaxSteps))
+    done_ = true;
+  Observe();
+  return reward;
 }
 
-GeneticPolygon::GeneticPolygon() {
-  ISC numPoints = (ISC)(3.0 + Math.random() * maxRandomPoints);
-
-  mother = father = null;
-  lifespan = defaultLifespan;
-
-  width = randomizeInt(defaultSize);
-  height = randomizeInt(defaultSize);
-  age = randomizeDouble(defaultLifespan);
-  angle = randomizeDouble(defaultAngle);
-
-  color = getDefaultColor(numPoints);
-
-  setupPoints(numPoints);
-
-  renderBitmap();
+void APolygonEnv::Observe() {
+  pop_.Observe(observation_);
 }
 
-GeneticPolygon::GeneticPolygon(ISC point_count, ISC color) {
-  mother = father = null;
-  lifespan = defaultLifespan;
-
-  width = randomizeInt(defaultSize);
-  height = randomizeInt(defaultSize);
-  age = randomizeDouble(defaultLifespan);
-  angle = randomizeDouble(defaultAngle);
-
-  color = new Color(color);
-
-  setupPoints(point_count);
-
-  renderBitmap();
+void APolygonEnv::SetTarget(TGenome& target) {
+  target_ = target;
+  pop_.Reset(seed_);
+  prev_best_fitness_ = 0.0f;
+  steps_ = 0;
+  done_ = false;
+  Observe();
 }
 
-GeneticPolygon::GeneticPolygon(ISC point_count, ISC width, ISC height,
-                               ISC color, ISC lifespan, FPD angle) {
-  mother = father = null;
-  lifespan = lifespan;
-
-  age = (ISC)lifespan;
-
-  width = randomizeInt(width);
-  height = randomizeInt(height);
-  angle = randomizeDouble(angle);
-
-  color = new Color(color);
-
-  setupPoints(point_count);
-  renderBitmap();
-}
-
-GeneticPolygon::GeneticPolygon(GeneticPolygon thisMother,
-                               GeneticPolygon thisFather) {
-  mother = thisMother;
-  father = thisFather;
-
-  if (mother == null || father == null) {
-    if (mother == null)
-      Print("Error breeding GeneticPolygon: Mother was null!\n");
-    if (father == null)
-      Print("Error breeding GeneticPolygon: Father was null!\n");
-
-    grandparents = null;
-
-    width = randomizeInt(GeneticPolygon.defaultSize);
-    height = randomizeInt(GeneticPolygon.defaultSize);
-    angle = randomizeDouble(GeneticPolygon.defaultAngle);
-
-    color = getDefaultColor(defaultNumPoints);
-
-    setupPoints(GeneticPolygon.defaultNumPoints);
-  } else {
-    grandparents = new GeneticPolygon(
-        (thisMother.getNumPoints() + thisFather.getNumPoints()) / 2,
-        (thisMother.Width() + thisFather.Width()) / 2,
-        (thisMother.Height() + thisFather.Height()) / 2,
-        (thisMother.getColor().getRGB() + thisFather.getColor().getRGB()) / 2,
-        (thisMother.getLifespan() + thisFather.getLifespan()) / 2,
-        (thisMother.getAngle() + thisFather.getAngle()) / 2.0f);
-
-    GeneticPolygon matGrandparents = mother.grandparents,
-                   patGrandparents = father.grandparents;
-
-    if (matGrandparents == null) matGrandparents = grandparents;
-    if (patGrandparents == null) patGrandparents = grandparents;
-
-    width = breedInt(mother.width, father.width, matGrandparents.width,
-                     patGrandparents.width);
-
-    if (width < minSize)
-      width = minSize;
-    else if (height > maxSize)
-      width = maxSize;
-
-    height = breedInt(mother.height, father.height, matGrandparents.height,
-                      patGrandparents.height);
-
-    if (height < minSize)
-      height = minSize;
-    else if (height > maxSize)
-      height = maxSize;
-
-    angle = breedFloat(mother.angle, father.angle, matGrandparents.angle,
-                       patGrandparents.angle);
-    color = breedColor(mother.color, father.color, matGrandparents.color,
-                       patGrandparents.color);
-
-    setupPoints(breedInt(mother.getNumPoints(), father.getNumPoints(),
-                         matGrandparents.getNumPoints(),
-                         patGrandparents.getNumPoints()));
-  }
-
-  renderBitmap();
-}
-
-void GeneticPolygon::rebound() {
-  // if (npoints == 0); // This shouldn't happen.
-
-  // Once a shape has been made from the idea width and height, the actual
-  // polygon width will not be the full width or height. For this reason, we
-  // need to find the left, right, top, and bottom bounds, and translate all of
-  // the points so that the farthest point to the left and top are both 0.
-
-  ISC lowestX = xpoints[0],  // The largest positive integer.
-      highestY = ypoints[0],
-      highestX = lowestX,  // The largest negative integer.
-      lowestY = highestY;
-
-  for (ISC i = 0; i < npoints; i++) {
-    ISC currentX = xpoints[i], currentY = ypoints[i];
-
-    if (currentX < lowestX)
-      lowestX = currentX;
-    else if (currentX > highestX)
-      highestX = currentX;
-
-    if (currentY > highestY)
-      highestY = currentY;
-    else if (currentY < lowestY)
-      lowestY = currentY;
-
-    // Print ("lowestX = " + lowestX + ", highestX = " + highestX + ", highestY
-    // = " + highestY + ", lowestY = " + lowestY + "\n");
-  }
-
-  // Now translate the pots such that the farthest point left and top point are
-  // both 0
-
-  for (ISC i = 0; i < npoints; i++) {
-    xpoints[i] = xpoints[i] - lowestX;
-    ypoints[i] = ypoints[i] - lowestY;
-  }
-
-  // Print ("initWidth = " + width + ", initHeight = " + height + "\n");
-
-  width = highestX - lowestX + 1;
-  height = highestY - lowestY + 1;
-
-  // printGeometry ();
-}
-
-void GeneticPolygon::PrintGeometry() {
-  ISC i;
-
-  Print("\nPrinting Geometry...\nwidth = " + width + ", height = " + height +
-        "\nnpoints = " + npoints + "\n");
-
-  for (i = 0; i < npoints; i++) {
-    Print("xpoints[" + i + "] = " + xpoints[i] + ", ypoints[" + i +
-          "] = " + xpoints[i] + "\n");
-  }
-
-  Print("\nChecking bounds...\n");
-
-  for (i = 0; i < npoints; i++) {
-    if (xpoints[i] > width)
-      Print("Error: xpoint[" + i + "] = " + xpoints[i] +
-            " which is greater than width!!!\n");
-    else if (xpoints[i] < 0)
-      Print("Error: xpoint[" + i + "] = " + xpoints[i] +
-            " which is less than 0!!!\n");
-
-    if (ypoints[i] > height)
-      Print("Error: ypoint[" + i + "] = " + ypoints[i] +
-            " which is greater than height!!!\n");
-    else if (ypoints[i] < 0)
-      Print("Error: xpoint[" + i + "] = " + ypoints[i] +
-            " whichis less than 0!!!\n");
-  }
-  Print("\n\n");
-}
-
-void GeneticPolygon::setupPoints(ISC numberOfPoints) {
-  if (numberOfPoints < 3) {
-    Print("Error: numberOfPoints < 3!\n");
-    numberOfPoints = 3;
-  }
-
-  FPD deltaAngle = (2.0 * Math.PI) / (FPD)numberOfPoints, rotationAngle,
-      cosAngle, sinAngle, stretchFactor, doubleWidth = (FPD)width,
-      doubleHeight = (FPD)height, halfWidth = doubleWidth / 2.0,
-      halfHeight = doubleHeight / 2.0, x, y;
-
-  if (width > height) {
-    stretchFactor = doubleWidth /
-                    doubleHeight;  // We want stretchFactor to be greater than 1
-
-    for (ISC i = 0; i < numberOfPoints; i++) {
-      rotationAngle = i * deltaAngle;
-
-      cosAngle = Math.cos(rotationAngle);
-      sinAngle = Math.sin(rotationAngle);
-
-      x = halfWidth + (halfHeight * cosAngle) * stretchFactor;
-      y = halfHeight + (halfHeight * sinAngle);
-
-      addPoint((ISC)x, (ISC)y);
-    }
-  } else {
-    stretchFactor = doubleHeight / doubleWidth;
-
-    for (ISC i = 0; i < numberOfPoints; i++) {
-      rotationAngle = i * deltaAngle;
-
-      cosAngle = Math.cos(rotationAngle);
-      sinAngle = Math.sin(rotationAngle);
-
-      x = halfWidth + (halfWidth * cosAngle);
-      y = halfHeight + (halfWidth * sinAngle) * stretchFactor;
-
-      addPoint((ISC)x, (ISC)y);
-    }
-  }
-
-  rebound();
-}
-
-BOL GeneticPolygon::age(ISC ageTime) {
-  age += ageTime;
-
-  if (age >= lifespan) return false;
-
-  return true;
-}
-
-Color GeneticPolygon::mixColors(Color motherColor, Color fatherColor) {
-  float[] motherHSB = new float[3], fatherHSB = new float[3];
-
-  Color.RGBtoHSB(motherColor.getRed(), motherColor.getGreen(),
-                 motherColor.getBlue(), motherHSB);
-  Color.RGBtoHSB(fatherColor.getRed(), fatherColor.getGreen(),
-                 fatherColor.getBlue(), fatherHSB);
-  return new Color(Color.HSBtoRGB((motherHSB[0] + fatherHSB[0]) / 2,
-                                  (motherHSB[1] + fatherHSB[1]) / 2,
-                                  (motherHSB[2] + fatherHSB[2]) / 2));
-}
-
-Color GeneticPolygon::breedColor(Color motherColor, Color fatherColor,
-                                 Color matGrandColor, Color patGrandColor) {
-  return mixColors(motherColor, fatherColor);
-}
-
-ISC GeneticPolygon::mutateInt(ISC thisValue, ISC mutateDirection) {
-  FPD mutation,    //< The
-      TArray,      // The TArray tells you if its getting bigger or smaller
-      scalar = 0;  // Tells you how much of a mutation there will be.
-
-  // Output = thisValue * (1 + scallar * trend)
-
-  if (mutateDirection > 0) {
-    TArray = 1.0;
-  } else if (mutateDirection == 0) {
-    if (Math.random() < 0.5)
-      TArray = 1.0;
-    else
-      TArray = -1.0;
-  } else  // mutateDirection
-  {
-    TArray = -1.0;
-  }
-
-  mutation = Math.random();
-
-  if (mutation < minorMutation) {
-    if (mutation < minorMutation) {
-      if (mutation < majorMutation)
-        scalar = majorScalar;
-      else
-        scalar = minorScalar;
-    }
-  }
-
-  ISC newValue = (ISC)((FPD)thisValue * (1.0 + TArray * scalar));
-
-  return newValue;
-}
-
-FPD GeneticPolygon::mutateFloat(FPD thisValue, ISC mutateDirection) {
-  FPD mutation,
-      TArray,      // The TArray tells you if its getting bigger or smaller
-      scalar = 0;  // Tells you how much of a mutation there will be.
-
-  // Output = thisValue * (1 + scallar*trend)
-
-  if (mutateDirection > 0) {
-    TArray = 1.0f;
-  } else if (mutateDirection == 0) {
-    if (Math.random() < 0.5)
-      TArray = 1.0;
-    else
-      TArray = -1.0;
-  } else  // mutateDirection
-  {
-    TArray = -1.0;
-  }
-
-  mutation = Math.random();
-
-  if (mutation < minorMutation) {
-    if (mutation < minorMutation) {
-      if (mutation < majorMutation)
-        scalar = majorScalar;
-      else
-        scalar = minorScalar;
-    }
-  }
-  return (FPD)((FPD)thisValue * (1.0 + TArray * scalar));
-}
-
-ISC GeneticPolygon::breedInt(ISC motherInt, ISC fatherInt, ISC matGrandInt,
-                             ISC patGrandInt) {
-  // The way that this algorithm works is that we are trying to mimic nature.
-  // First we need to determine if we are going to grow bigger or smaller
-  // the the parents. The idea is that we need to see what the reproductive
-  // trend is. If the grandparents was greater than its offspring, then that
-  // shows that there is trend of having larger offspring. If both grandparents
-  // were larger, then the offspring will be larger.
-
-  ISC largerValue, smallerValue;
-
-  // Step one: Determine which is the larger and smaller value.
-
-  if (motherInt > fatherInt) {
-    largerValue = motherInt;
-    smallerValue = fatherInt;
-  } else {
-    largerValue = fatherInt;
-    smallerValue = motherInt;
-  }
-
-  if (motherInt > matGrandInt) {
-    if (fatherInt >
-        patGrandInt)  // Then both grandparents were bigger so grow bigger.
-    {
-      return mutateInt(largerValue, 1);
-    } else {
-    }
-  } else  // Then mother getting smaller
-  {
-    if (fatherInt <
-        patGrandInt)  // Then both grandparents were smaller so getting smaller
-    {
-      return mutateInt(smallerValue, -1);
-    }
-  }
-
-  return mutateInt(smallerValue, 0);
-}
-
-BOL GeneticPolygon::containsGeneticPolygon(GeneticPolygon that) {
-  // The theory behind this algorithm is that in order for two polygons to
-  // intersect, at least one point of either object has to be inside of the
-  // other.
-
-  // Currently I am unaware of how Java does its contains (ISC, ISC) function so
-  // I have absolutly no idea how efficient this is. The other method would be
-  // to compair their bitmaps. This might be able to be done in hardware via
-  // OpenCL.
-
-  Print("BOL contains (GeneticPolygon that)\n");
-  ISC i;
-
-  for (i = 0; i < this.npoints; i++)
-    if (this.contains(xpoints[i], ypoints[i])) return false;
-
-  for (i = 0; i < that.npoints; i++)
-    if (that.contains(xpoints[i], ypoints[i])) return false;
-
-  return true;
-}
-
-FPD GeneticPolygon::breedFloat(FPD motherInt, FPD fatherInt, FPD matGrandInt,
-                               FPD patGrandInt) {
-  return 0.0f;
-}
-
-/*  @brief  Function that returns the BufferedImage for this this.
-
- */
-
-BufferedImage GeneticPolygon::getBitmap() { return bitmap; }
-
-ISC GeneticPolygon::Width() { return width; }
-
-ISC GeneticPolygon::Height() { return height; }
-
-FPD GeneticPolygon::getAngle() { return angle; }
-
-Color GeneticPolygon::getColor() { return color; }
-
-long GeneticPolygon::getNumPixels() { return numPixels; }
-
-ISC GeneticPolygon::getLifespan() { return lifespan; }
-
-ISC GeneticPolygon::getNumPoints() { return this.npoints; }
-
-// Function that prints out the this to a bitstream
-
-void GeneticPolygon::printGenes(ISC[] thisStream, ISC currentIndex) {
-  thisStream[currentIndex] = width;
-  thisStream[currentIndex + 1] = height;
-  thisStream[currentIndex + 2] = (ISC)angle;
-  thisStream[currentIndex + 5] = color.getRGB();
-  thisStream[currentIndex + 6] = (ISC)this.npoints;
-
-  currentIndex += 7;
-
-  for (ISC i = 0; i < super.npoints; i++) {
-    thisStream[currentIndex] = xpoints[i];
-    thisStream[currentIndex + 1] = ypoints[i];
-    currentIndex += 2;
-  }
-}
-
-/* @brief   Function that compares
- */
-
-BOL GeneticPolygon::intersects(Polygon thatPolygon) {
-  Rectangle bounds = thatPolygon.getBounds();
-
-  ISC offsetX = (width - bounds.width) / 2,
-      offsetY = (height - bounds.height) / 2;
-
-  // Print ("offsetX = " + offsetX + ", offsetY = " + offsetY + "\n");
-  return intersects(thatPolygon, offsetX, offsetY);
-}
-
-BOL GeneticPolygon::intersects(GeneticPolygon thatPolygon) {
-  ISC offsetX = (width - thatPolygon.width) / 2,
-      offsetY = (height - thatPolygon.height) / 2;
-
-  // Print ("offsetX = " + offsetX + ", offsetY = " + offsetY + "\n");
-  return intersects(thatPolygon, offsetX, offsetY);
-}
-
-BOL GeneticPolygon::intersects(Polygon thatPolygon, FPD offsetX, FPD offsetY) {
-  return intersects(thatPolygon, (ISC)offsetX, (ISC)offsetY);
-}
-
-BOL GeneticPolygon::intersects(Polygon thatPolygon, ISC offsetX, ISC offsetY) {
-  // In order to determine if one Polygons ccontain eachother, we have to check
-  // every point in both Polygon(s).
-
-  if (thatPolygon == null) return false;
-
-  for (ISC i = 0; i < thatPolygon.npoints; i++) {
-    if (super.contains(thatPolygon.xpoints[i] + offsetX,
-                       thatPolygon.ypoints[i] + offsetX)) {
-      return true;
-    }
-  }
-  for (ISC i = 0; i < npoints; i++) {
-    if (thatPolygon.contains(xpoints[i] - offsetX, ypoints[i] - offsetY))
-      return true;
-  }
-  return false;
-}
-
-void GeneticPolygon::equalizePoints() {
-  FPD centerX = (FPD)width / 2.0, centerY = (FPD)height / 2.0,
-      deltaY = ypoints[1] - ypoints[0], deltaX = xpoints[1] - xpoints[0],
-      deltaAngle = (2 * Math.PI) / (FPD)this.npoints,
-      initAngle = Math.atan(deltaY / deltaX), currentAngle, idealAngle,
-      rotationAngle, x, y, cosAngle, sinAngle;
-
-  for (ISC i = 0; i < this.npoints - 1; i++) {
-    // Step 1: find angle between the current and next point.
-
-    x = (FPD)xpoints[i];
-    y = (FPD)ypoints[i];
-
-    deltaX = xpoints[i + 1] - x;
-    deltaY = ypoints[i + 1] - y;
-    currentAngle = Math.atan((deltaY / deltaX));
-
-    // Step 2: figure out what the angle should be.
-
-    idealAngle = i * deltaAngle + initAngle;
-
-    // Step 3: rotate the point closer to the
-
-    if (currentAngle < idealAngle)
-      rotationAngle = (FPD)angularMutation;
-    else if (currentAngle > idealAngle)
-      rotationAngle = (FPD)angularMutation * -1.0;
-    else
-      rotationAngle = 0.0;
-
-    cosAngle = Math.cos(rotationAngle);
-    sinAngle = Math.sin(rotationAngle);
-
-    xpoints[i] = (ISC)((x + centerX) * cosAngle - (y + centerY) * sinAngle);
-    ypoints[i] = (ISC)((y + centerY) * sinAngle + (y + centerY) * cosAngle);
-  }
-
-  rebound();
-}
-
-void GeneticPolygon::renderBitmap() {
-  bitmap = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-  Graphics2D g2d = bitmap.createGraphics();
-  // g2d.setComposite(AlphaComposite.Clear);
-  // g2d.fillRect(0, 0, width, height);
-
-  g2d.setColor(color);
-  g2d.fillPolygon(this);
-
-  g2d.setColor(Color.BLACK);
-  g2d.drawPolygon(this);
-
-  // g2d.fillRect (0,0,width,height); //< This is to test to see if it draws
-  // anything.
-
-  // g2d.dispose();
-
-  // Now count the number of pixels.
-  ISC thisNumPixels = 0;
-
-  for (ISC x = 0; x < width; x++)
-    for (ISC y = 0; y < height; y++)
-      if (contains(x, y)) thisNumPixels++;
-
-  numPixels = thisNumPixels;
-
-  // JOptionPane.showMessageDialog(null, new JLabel (new ImageIcon (bitmap)),
-  // "About", JOptionPane.PLAIN_MESSAGE, null);
-}
-
-FPD GeneticPolygon::crossOver(FPD dominant, FPD recessive) {
-  /* Cross over scheme.
-      In real anamals, there are dominant and recessive genes. The dominant gene
-     is represented by the most significant digit and the recessive is
-     represented by the lest significant.
-      
-
-
-      Currently, the bitmasks were selected by intuition and should be
-     reevaluated.
-   */
-
-  if (dominant > 1.0f)
-    JOptionPane.showMessageDialog(null,
-                                  "Error! Dominant FPD was greater than 1!!!");
-  else if (dominant < 0.0f)
-    JOptionPane.showMessageDialog(null,
-                                  "Error! Dominant FPD was less than 0!!!");
-
-  if (recessive > 1.0f)
-    JOptionPane.showMessageDialog(null,
-                                  "Error! Recessive FPD was greater than 1!!!");
-  else if (recessive < 0.0f)
-    JOptionPane.showMessageDialog(null,
-                                  "Error! Recessive FPD was less than 0!!!");
-
-  AString dominantString = Double.ToString(dominant),
-          recessiveString = Double.ToString(recessive);
-
-  ISC dominantStringLength = dominantString.length(),
-      recessiveStringLength = recessiveString.length(),
-      longestStringLength = (dominantStringLength > recessiveStringLength)
-                                ? recessiveStringLength
-                                : recessiveStringLength,
-      i;
-
-  CHA[] newString = new CHA[longestStringLength];
-
-  BOL dominantTurn = true;
-
-  for (i = 2; i < longestStringLength; i++) {
-    if (dominantTurn) {
-      dominantTurn = false;
-
-      if (i < dominantStringLength)
-        newString[i] = dominantString.charAt(i);
-      else
-        newString[i] = '0';
-    } else  // resessiveTurn
-    {
-      dominantTurn = true;
-
-      if (i < recessiveStringLength)
-        newString[i] = recessiveString.charAt(i);
-      else
-        newString[i] = '0';
-    }
-  }
-
-  return Float.parseFloat(new AString(newString));
-}
-
-void GeneticPolygon::rotate() {
-  // function uses standard 2D rotation matrix.
-
-  FPD cosAngle = Math.cos((FPD)angle), sinAngle = Math.sin((FPD)angle), x, y;
-
-  for (ISC i = 0; i < this.npoints; i++) {
-    x = (FPD)xpoints[i];
-    y = (FPD)ypoints[i];
-
-    xpoints[i] = (ISC)(x * cosAngle - y * sinAngle);
-    ypoints[i] = (ISC)(x * sinAngle + y * cosAngle);
-  }
-  rebound();
-}
-
-FPD GeneticPolygon::boundBetween0and1(FPD inputValue) {
-  if (inputValue < 0)
-    return 0;
-
-  else if (inputValue > 1)
-    return 1;
-
-  return inputValue;
-}
-
-FPD GeneticPolygon::randomizeDouble(FPD inputValue) {
-  FPD scalar = 0.0, randomNumber = Math.random();
-
-  if (randomNumber < majorMutation) {
-    scalar = 1.0 + Math.random() * majorScalar;
-  } else
-    scalar = 1.0 + Math.random() * minorScalar;
-
-  FPD newValue = inputValue * scalar;
-
-  return newValue;
-}
-
-ISC GeneticPolygon::randomizeInt(ISC inputValue) {
-  if (inputValue < 0)
-    inputValue = inputValue * -1;  //< Chop off the negative values.
-
-  FPD scalar = 1.0 + (Math.random() * 2.0 - 1.0) * minorScalar;
-
-  ISC newValue = (ISC)((FPD)inputValue * scalar);
-
-  return newValue;
-}
-
-} //< namespace iGeek
+}  //< namespace PolygonWorld
+#endif  //< _iGeekPolygonWorldGeneticPolygonHXX

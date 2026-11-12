@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MazeWorld — native A* maze</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    background: #0d1117; color: #c9d1d9;
+    font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  header {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 14px; border-bottom: 1px solid #21262d; background: #161b22;
+  }
+  h1 { font-size: 14px; margin: 0; letter-spacing: .08em; text-transform: uppercase; color: #e6edf3; }
+  .badge { color: #8b949e; font-size: 12px; }
+  .controls { display: flex; gap: 8px; margin-left: auto; }
+  button {
+    background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px;
+    padding: 6px 12px; font: inherit; cursor: pointer;
+  }
+  button:hover { background: #30363d; }
+  button:active { transform: translateY(1px); }
+  main { position: relative; flex: 1; min-height: 0; }
+  canvas { display: block; width: 100%; height: 100%; }
+  footer {
+    display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+    padding: 8px 14px; border-top: 1px solid #21262d; background: #161b22;
+    font-size: 12px; color: #8b949e;
+  }
+  footer b { color: #e6edf3; font-weight: 600; }
+  #message { color: #58a6ff; }
+  #done { color: #3fb950; font-weight: 700; }
+  #error {
+    position: absolute; inset: 0; display: none; place-items: center;
+    padding: 24px; text-align: center; color: #ff7b72; background: #0d1117;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>MazeWorld</h1>
+  <span class="badge">native recursive-backtracker + A* / port 5006</span>
+  <div class="controls">
+    <button id="new" title="N">New maze</button>
+    <button id="reset" title="R">Reset</button>
+    <button id="solve" title="S">Solve (A*)</button>
+  </div>
+</header>
+<main>
+  <canvas id="view"></canvas>
+  <div id="error">WebGL is unavailable in this browser. The demo needs WebGL 1.</div>
+</main>
+<footer>
+  <span>seed <b id="seed">–</b></span>
+  <span>size <b id="size">–</b></span>
+  <span>steps <b id="steps">0</b></span>
+  <span>path <b id="path">–</b></span>
+  <span id="message">loading…</span>
+  <span id="done"></span>
+</footer>
+<script>
+"use strict";
+
+const canvas = document.getElementById("view");
+const gl = canvas.getContext("webgl", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+if (!gl) {
+  document.getElementById("error").style.display = "grid";
+  throw new Error("WebGL unavailable");
+}
+
+const VertexShader = `
+attribute vec2 aPos;
+attribute vec3 aColor;
+uniform vec2 uScale;
+uniform vec2 uOffset;
+varying vec3 vColor;
+void main() {
+  gl_Position = vec4(aPos * uScale + uOffset, 0.0, 1.0);
+  vColor = aColor;
+}`;
+
+const FragmentShader = `
+precision mediump float;
+varying vec3 vColor;
+void main() { gl_FragColor = vec4(vColor, 1.0); }`;
+
+function Compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error(gl.getShaderInfoLog(shader));
+  }
+  return shader;
+}
+
+const program = gl.createProgram();
+gl.attachShader(program, Compile(gl.VERTEX_SHADER, VertexShader));
+gl.attachShader(program, Compile(gl.FRAGMENT_SHADER, FragmentShader));
+gl.linkProgram(program);
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+  throw new Error(gl.getProgramInfoLog(program));
+}
+gl.useProgram(program);
+
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+const aPos = gl.getAttribLocation(program, "aPos");
+const aColor = gl.getAttribLocation(program, "aColor");
+const uScale = gl.getUniformLocation(program, "uScale");
+const uOffset = gl.getUniformLocation(program, "uOffset");
+const stride = 5 * 4;
+
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+gl.enableVertexAttribArray(aColor);
+gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, stride, 8);
+
+const Colors = {
+  wall:  [0.19, 0.21, 0.24],
+  path:  [0.12, 0.44, 0.92],
+  start: [0.25, 0.73, 0.31],
+  exit:  [0.82, 0.60, 0.13],
+  player:[0.93, 0.97, 1.00],
+};
+const FloorColor = [0.05, 0.07, 0.09];
+
+let state = null;
+let vertexCount = 0;
+
+function PushQuad(ax, ay, bx, by, color) {
+  // Two triangles for the rect [ax,ay]-[bx,by] in maze cell units.
+  const c = color;
+  const v = [
+    ax, ay, c[0], c[1], c[2],
+    bx, ay, c[0], c[1], c[2],
+    bx, by, c[0], c[1], c[2],
+    ax, ay, c[0], c[1], c[2],
+    bx, by, c[0], c[1], c[2],
+    ax, by, c[0], c[1], c[2],
+  ];
+  return v;
+}
+
+function BuildGeometry() {
+  if (!state) return;
+  const verts = [];
+  const grid = state.grid;
+  const cols = state.cols, rows = state.rows;
+  const px = state.player[0], py = state.player[1];
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const ch = grid[y * cols + x];
+      if (ch === ".") continue; // floor is the clear colour
+      const color = ch === "#" ? Colors.wall
+        : ch === "*" ? Colors.path
+        : ch === "S" ? Colors.start
+        : ch === "E" ? Colors.exit
+        : FloorColor;
+      verts.push(...PushQuad(x, y, x + 1, y + 1, color));
+    }
+  }
+  // Player overlays the cell it stands on (inset so the tile stays visible).
+  if (px !== undefined) {
+    verts.push(...PushQuad(px + 0.14, py + 0.14, px + 0.86, py + 0.86, Colors.player));
+  }
+  vertexCount = verts.length / 5;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
+  Draw();
+}
+
+function Resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, canvas.clientWidth * dpr);
+  const height = Math.max(1, canvas.clientHeight * dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  Draw();
+}
+
+function Draw() {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(FloorColor[0], FloorColor[1], FloorColor[2], 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (!state || !vertexCount) return;
+  const cell = Math.min(canvas.width / state.cols, canvas.height / state.rows) * 0.96;
+  const scaleX = 2 * cell / canvas.width;
+  const scaleY = -2 * cell / canvas.height;
+  gl.uniform2f(uScale, scaleX, scaleY);
+  gl.uniform2f(uOffset, -state.cols * cell / canvas.width,
+                          state.rows * cell / canvas.height);
+  gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+}
+
+function Paint() {
+  if (!state) return;
+  document.getElementById("seed").textContent = state.seed;
+  document.getElementById("size").textContent = state.cols + "x" + state.rows;
+  document.getElementById("steps").textContent = state.steps;
+  document.getElementById("path").textContent =
+    state.path_len === null ? "–" : state.path_len + " cells";
+  document.getElementById("message").textContent = state.message;
+  document.getElementById("done").textContent = state.done ? "EXIT REACHED" : "";
+  BuildGeometry();
+}
+
+let pending = false;
+
+async function Call(path, body) {
+  if (pending) return;
+  pending = true;
+  try {
+    const response = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: body === undefined ? {} : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("message").textContent = data.error || "request failed";
+      return;
+    }
+    state = data;
+    Paint();
+  } catch (error) {
+    document.getElementById("message").textContent = "network error: " + error.message;
+  } finally {
+    pending = false;
+  }
+}
+
+function Move(direction) { Call("/api/action", { action: "move", direction }); }
+function Solve() { Call("/api/action", { action: "solve" }); }
+function Reset() { Call("/api/action", { action: "reset" }); }
+function NewMaze() {
+  const seed = Math.floor(Math.random() * 9007199254740990) + 1;
+  Call("/api/new", { cols: 31, rows: 21, seed });
+}
+
+const KeyMap = {
+  ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right",
+  w: "up", s: "down", a: "left", d: "right",
+  W: "up", S: "down", A: "left", D: "right",
+};
+
+window.addEventListener("keydown", (event) => {
+  const direction = KeyMap[event.key];
+  if (direction) {
+    event.preventDefault();
+    Move(direction);
+    return;
+  }
+  if (event.key === "r" || event.key === "R") Reset();
+  if (event.key === "s" && !KeyMap[event.key]) Solve();
+  if (event.key === "n" || event.key === "N") NewMaze();
+});
+
+document.getElementById("new").addEventListener("click", NewMaze);
+document.getElementById("reset").addEventListener("click", Reset);
+document.getElementById("solve").addEventListener("click", Solve);
+window.addEventListener("resize", Resize);
+
+Resize();
+Call("/api/state");
+</script>
+</body>
+</html>

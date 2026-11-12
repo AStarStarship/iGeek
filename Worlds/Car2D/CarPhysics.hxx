@@ -28,7 +28,7 @@ inline BOL TCarStateValid(TCarState& s) {
   FPD values[7]; TCarPack(s, values);
   for (FPD value : values) if (!iGeek::IsFinite(value)) return false;
   return Absolute(s.x) <= 1e9 && Absolute(s.y) <= 1e9 && Absolute(s.heading) <= 1e6 &&
-      s.forward >= 0 && s.forward <= 1e4 && Absolute(s.lateral) <= 1e4 &&
+      Absolute(s.forward) <= 1e4 && Absolute(s.lateral) <= 1e4 &&
       Absolute(s.yaw_rate) <= 1e4 && Absolute(s.steer) <= 1.3 &&
       iGeek::IsFinite(s.time) && s.time >= 0 && s.time <= 1e12 &&
       iGeek::IsFinite(s.distance) && s.distance >= 0 && s.distance <= 1e15 &&
@@ -59,8 +59,9 @@ inline void TCarDerivative(const FPD* v, TCarParams& p,
     FPD u_tire = u * cs + side * sn, v_tire = side * cs - u * sn;
     FPD normal = 0.5 * p.mass * normal_g *
         (front ? p.rear_arm : p.front_arm) / length;
+    FPD gear = c.reverse > 0 ? -1 : 1;
     FPD fx = front ? 0 : 0.5 * TBikeClamp(c.throttle, 0, 1) *
-        TBikeMin(p.drive_force, p.drive_power / TBikeMax(v[3], 1.0));
+        TBikeMin(p.drive_force, p.drive_power / TBikeMax(Absolute(v[3]), 1.0)) * gear;
     fx -= 0.5 * TBikeClamp(c.brake, 0, 1) * p.brake_force *
         (front ? p.brake_bias : 1 - p.brake_bias) * tanh(u_tire / 0.05);
     // Low-speed slip chart is regularized at 2 m/s, not a hidden driver.
@@ -88,7 +89,7 @@ BOL TCarStep(TCarState& car, TCarParams& p,
     TCarControl& c, TCarContacts& contacts, FPD dt) {
   if (!iGeek::IsFinite(dt) || dt <= 0 || dt > 0.01 || !TCarParamsValid(p) ||
       !TCarStateValid(car) || !iGeek::IsFinite(c.steer) || !iGeek::IsFinite(c.throttle) ||
-      !iGeek::IsFinite(c.brake)) return false;
+      !iGeek::IsFinite(c.brake) || !iGeek::IsFinite(c.reverse)) return false;
   for (TVehicleSurface& s : contacts.wheels)
     if (!TBikeSurfaceValid(s) || s.friction > 2 || s.rolling > 1 ||
         Absolute(s.slope_x) > 1 || Absolute(s.slope_y) > 1) return false;
@@ -106,7 +107,8 @@ BOL TCarStep(TCarState& car, TCarParams& p,
     v[i] += dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
     if (!iGeek::IsFinite(v[i])) return false;
   }
-  v[3] = TBikeMax(v[3], 0);  // No reverse gear in this pilot.
+  // Reverse gear permits negative longitudinal speed; forward stays non-negative.
+  v[3] = c.reverse > 0 ? TBikeMax(v[3], -1e4) : TBikeMax(v[3], 0);
   TCarDerivative(v, p, c, contacts, work, utilization, ax, ay);
   if (!iGeek::IsFinite(utilization) || !iGeek::IsFinite(ax) || !iGeek::IsFinite(ay)) return false;
   TCarState next = car;
